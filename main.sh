@@ -25,8 +25,8 @@ fi
 
 done
 
-choice_file=$(cat $(pwd)/words/$choice)
-
+choice_file=$(cat $(pwd)/words/$choice | sort -R)
+[ -z $choice_file ] && clear && printf "File is empty exiting" && exit
 
 }
 
@@ -39,12 +39,18 @@ dialog --colors --title "\Z7\ZbMake a choice" --yes-label "Azerbajan" --no-label
 
 question() { \
 
-    for cf in $(printf '%s\n' "${choice_file}" | shuf) ; do
+    for cf in $choice_file ; do
+    
+        azeri=$(echo $cf | cut -d ':' -f 1) 
+        eng=$(echo $cf | cut -d ':' -f 2) 
+
+    for en in $eng ; do
+    for aze in $azeri ; do
     
     if [ $language = "english" ] ; then  
     word=$(printf '%s\n' "${cf}" | awk -F ":" '{print $2}')
-    question=$(printf "What does $word mean in Azerbajani\n")
-    correct=$(printf '%s\n' "${cf}" | awk -F ":" '{print $1}')
+    question=$(printf "What does $en mean in Azerbajani\n")
+    correct=$(printf '%s\n' "${en}" | awk -F ":" '{print $1}')
     else
     
     word=$(printf '%s\n' "${cf}" | awk -F ":" '{print $1}')
@@ -52,7 +58,7 @@ question() { \
     
     correct=$(printf '%s\n' "${cf}" | awk -F ":" '{print $2}')
     fi 
-    
+ 
     
     answer=$(dialog --colors --title "\Z7\ZbQuestion" --inputbox "\Z4$question" --output-fd 1 8 60  ) 
    
@@ -63,7 +69,8 @@ question() { \
          dialog --colors --title "\Z7\ZbIncorrect!!" --msgbox "\Z4Sadly your answer is incorrect\ncorrect answer is $correct" 16 60
 
     fi
-
+done
+done
 done
 }
 

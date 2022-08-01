@@ -1,4 +1,4 @@
-# languagelearning
+# Learn a new language
 This is a small script where I can use to practice a new language
 
 

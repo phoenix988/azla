@@ -1,15 +1,28 @@
 #!/bin/bash
+##############################################
+### WELCOME TO MY LANGUAGE LEARNING SCRIPT ###
+##############################################
 
+#Sets variable that controls
+#if you wanna keep running the script
+#after you are done with a session
 run="yes"
+
+#Sets the location of the Language files
 files=$(ls $(pwd)/words | sed 's/.txt//g' | nl )
+
+#Calculates the amount of correct answers
 correct_answers="0"
 incorrect_answers="0"
+
+#Welcome message function
 welcome() { \
 
 dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my script that will help you pratice azerbajani words and sentences\\n\\n-Karl" 16 60
 
 }
 
+#Function that let you choose which file you wanna use
 wordstolearn() { \
 
 while [ -z $choice ] ; do
@@ -32,6 +45,7 @@ choice_file=$(cat $(pwd)/words/$choice | sed -e 's/ /_/g' | sort -R)
 
 }
 
+#Function that ask you if you wanna write in English or Azerbajani
 azeri_or_english() { \
 
 dialog --colors --title "\Z7\ZbMake a choice" --yes-label "Azerbajan" --no-label "English" --yesno "\Z4Do you want your answers to be written in Azerbajani or English?" 8 60 && language=azerbajan || language=english
@@ -39,6 +53,8 @@ dialog --colors --title "\Z7\ZbMake a choice" --yes-label "Azerbajan" --no-label
 
 }
 
+#Function that will ask you the question
+#And determine if you answered correctly or not
 question() { \
 
     for cf in $choice_file ; do
@@ -80,6 +96,8 @@ done
 done
 }
 
+#Function that will ask you if you want to 
+#Do another session
 wanttotryagain() {
 
 
@@ -102,11 +120,14 @@ question
 
 wanttotryagain
 
+choice=""
+
 done
 
-
-
 clear
+
+#Will print your correct answers and incorrects answers 
+#All sessions combined
 echo -e "\e[1;32mCorrect answers : $correct_answers"
 
 echo -e "\e[1;31mIncorrect answers : $incorrect_answers"

@@ -19,7 +19,7 @@ choice=$(printf "\n$files" | grep $wordstolearn | awk '{print $NF}' | sed 's/$/.
 
 if [ -z $choice ] ; then
 
-dialog --colors --title "\Z7\ZbError!" --msgbox "\Z4Invalid value file doesn't exist" 16 60
+dialog --colors --title "\Z7\ZbError!" --msgbox "\Z4Invalid value file doesn't exist" 16 60 
 
 fi
 
@@ -79,7 +79,7 @@ welcome
 
 while [ $run = "yes" ] ; do
 
-wordstolearn
+wordstolearn 
 
 azeri_or_english 
 

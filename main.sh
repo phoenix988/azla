@@ -2,7 +2,8 @@
 
 run="yes"
 files=$(ls $(pwd)/words | sed 's/.txt//g' | nl )
-
+correct_answers="0"
+incorrect_answers="0"
 welcome() { \
 
 dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my script that will help you pratice azerbajani words and sentences\\n\\n-Karl" 16 60
@@ -25,14 +26,15 @@ fi
 
 done
 
-choice_file=$(cat $(pwd)/words/$choice | sort -R)
+choice_file=$(cat $(pwd)/words/$choice | sed -e 's/ /_/g' | sort -R)
+
 [ -z $choice_file ] && clear && printf "File is empty exiting" && exit
 
 }
 
 azeri_or_english() { \
 
-dialog --colors --title "\Z7\ZbMake a choice" --yes-label "Azerbajan" --no-label "English" --yesno "\Z4Do you want your answers to be written in Azerbajani or Enlish?" 8 60 && language=azerbajan || language=english
+dialog --colors --title "\Z7\ZbMake a choice" --yes-label "Azerbajan" --no-label "English" --yesno "\Z4Do you want your answers to be written in Azerbajani or English?" 8 60 && language=azerbajan || language=english
 
 
 }
@@ -41,31 +43,35 @@ question() { \
 
     for cf in $choice_file ; do
     
-        azeri=$(echo $cf | cut -d ':' -f 1) 
-        eng=$(echo $cf | cut -d ':' -f 2) 
+        azeri=$(echo $cf | awk -F ":" '{print $1}') 
+        eng=$(echo $cf | awk -F ":" '{print $2}') 
+
 
     for en in $eng ; do
     for aze in $azeri ; do
     
-    if [ $language = "english" ] ; then  
-    word=$(printf '%s\n' "${cf}" | awk -F ":" '{print $2}')
-    question=$(printf "What does $en mean in Azerbajani\n")
-    correct=$(printf '%s\n' "${en}" | awk -F ":" '{print $1}')
+    if [ $language = "azerbajan" ] ; then  
+    word=$(echo $en | sed -e 's/_/ /g')
+    question=$(printf "What is $word in Azerbajani?\n")
+    correct=$(echo $aze | sed -e 's/_/ /g')
     else
     
-    word=$(printf '%s\n' "${cf}" | awk -F ":" '{print $1}')
-    question=$(printf "What does $word mean in English\n")
+    word=$(echo $aze | sed -e 's/_/ /g')
+    question=$(printf "What is $word in English?\n")
     
-    correct=$(printf '%s\n' "${cf}" | awk -F ":" '{print $2}')
+    correct=$(echo $en | sed -e 's/_/ /g')
     fi 
  
     
     answer=$(dialog --colors --title "\Z7\ZbQuestion" --inputbox "\Z4$question" --output-fd 1 8 60  ) 
-   
-    if [ "$answer" = "$correct" ] ; then
     
+
+      if [ "$answer" = "$correct" ] ; then
+         
+          correct_answers=$(expr "$correct_answers" "+" "1") 
          dialog --colors --title "\Z7\ZbCorrect!!" --msgbox "\Z4Congratulations your answer was correct" 16 60
      else
+         incorrect_answers=$(expr "$incorrect_answers" "+" "1")
          dialog --colors --title "\Z7\ZbIncorrect!!" --msgbox "\Z4Sadly your answer is incorrect\ncorrect answer is $correct" 16 60
 
     fi
@@ -92,7 +98,15 @@ azeri_or_english
 
 question
  
+
+
 wanttotryagain
 
 done
 
+
+
+clear
+echo -e "\e[1;32mCorrect answers : $correct_answers"
+
+echo -e "\e[1;31mIncorrect answers : $incorrect_answers"

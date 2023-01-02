@@ -25,17 +25,21 @@ dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my scr
 #Function that let you choose which file you wanna use
 wordstolearn() { \
 
+
+clear
 while [ -z $choice ] ; do
 wordtext=$(printf "Choose which list you want to use for learning\nThese files are available:\n$files")
-wordstolearn=$(dialog --colors --title "\Z7\ZbWord list" --inputbox "\Z4$wordtext" --output-fd 1 8 60  ) 
+#wordstolearn=$(dialog --colors --title "\Z7\ZbWord list" --inputbox "\Z4$wordtext" --output-fd 1 8 60  ) 
+
+read -p "$wordtext :" wordstolearn
 
 choice=$(printf "\n$files" | grep $wordstolearn | awk '{print $NF}' | sed 's/$/.txt/g')
 
-if [ -z $choice ] ; then
-
-dialog --colors --title "\Z7\ZbError!" --msgbox "\Z4Invalid value file doesn't exist" 16 60 
-
-fi
+#if [ -z $choice ] ; then
+#
+#dialog --colors --title "\Z7\ZbError!" --msgbox "\Z4Invalid value file doesn't exist" 16 60 
+#
+#fi
 
 done
 

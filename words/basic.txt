@@ -1,10 +1,9 @@
 Sənin adın nədir:whats your name
-sizin adiniz nədir:whats your name
 bəs sənin adın nədir:and whats your name
 mənim adım:my name is
 şad oldum:nice to meet you
 necəsən:how are you
-sənin səviram:I love you
+səni səviram:I love you
 salam:hello
 minosh:Cute
 balam:Honey
@@ -13,10 +12,11 @@ he:yes
 yox:no
 çox sagol:Thank you
 helekik:goodbye
-tualet haradador:where is the toilet
+tualet hardadir:where is the toilet
 duz gedın:go straight
-sola Don:turn left
+sola don:turn left
 saga don:turn right
 avtobus va qatar:bus and train
 sabahın xeyir:good morning
 neynirsən:what are you doing
+öpurem sen:I kiss you

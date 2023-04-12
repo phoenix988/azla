@@ -5,6 +5,7 @@
 * TABLE OF CONTENTS
 - [[About][About My Project]]
 - [[Script][Script]]
+- [[suffix][Suffix]]
 - [[Example Words][Examples]]
 
 
@@ -30,6 +31,9 @@ And you need to translate it
 *** Script
 #+CAPTION: About my script included in this project
 
+
+*** Suffix
+#+CAPTION: About the rules of suffix in azerbajani language
 
 
 *** Example Words

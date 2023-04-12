@@ -10,7 +10,7 @@
 
 
 ** Word Section
-- [[words/BASIC/BASICS1.org][BASICS1]]
+- [[words/BASIC/BASICS.org][BASICS]]
 - [[words/BASIC/GREETINGS.org][GREETINGS]]
 - [[words/MONTHS/MONTHS.org][MONTHS]]
 - [[words/MONTHS/WEEKDAYS.org][WEEKDAYS]]

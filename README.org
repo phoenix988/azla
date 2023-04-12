@@ -4,7 +4,7 @@
 
 * TABLE OF CONTENTS
 - [[About][About My Project]]
-- [[azerbajan.org][Examples]]
+- [[Example Words][Examples]]
 
 
 ** Azerbajan Word Sections
@@ -14,19 +14,30 @@
 - [[words/BASIC][VERBS]]
 
 *** Jump Directly To a Vocabulary List
-- [[words/BASIC/BASICS1][BASICS1]]
+- [[words/BASIC/BASICS1.org][BASICS1]]
+- [[words/MONTHS/MONTHS.org][MONTHS]]
+- [[words/FAMILY/MEMBERS.org][FAMILY_MEMBERS]]
+- [[words/VERBS/VERBS-INFINITE.org][VERBS_INFINITE]]
 
 
 
 
 
 
+*** About
+#+CAPTION: ABOUT
+
+Some Important Azerbajani Vocabluary words to know that will help me learn the azerbajani language
+There is also a script that kinda works like an exam and it will give you a sentence in english or azerbajani.
+And you need to translate it
 
 
 
+*** Example Words
 
+**** BASICS
 
-**** BASICS1
+This is some basics words in azerbajani
 
  | Azerbajani        | English         |
  |-------------------+-----------------|
@@ -51,6 +62,8 @@
 
 **** MONTHS
 
+Months in Azeerbajani
+
 | Azerbajani | English   |
 |------------+-----------|
 | Ay         | Month     |
@@ -68,7 +81,7 @@
 | Dekabr     | December  |
 | Tarix      | Date      |
 
-| Examples Azerbajani        | English Version        |
+| Example Usage Azerbajani   | English Version        |
 |----------------------------+------------------------|
 | Bir sentyabr               | September 1            |
 | Fevralın on beşi           | February 15            |
@@ -80,6 +93,8 @@
 
 
 **** FAMILY
+
+Family words in azerbajani
 
 | Azerbajani  | English       |
 |-------------+---------------|
@@ -101,6 +116,9 @@
 
 
 **** VERBS_INFINITE
+
+ Verbs in infinite form in azerbajani
+
 | Azerbajani  | English       |
 |-------------+---------------|
 | Bağlamaq    | to close      |

@@ -3,18 +3,14 @@
 #+AUTHOR: Karl Fredin
 
 * TABLE OF CONTENT
-** Verbs
 - [[Present tense][Present Tense]]
 - [[Past Tense][Past Tense]]
 - [[Future Tense][Future Tense]]
 
-** Nouns Cases
 
+- Personal Pronunce
 
-** Personal Pronunce
-
-
-** Language Cases
+- Language Cases
 
 
 
@@ -38,4 +34,4 @@
 
 
 
-*** Languaage Cases
+*** Language Cases

@@ -49,18 +49,21 @@ word_list() { \
 clear
 
 # Keeps running if the choice is empty
-while [ -z $choice ] ; do
+while [ -z "$choice" ] ; do
 
 # Modify This in order to change the text
-wordtext=$(tput setaf $purple && printf "Choose which list you want to use for learning\nThese files are available:\n$files")
+wordtext=$(tput setaf $purple && printf "Choose which list you want to use for learning\nThese files are available:\n\n$files")
 
 # Prompt you to choose an org file document to practise from
-read -p "$wordtext :" wordstolearn
+read -p "$wordtext : " wordstolearn
 
-choice=$(printf "\n$files" | grep $wordstolearn | awk '{print $NF}' | sed 's/$/.org/g')
+choice=$(printf "\n$files" | grep $wordstolearn | awk '{print $NF}' | sed 's/$/.org/g' | tail -n1)
+
 
 clear
+
 done
+
 
 # finds the file inside the word directory
 choice_file=$(find $(pwd) -iname "$choice"  )

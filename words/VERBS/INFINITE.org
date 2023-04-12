@@ -32,5 +32,4 @@
 | Bilmək       | to know       |
 | Yumaq       | to wash       |
 | Olmaq       | to be         |
-| Alğamaq     | to cry        |
-| Qulaq asmaq | to listen     |
+| Ağlamaq     | to cry        |

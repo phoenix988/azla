@@ -1,6 +1,0 @@
-Isti:hot
-Soyuq:cold
-Yemək:food
-Ağız:mouth
-Burun:nose
-Göz:eye

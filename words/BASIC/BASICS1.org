@@ -1,27 +1,53 @@
-#+title: Azerbajani Vocabulary
-#+DESCRIPTION: azerbajani vocabulary words
-#+AUTHOR: Karl Fredin
-
-
+#+title| Azerbajani Vocabulary
+#+DESCRIPTION| azerbajani vocabulary words
+#+AUTHOR| Karl Fredin
 
 
 *** BASICS1
 
- | Azerbajani        | English         |
- |-------------------+-----------------|
- | Kino              | Movie           |
- | Ügurlar           | Good Luck       |
- | Xoş gördük        | Good to see you |
- | Xeyr              | No              |
- | Kimi              | Who             |
- | Dəftər             | Notebook        |
- | Kilsə              | Church          |
- | Edec              | Do              |
- | Ola biler         | Maybe           |
- | Var               | There is        |
- | Hara              | Where           |
- | Hansı             | Which           |
- | Sənin nə yaşin var | How old are you |
- | Tez               | Early/Fast      |
- | Gec               | Late            |
- | Təzliklə           | Soon            |
+ | Azerbajani          | English             |
+ |---------------------+---------------------|
+ | Kino                | Movie               |
+ | Ügurlar             | Good Luck           |
+ | Xoş gördük          | Good to see you     |
+ | Xeyr                | No                  |
+ | Kimi                | Who                 |
+ | Dəftər               | Notebook            |
+ | Kilsə                | Church              |
+ | Edec                | Do                  |
+ | Ola biler           | Maybe               |
+ | Var                 | There is            |
+ | Hara                | Where               |
+ | Hansı               | Which               |
+ | Sənin nə yaşin var   | How old are you     |
+ | Tez                 | Early/Fast          |
+ | Gec                 | Late                |
+ | Təzliklə             | Soon                |
+ | Soyuq               | Cold                |
+ | Isti                | Hot                 |
+ | Yemək                | Food                |
+ | Ağız                | Mouth               |
+ | Burun               | Nose                |
+ | Göz                 | Eye                 |
+ | Sənin adın nədir     | whats your name     |
+ | bəs sənin adın nədir | and whats your name |
+ | mənim adım           | my name is          |
+ | şad oldum           | nice to meet you    |
+ | necəsən              | how are you         |
+ | səni səviram         | I love you          |
+ | salam               | hello               |
+ | minosh              | Cute                |
+ | balam               | Honey               |
+ | Yaxşiyam            | I am fine           |
+ | he                  | yes                 |
+ | yox                 | no                  |
+ | çox sagol           | Thank you           |
+ | helekik             | goodbye             |
+ | tualet hardadir     | where is the toilet |
+ | duz gedın           | go straight         |
+ | sola don            | turn left           |
+ | saga don            | turn right          |
+ | avtobus va qatar    | bus and train       |
+ | sabahın xeyir       | good morning        |
+ | neynirsən            | what are you doing  |
+ | öpurem sen          | I kiss you          |

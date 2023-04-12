@@ -4,6 +4,7 @@
 
 * TABLE OF CONTENTS
 - [[About][About My Project]]
+- [[Script][Script]]
 - [[Example Words][Examples]]
 
 
@@ -24,6 +25,10 @@
 Some Important Azerbajani Vocabluary words to know that will help me learn the azerbajani language
 There is also a script that kinda works like an exam and it will give you a sentence in english or azerbajani.
 And you need to translate it
+
+
+*** Script
+#+CAPTION: About my script included in this project
 
 
 

@@ -1,2 +1,0 @@
-bir:one
-iki:two

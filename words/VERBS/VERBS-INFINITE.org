@@ -8,6 +8,7 @@
 | Bağlamaq    | to close      |
 | Başa duşmək  | to understand |
 | Fikirləşmək  | to think      |
+| Başlamaq    | to start      |
 | Qurtamaq    | to end        |
 | Qulaq asmaq | to listen     |
 | Yazmaq      | to write      |
@@ -32,3 +33,4 @@
 | Yumaq       | to wash       |
 | Olmaq       | to be         |
 | Alğamaq     | to cry        |
+| Qulaq asmaq | to listen     |

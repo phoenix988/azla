@@ -1,12 +1,132 @@
-# Learn a new language
-This is a small script I made in order to help me learn Azerbajani
+#+title: Learn Azerbajani
+#+DESCRIPTION: azerbajani vocabulary words
+#+AUTHOR: Karl Fredin
 
-In order for this script to work you need to have language files
-located in the words folder in my repository
-The right format for this to properly work is.
+* TABLE OF CONTENTS
+- [[About][About My Project]]
+- [[azerbajan.org][Examples]]
 
-Azerbajani:English
 
-Make sure that it is seperated by a semicolum otherwise it wont work
-I have some language repositories added already but feel free to add your own
+** Azerbajan Word Sections
+- [[words/BASIC/][BASIC]]
+- [[words/FAMILY][FAMILY]]
+- [[words/MONTHS][MONTHS]]
+- [[words/BASIC][VERBS]]
 
+*** Jump Directly To a Vocabulary List
+- [[words/BASIC/BASICS1][BASICS1]]
+
+
+
+
+
+
+
+
+
+
+
+**** BASICS1
+
+ | Azerbajani        | English         |
+ |-------------------+-----------------|
+ | Kino              | Movie           |
+ | Ügurlar           | Good Luck       |
+ | Xoş gördük        | Good to see you |
+ | Xeyr              | No              |
+ | Kimi              | Who             |
+ | Dəftər             | Notebook        |
+ | Kilsə              | Church          |
+ | Edec              | Do              |
+ | Ola biler         | Maybe           |
+ | Var               | There is        |
+ | Hara              | Where           |
+ | Hansı             | Which           |
+ | Sənin nə yaşin var | How old are you |
+ | Tez               | Early/Fast      |
+ | Gec               | Late            |
+ | Təzliklə           | Soon            |
+
+
+
+**** MONTHS
+
+| Azerbajani | English   |
+|------------+-----------|
+| Ay         | Month     |
+| Yanvar     | January   |
+| Fevral     | February  |
+| Mart       | March     |
+| Aprel      | April     |
+| May        | May       |
+| Ijun       | June      |
+| iyul       | July      |
+| Avqust     | August    |
+| Sentyabr   | September |
+| Oktyabr    | October   |
+| Noyabr     | November  |
+| Dekabr     | December  |
+| Tarix      | Date      |
+
+| Examples Azerbajani        | English Version        |
+|----------------------------+------------------------|
+| Bir sentyabr               | September 1            |
+| Fevralın on beşi           | February 15            |
+| Yanvarın iyirmi üçü        | Januray 23             |
+| first                      | birinci                |
+| Sizin ad gününüz nə vaxtdir | When is your birthday  |
+| Bu gün ayın neçəsidir       | What is the date today |
+
+
+
+**** FAMILY
+
+| Azerbajani  | English       |
+|-------------+---------------|
+| Bacı        | Sister        |
+| Qardaş      | Brother       |
+| Uşaq        | Child         |
+| Nənə         | Grandmother   |
+| Baba        | Grandfather   |
+| Bibi        | Aunt          |
+| Əmi         | Uncle         |
+| Xalaqızı    | Cousin        |
+| Qayınata    | Father-in-law |
+| Qayınana    | Mother-in-law |
+| Sevgili     | Girlfriend    |
+| Ailə         | Family        |
+| nişanlı qız | Fiance        |
+| nişanlə      | Engaged       |
+
+
+
+**** VERBS_INFINITE
+| Azerbajani  | English       |
+|-------------+---------------|
+| Bağlamaq    | to close      |
+| Başa duşmək  | to understand |
+| Fikirləşmək  | to think      |
+| Qurtamaq    | to end        |
+| Qulaq asmaq | to listen     |
+| Yazmaq      | to write      |
+| Baxmaq      | to look       |
+| Göturmaq    | to take       |
+| Bilmək       | to know       |
+| Getmək       | to go         |
+| Gəlmək       | to come       |
+| Işlemək      | to work       |
+| Öyrəmək      | to learn      |
+| Oxumaq      | to read       |
+| Yemək        | to eat        |
+| Içmək        | to drink      |
+| Açmaq       | to open       |
+| Vermək       | to give       |
+| Görmək       | to see        |
+| Oynamaq     | to play       |
+| Oyanmaq     | to wake up    |
+| Sincəlmeq    | to rest       |
+| Almaq       | to buy        |
+| Bilmək       | to know       |
+| Yumaq       | to wash       |
+| Olmaq       | to be         |
+| Alğamaq     | to cry        |

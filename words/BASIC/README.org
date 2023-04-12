@@ -3,4 +3,4 @@
 #+AUTHOR: Karl Fredin
 
 * TABLE OF CONTENTS
-- [[BASICS1][BASICS1]]
+- [[BASICS1.org][BASICS1]]

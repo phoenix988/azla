@@ -2,17 +2,13 @@
 #+DESCRIPTION: azerbajani vocabulary words
 #+AUTHOR: Karl Fredin
 
-* INFORMATION
-- [[ABOUT THIS FILE][ABOUT]]
-- [[words/BASIC/BASIC1][BASIC]]
 
 * TABLE OF CONTENTS
-# TABLE_START
+- [[words/BASIC/BASIC1][BASIC]]
 - [[BASICS1][BASICS1]]
 - [[FAMILY][FAMILY]]
 - [[MONTHS][MONTHS]]
 - [[VERBS_INFINITE][VERBS_INFINITE]]
-# TABLE_END
 
 
 * ABOUT THIS FILE
@@ -22,9 +18,8 @@ Some Important Azerbajani Vocabluary words to know that will help me learn the a
 There is also a script that kinda works like an exam and it will give you a sentence in english or azerbajani.
 And you need to translate it
 
-*** BASICS1
 
-# BASICS1_START
+*** BASICS1
 
  | Azerbajani        | English         |
  |-------------------+-----------------|
@@ -45,7 +40,6 @@ And you need to translate it
  | Gec               | Late            |
  | Təzliklə           | Soon            |
 
-# BASICS1_END
 
 
 *** MONTHS

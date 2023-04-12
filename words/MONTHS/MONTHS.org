@@ -1,0 +1,27 @@
+#+title: Months
+#+DESCRIPTION: Months in azerbajani
+#+AUTHOR: Karl Fredin
+
+
+| Azerbajani | English   |
+|------------+-----------|
+| Ay         | Month     |
+| Yanvar     | January   |
+| Fevral     | February  |
+| Mart       | March     |
+| Aprel      | April     |
+| May        | May       |
+| Ijun       | June      |
+| iyul       | July      |
+| Avqust     | August    |
+| Sentyabr   | September |
+| Oktyabr    | October   |
+| Noyabr     | November  |
+| Dekabr     | December  |
+| Tarix      | Date      |
+| Bir sentyabr               | September 1            |
+| Fevralın on beşi           | February 15            |
+| Yanvarın iyirmi üçü        | Januray 23             |
+| first                      | birinci                |
+| Sizin ad gününüz nə vaxtdir | When is your birthday  |
+| Bu gün ayın neçəsidir       | What is the date today |

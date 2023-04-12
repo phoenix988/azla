@@ -1,0 +1,11 @@
+#+title: Weekdays
+#+DESCRIPTION: Day of the week words in azerbajani
+#+AUTHOR: Karl Fredin
+
+| Azerbajani     | English   |
+|----------------+-----------|
+| Dünən           | Yesterday |
+| Bu gün         | Today     |
+| Sabah          | Tomorrow  |
+| birinci gündür | Monday    |
+| Bazar gün      | Sunday    |

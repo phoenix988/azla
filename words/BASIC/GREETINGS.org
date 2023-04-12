@@ -1,0 +1,33 @@
+#+title: Greetings
+#+DESCRIPTION: azerbajani vocabulary words
+#+AUTHOR: Karl Fredin
+
+
+| Azerbajani          | English          |
+|---------------------+------------------|
+| Necə gedir?          | How's going on   |
+| günün necə idi?      | How was your day |
+| sağol               | Good bye         |
+| görüşərik            | We will meet     |
+| sonra görüşərik      | see you later    |
+| sabahadək            | until tomorrow   |
+| sabahın(iz) xeyir   | Good Morning     |
+| Hər vaxtin xeyir     | Good day         |
+| günortan xeyir      | good afternoon   |
+| axşamın xeyir       | good evening     |
+| Gecəen xeyrə         | Good night       |
+| buyur               | you're welcome   |
+| nə                   | what             |
+| necə                 | how              |
+| gecə                 | night            |
+| sabah               | tomorrow         |
+| səhər                | morning          |
+| gün                 | day              |
+| yaxşı               | okay, good       |
+| necə                 | how              |
+| əla                  | perfect          |
+| elə                  | just because     |
+| idi                 | was              |
+| hara                | where            |
+| ora                 | there            |
+| bura                | here             |

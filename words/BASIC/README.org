@@ -1,6 +1,0 @@
-#+title: Azerbajani Vocabulary
-#+DESCRIPTION: azerbajani vocabulary words
-#+AUTHOR: Karl Fredin
-
-* TABLE OF CONTENTS
-- [[BASICS1.org][BASICS1]]

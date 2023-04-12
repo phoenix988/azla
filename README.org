@@ -62,7 +62,7 @@ This is some basics words in azerbajani
 
 **** MONTHS
 
-Months in Azeerbajani
+Months in Azerbajani
 
 | Azerbajani | English   |
 |------------+-----------|
@@ -80,9 +80,6 @@ Months in Azeerbajani
 | Noyabr     | November  |
 | Dekabr     | December  |
 | Tarix      | Date      |
-
-| Example Usage Azerbajani   | English Version        |
-|----------------------------+------------------------|
 | Bir sentyabr               | September 1            |
 | Fevralın on beşi           | February 15            |
 | Yanvarın iyirmi üçü        | Januray 23             |

@@ -1,0 +1,34 @@
+#+title: Verbs Infinite
+#+DESCRIPTION: azerbajani verbs in infinite form
+#+AUTHOR: Karl Fredin
+
+*** VERBS_INFINITE
+| Azerbajani  | English       |
+|-------------+---------------|
+| Bağlamaq    | to close      |
+| Başa duşmək  | to understand |
+| Fikirləşmək  | to think      |
+| Qurtamaq    | to end        |
+| Qulaq asmaq | to listen     |
+| Yazmaq      | to write      |
+| Baxmaq      | to look       |
+| Göturmaq    | to take       |
+| Bilmək       | to know       |
+| Getmək       | to go         |
+| Gəlmək       | to come       |
+| Işlemək      | to work       |
+| Öyrəmək      | to learn      |
+| Oxumaq      | to read       |
+| Yemək        | to eat        |
+| Içmək        | to drink      |
+| Açmaq       | to open       |
+| Vermək       | to give       |
+| Görmək       | to see        |
+| Oynamaq     | to play       |
+| Oyanmaq     | to wake up    |
+| Sincəlmeq    | to rest       |
+| Almaq       | to buy        |
+| Bilmək       | to know       |
+| Yumaq       | to wash       |
+| Olmaq       | to be         |
+| Alğamaq     | to cry        |

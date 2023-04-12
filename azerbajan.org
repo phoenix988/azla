@@ -1,11 +1,12 @@
-#+title: Aerbajani Vocablurary
-#+DESCRIPTION: azerbajani vocabluary words
+#+title: Azerbajani Vocabulary
+#+DESCRIPTION: azerbajani vocabulary words
 #+AUTHOR: Karl Fredin
 
-* INFORMATION :toc: :include all
+* INFORMATION
 - [[ABOUT THIS FILE][ABOUT]]
+- [[words/BASIC/BASIC1][BASIC]]
 
-* TABLE OF CONTENTS :toc:     :include all
+* TABLE OF CONTENTS
 # TABLE_START
 - [[BASICS1][BASICS1]]
 - [[FAMILY][FAMILY]]

@@ -1,0 +1,27 @@
+#+title: Azerbajani Vocabulary
+#+DESCRIPTION: azerbajani vocabulary words
+#+AUTHOR: Karl Fredin
+
+
+
+
+*** BASICS1
+
+ | Azerbajani        | English         |
+ |-------------------+-----------------|
+ | Kino              | Movie           |
+ | Ügurlar           | Good Luck       |
+ | Xoş gördük        | Good to see you |
+ | Xeyr              | No              |
+ | Kimi              | Who             |
+ | Dəftər             | Notebook        |
+ | Kilsə              | Church          |
+ | Edec              | Do              |
+ | Ola biler         | Maybe           |
+ | Var               | There is        |
+ | Hara              | Where           |
+ | Hansı             | Which           |
+ | Sənin nə yaşin var | How old are you |
+ | Tez               | Early/Fast      |
+ | Gec               | Late            |
+ | Təzliklə           | Soon            |

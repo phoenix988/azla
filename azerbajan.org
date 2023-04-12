@@ -1,0 +1,130 @@
+#+title: Aerbajani Vocablurary
+#+DESCRIPTION: azerbajani vocabluary words
+#+AUTHOR: Karl Fredin
+
+* INFORMATION :toc: :include all
+- [[ABOUT THIS FILE][ABOUT]]
+
+* TABLE OF CONTENTS :toc:     :include all
+# TABLE_START
+- [[BASICS1][BASICS1]]
+- [[FAMILY][FAMILY]]
+- [[MONTHS][MONTHS]]
+- [[VERBS_INFINITE][VERBS_INFINITE]]
+# TABLE_END
+
+
+* ABOUT THIS FILE
+#+CAPTION: ABOUT
+
+Some Important Azerbajani Vocabluary words to know that will help me learn the azerbajani language
+There is also a script that kinda works like an exam and it will give you a sentence in english or azerbajani.
+And you need to translate it
+
+*** BASICS1
+
+# BASICS1_START
+
+ | Azerbajani        | English         |
+ |-------------------+-----------------|
+ | Kino              | Movie           |
+ | Ügurlar           | Good Luck       |
+ | Xoş gördük        | Good to see you |
+ | Xeyr              | No              |
+ | Kimi              | Who             |
+ | Dəftər             | Notebook        |
+ | Kilsə              | Church          |
+ | Edec              | Do              |
+ | Ola biler         | Maybe           |
+ | Var               | There is        |
+ | Hara              | Where           |
+ | Hansı             | Which           |
+ | Sənin nə yaşin var | How old are you |
+ | Tez               | Early/Fast      |
+ | Gec               | Late            |
+ | Təzliklə           | Soon            |
+
+# BASICS1_END
+
+
+*** MONTHS
+
+| Azerbajani | English   |
+|------------+-----------|
+| Ay         | Month     |
+| Yanvar     | January   |
+| Fevral     | February  |
+| Mart       | March     |
+| Aprel      | April     |
+| May        | May       |
+| Ijun       | June      |
+| iyul       | July      |
+| Avqust     | August    |
+| Sentyabr   | September |
+| Oktyabr    | October   |
+| Noyabr     | November  |
+| Dekabr     | December  |
+| Tarix      | Date      |
+
+| Examples Azerbajani        | English Version        |
+|----------------------------+------------------------|
+| Bir sentyabr               | September 1            |
+| Fevralın on beşi           | February 15            |
+| Yanvarın iyirmi üçü        | Januray 23             |
+| first                      | birinci                |
+| Sizin ad gününüz nə vaxtdir | When is your birthday  |
+| Bu gün ayın neçəsidir       | What is the date today |
+
+
+
+*** FAMILY
+
+| Azerbajani  | English       |
+|-------------+---------------|
+| Bacı        | Sister        |
+| Qardaş      | Brother       |
+| Uşaq        | Child         |
+| Nənə         | Grandmother   |
+| Baba        | Grandfather   |
+| Bibi        | Aunt          |
+| Əmi         | Uncle         |
+| Xalaqızı    | Cousin        |
+| Qayınata    | Father-in-law |
+| Qayınana    | Mother-in-law |
+| Sevgili     | Girlfriend    |
+| Ailə         | Family        |
+| nişanlı qız | Fiance        |
+| nişanlə      | Engaged       |
+
+
+
+*** VERBS_INFINITE
+| Azerbajani  | English       |
+|-------------+---------------|
+| Bağlamaq    | to close      |
+| Başa duşmək  | to understand |
+| Fikirləşmək  | to think      |
+| Qurtamaq    | to end        |
+| Qulaq asmaq | to listen     |
+| Yazmaq      | to write      |
+| Baxmaq      | to look       |
+| Göturmaq    | to take       |
+| Bilmək       | to know       |
+| Getmək       | to go         |
+| Gəlmək       | to come       |
+| Işlemək      | to work       |
+| Öyrəmək      | to learn      |
+| Oxumaq      | to read       |
+| Yemək        | to eat        |
+| Içmək        | to drink      |
+| Açmaq       | to open       |
+| Vermək       | to give       |
+| Görmək       | to see        |
+| Oynamaq     | to play       |
+| Oyanmaq     | to wake up    |
+| Sincəlmeq    | to rest       |
+| Almaq       | to buy        |
+| Bilmək       | to know       |
+| Yumaq       | to wash       |
+| Olmaq       | to be         |
+| Alğamaq     | to cry        |

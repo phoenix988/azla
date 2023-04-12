@@ -1,0 +1,41 @@
+#+title: Rules of Suffixes
+#+DESCRIPTION: This will explain all the suffixes in azerbajani language plus noun cases
+#+AUTHOR: Karl Fredin
+
+* TABLE OF CONTENT
+** Verbs
+- [[Present tense][Present Tense]]
+- [[Past Tense][Past Tense]]
+- [[Future Tense][Future Tense]]
+
+** Nouns Cases
+
+
+** Personal Pronunce
+
+
+** Language Cases
+
+
+
+*** Verbs
+
+| Present Tense | Past Tense | Future Tense |
+|---------------+------------+--------------|
+| ir  ır        | di  dı     | acaq         |
+| ür  ur        | dü  du     | əcəq          |
+
+
+
+
+*** Nouns Cases
+*** Personal Pronunce
+
+| mən    | sən      | o   | biz    | siz     | onlar  |
+|-------+---------+-----+--------+---------+--------|
+| am, əm | san, sən | dir | ik, ık | siz,sız | lar,lər |
+
+
+
+
+*** Languaage Cases

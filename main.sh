@@ -1,137 +1,204 @@
 #!/bin/bash
+##____  _                      _
+#|  _ \| |__   ___   ___ _ __ (_)_  __
+#| |_) | '_ \ / _ \ / _ \ '_ \| \ \/ /
+#|  __/| | | | (_) |  __/ | | | |>  <
+#|_|   |_| |_|\___/ \___|_| |_|_/_/\_\
+#
+# -*- coding: utf-8 -*-
 ##############################################
 ### WELCOME TO MY LANGUAGE LEARNING SCRIPT ###
 ##############################################
+#######################################################
+#######################################################
+###### This is gonna help me practice azerbajani ######
+#######################################################
 
-#Sets variable that controls
-#if you wanna keep running the script
-#after you are done with a session
-run="yes"
+# Sets variable that controls
+# if you wanna keep running the script
+# after you are done with a session
+run="no"
 
-#Sets the location of the Language files
-files=$(ls $(pwd)/words | sed 's/.txt//g' | nl )
+# Sets the location of the Language files
+files=$(ls -R $(pwd)/words | grep org | sed 's/.org//g' | nl )
 
-#Calculates the amount of correct answers
+purple="5"
+blue="12"
+
+
+files=$(tput setaf $blue && echo "$files")
+
+
+# Calculates the amount of correct answers
 correct_answers="0"
 incorrect_answers="0"
 
-#Welcome message function
+# Welcome message function
 welcome() { \
 
 dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my script that will help you pratice azerbajani words and sentences\\n\\n-Karl" 16 60
 
 }
 
-#Function that let you choose which file you wanna use
-wordstolearn() { \
+
+
+# Function that let you choose which file you wanna use
+word_list() { \
 
 
 clear
-while [ -z $choice ] ; do
-wordtext=$(printf "Choose which list you want to use for learning\nThese files are available:\n$files")
-#wordstolearn=$(dialog --colors --title "\Z7\ZbWord list" --inputbox "\Z4$wordtext" --output-fd 1 8 60  ) 
 
+# Keeps running if the choice is empty
+while [ -z $choice ] ; do
+
+# Modify This in order to change the text
+wordtext=$(tput setaf $purple && printf "Choose which list you want to use for learning\nThese files are available:\n$files")
+
+# Prompt you to choose an org file document to practise from
 read -p "$wordtext :" wordstolearn
 
-choice=$(printf "\n$files" | grep $wordstolearn | awk '{print $NF}' | sed 's/$/.txt/g')
+choice=$(printf "\n$files" | grep $wordstolearn | awk '{print $NF}' | sed 's/$/.org/g')
 
-#if [ -z $choice ] ; then
-#
-#dialog --colors --title "\Z7\ZbError!" --msgbox "\Z4Invalid value file doesn't exist" 16 60 
-#
-#fi
-
+clear
 done
 
-choice_file=$(cat $(pwd)/words/$choice | sed -e 's/ /_/g' | sort -R)
+# finds the file inside the word directory
+choice_file=$(find $(pwd) -iname "$choice"  )
 
+# will exit if it can't find the file
 [ -z $choice_file ] && clear && printf "File is empty exiting" && exit
 
 }
 
 #Function that ask you if you wanna write in English or Azerbajani
-azeri_or_english() { \
+language() { \
 
 dialog --colors --title "\Z7\ZbMake a choice" --yes-label "Azerbajan" --no-label "English" --yesno "\Z4Do you want your answers to be written in Azerbajani or English?" 8 60 && language=azerbajan || language=english
 
+}
+
+
+# Format the text
+# running sed a bunch of times to get a clean output
+format() {
+
+
+choice_file=$(cat "$choice_file" | grep -v Azer | sed -e 's/-//g' -e 's/+//g' | grep -v "^#" | sed 's/|//' | sed '/^[[:space:]]*$/d'   )
+choice_file=$(echo "$choice_file" | sed 's/ | /:/g' | sed -e 's/|//g' -e 's/main.sh//g' -e 's/main-new.sh//g' -e 's/README.org//g' -e 's/suffix//g' -e 's/words//g' -e "s|$wordstolearn:||g" -e "s/BASICS//g")
+
+
+clear
+
+
+choice_file=$(echo "$choice_file" | sed -e 's/ /_/g')
 
 }
 
-#Function that will ask you the question
-#And determine if you answered correctly or not
+
+
+# Function that will ask you the question
+# And determine if you answered correctly or not
 question() { \
 
+
+    clear
+
     for cf in $choice_file ; do
-    
-        azeri=$(echo $cf | awk -F ":" '{print $1}') 
+
+        azeri=$(echo $cf | awk -F ":" '{print $1}')
         eng=$(echo $cf | awk -F ":" '{print $2}') 
 
 
     for en in $eng ; do
     for aze in $azeri ; do
     
-    if [ $language = "azerbajan" ] ; then  
-    word=$(echo $en | sed -e 's/_/ /g')
-    question=$(printf "What is $word in Azerbajani?\n")
-    correct=$(echo $aze | sed -e 's/_/ /g')
-    else
-    
-    word=$(echo $aze | sed -e 's/_/ /g')
-    question=$(printf "What is $word in English?\n")
-    
-    correct=$(echo $en | sed -e 's/_/ /g')
-    fi 
- 
-    
-    answer=$(dialog --colors --title "\Z7\ZbQuestion" --inputbox "\Z4$question" --output-fd 1 8 60  ) 
-    
+    if [ $language = "azerbajan" ] ; then
 
-      if [ "$answer" = "$correct" ] ; then
-         
-          correct_answers=$(expr "$correct_answers" "+" "1") 
-         dialog --colors --title "\Z7\ZbCorrect!!" --msgbox "\Z4Congratulations your answer was correct" 16 60
-     else
-         incorrect_answers=$(expr "$incorrect_answers" "+" "1")
-         dialog --colors --title "\Z7\ZbIncorrect!!" --msgbox "\Z4Sadly your answer is incorrect\ncorrect answer is $correct" 16 60
+    # Makes the question if you choose to write answers in Azeri
+    word=$(tput setaf $blue && echo $en | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g' | sed 's/.*/\u&/')
+    question=$(tput setaf $purple && printf "Please Write your answer in Azerbajani?\n\n$word : ")
+
+    # Converts correct answer to all lowercase
+    correct=$(echo $aze | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g' | tr '[:upper:]' '[:lower:]')
+
+
+    else
+
+    # Makes the question if you choose to write answers in English
+    word=$(tput setaf $blue && echo "$aze" | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g')
+    question=$(tput setaf $purple && printf "What is $word in English?\nPlease Write your answer : ")
+
+    # Converts correct answer to all lowercase
+    correct=$(echo $en | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g' | tr '[:upper:]' '[:lower:]')
 
     fi
+
+    # Uncomment this if you wanna use dialog
+    # answer=$(dialog --colors --title "\Z7\ZbQuestion" --inputbox "\Z4$question" --output-fd 1 8 60  )
+
+    # Using read to prompt for input
+    read -p "$question" answer
+
+    # Converts answer to all lowercase
+    answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]' )
+
+
+    # Compares your answer to the correct one
+     if [ "$answer" = "$correct" ] ; then
+         
+         correct_answers=$(expr "$correct_answers" "+" "1")
+         dialog --colors --title "\Z7\ZbCorrect!!" --msgbox "\Z4Congratulations your answer was correct" 16 60
+         clear
+     else
+         correct=$(echo $correct | sed 's/.*/\u&/')
+         answer=$(echo $answer | sed 's/.*/\u&/')
+         incorrect_answers=$(expr "$incorrect_answers" "+" "1")
+         dialog --colors --title "\Z7\ZbIncorrect!!" --msgbox "\Z4Sadly your answer is incorrect\ncorrect answer is $correct\nYour answer was $answer" 16 60
+         clear
+
+    fi
+
+
 done
 done
 done
+
 }
 
-#Function that will ask you if you want to 
-#Do another session
-wanttotryagain() {
+# Function that will ask you if you want to Do another session
+
+tryagain() {
 
 
 dialog --colors --title "\Z7\ZbRetry?" --yes-label "Yes" --no-label "No" --yesno "\Z4Do you want to try again using another list or same list?" 8 60 && run=yes || run=no
+
 
 }
      
 
 welcome
 
-while [ $run = "yes" ] ; do
+#while [ $run = "yes" ] ; do
 
-wordstolearn 
+word_list
 
-azeri_or_english 
+format
+
+language
 
 question
  
 
-
-wanttotryagain
+#tryagain
 
 choice=""
 
-done
+#done
 
 clear
 
-#Will print your correct answers and incorrects answers 
-#All sessions combined
+# Will print your correct answers and incorrects answers
+# All sessions combined
 echo -e "\e[1;32mCorrect answers : $correct_answers"
 
 echo -e "\e[1;31mIncorrect answers : $incorrect_answers"

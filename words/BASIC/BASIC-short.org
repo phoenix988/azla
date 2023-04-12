@@ -1,0 +1,17 @@
+#+title| Azerbajani Vocabulary
+#+DESCRIPTION| azerbajani vocabulary words
+#+AUTHOR| Karl Fredin
+
+
+*** BASICS1
+
+ | Azerbajani          | English             |
+ |---------------------+---------------------|
+ | tualet hardadir     | where is the toilet |
+ | duz gedın           | go straight         |
+ | sola don            | turn left           |
+ | saga don            | turn right          |
+ | avtobus va qatar    | bus and train       |
+ | sabahın xeyir       | good morning        |
+ | neynirsən            | what are you doing  |
+ | öpurem sen          | I kiss you          |

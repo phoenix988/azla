@@ -15,7 +15,7 @@
  | Dəftər               | Notebook            |
  | Kilsə                | Church              |
  | Edec                | Do                  |
- | Ola biler           | Maybe               |
+ | Ola bilər            | Maybe               |
  | Var                 | There is            |
  | Hara                | Where               |
  | Hansı               | Which               |
@@ -36,18 +36,17 @@
  | necəsən              | how are you         |
  | səni səviram         | I love you          |
  | salam               | hello               |
- | minosh              | Cute                |
+ | minoş               | Cute                |
  | balam               | Honey               |
- | Yaxşiyam            | I am fine           |
- | he                  | yes                 |
- | yox                 | no                  |
+ | Yaxşıyam            | I am fine           |
+ | bəli                 | yes                 |
  | çox sagol           | Thank you           |
- | helekik             | goodbye             |
+ | helelik             | goodbye             |
  | tualet hardadir     | where is the toilet |
  | duz gedın           | go straight         |
  | sola don            | turn left           |
  | saga don            | turn right          |
- | avtobus va qatar    | bus and train       |
+ | avtobus və qatar     | bus and train       |
  | sabahın xeyir       | good morning        |
  | neynirsən            | what are you doing  |
- | öpurem sen          | I kiss you          |
+ | öpürəm sen           | I kiss you          |

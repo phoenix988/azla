@@ -1,0 +1,21 @@
+#+title: Family words
+#+DESCRIPTION: Words in azerbajani related to your family
+#+AUTHOR: Karl Fredin
+
+
+| Azerbajani  | English       |
+|-------------+---------------|
+| Bacı        | Sister        |
+| Qardaş      | Brother       |
+| Uşaq        | Child         |
+| Nənə         | Grandmother   |
+| Baba        | Grandfather   |
+| Bibi        | Aunt          |
+| Əmi         | Uncle         |
+| Xalaqızı    | Cousin        |
+| Qayınata    | Father-in-law |
+| Qayınana    | Mother-in-law |
+| Sevgili     | Girlfriend    |
+| Ailə         | Family        |
+| nişanlı qız | Fiance        |
+| nişanlə      | Engaged       |

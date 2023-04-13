@@ -11,6 +11,7 @@
 
 ** Word Section
 - [[words/BASIC/BASICS.org][BASICS]]
+- [[words/BASIC/EXTRAS.org][EXTRAS]]
 - [[words/BASIC/GREETINGS.org][GREETINGS]]
 - [[words/MONTHS/MONTHS.org][MONTHS]]
 - [[words/MONTHS/WEEKDAYS.org][WEEKDAYS]]

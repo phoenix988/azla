@@ -2,7 +2,6 @@
 #+DESCRIPTION: azerbajani verbs in infinite form
 #+AUTHOR: Karl Fredin
 
-*** VERBS_INFINITE
 | Azerbajani         | English                |
 |--------------------+------------------------|
 | Bağlamaq           | To close               |

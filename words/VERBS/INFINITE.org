@@ -33,3 +33,5 @@
 | Yumaq       | to wash       |
 | Olmaq       | to be         |
 | Ağlamaq     | to cry        |
+| Unutmaq     | to forget     |
+| Gəzmək       | to walk       |

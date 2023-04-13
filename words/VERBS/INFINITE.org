@@ -3,35 +3,57 @@
 #+AUTHOR: Karl Fredin
 
 *** VERBS_INFINITE
-| Azerbajani  | English       |
-|-------------+---------------|
-| Bağlamaq    | to close      |
-| Başa duşmək  | to understand |
-| Fikirləşmək  | to think      |
-| Başlamaq    | to start      |
-| Qurtamaq    | to end        |
-| Qulaq asmaq | to listen     |
-| Yazmaq      | to write      |
-| Baxmaq      | to look       |
-| Göturmaq    | to take       |
-| Bilmək       | to know       |
-| Getmək       | to go         |
-| Gəlmək       | to come       |
-| Işlemək      | to work       |
-| Öyrəmək      | to learn      |
-| Oxumaq      | to read       |
-| Yemək        | to eat        |
-| Içmək        | to drink      |
-| Açmaq       | to open       |
-| Vermək       | to give       |
-| Görmək       | to see        |
-| Oynamaq     | to play       |
-| Oyanmaq     | to wake up    |
-| Sincəlmeq    | to rest       |
-| Almaq       | to buy        |
-| Bilmək       | to know       |
-| Yumaq       | to wash       |
-| Olmaq       | to be         |
-| Ağlamaq     | to cry        |
-| Unutmaq     | to forget     |
-| Gəzmək       | to walk       |
+| Azerbajani         | English                |
+|--------------------+------------------------|
+| Bağlamaq           | To close               |
+| Başa duşmək         | To understand          |
+| Fikirləşmək         | To think               |
+| Başlamaq           | To start               |
+| Qurtamaq           | To end                 |
+| Qulaq asmaq        | To listen              |
+| Yazmaq             | To write               |
+| Baxmaq             | To look                |
+| Göturmaq           | To take                |
+| Bilmək              | To know                |
+| Getmək              | To go                  |
+| Gəlmək              | To come                |
+| Işlemək             | To work                |
+| Öyrəmək             | To learn               |
+| Oxumaq             | To read                |
+| Yemək               | To eat                 |
+| Içmək               | To drink               |
+| Açmaq              | To open                |
+| Vermək              | To give                |
+| Görmək              | To see                 |
+| Oynamaq            | To play                |
+| Oyanmaq            | To wake up             |
+| Sincəlmeq           | To rest                |
+| Almaq              | To buy                 |
+| Bilmək              | To know                |
+| Yumaq              | To wash                |
+| Olmaq              | To be                  |
+| Ağlamaq            | To cry                 |
+| Unutmaq            | To forget              |
+| Gəzmək              | To walk                |
+| Etmək               | To Do                  |
+| Düşünmək            | To Think               |
+| Bəyənmək            | To Like                |
+| Qəbul edmək         | To Accept              |
+| Redd edmək          | To Reject              |
+| Söhbət edmək        | To Talk                |
+| Tələsmək            | To Need                |
+| Gözləymək           | To Wait                |
+| Qoymmək             | To Leave               |
+| Qaytarmək           | To Return              |
+| Eşidmək             | To Hear                |
+| İdarə edmək         | To Manage              |
+| Özünü ifadə edmək   | To Express oneself     |
+| Sınaq edmək         | To Test                |
+| Müqavilə imzalaymək | To Sign a contract     |
+| İmtahan vermək      | To Take an exam        |
+| Təbrik edmək        | To Congratulate        |
+| Yardım edmək        | To Help                |
+| Böyüymək            | To Grow                |
+| Acı çəkmək          | To Suffer              |
+| Üzüntüyə düşmək     | To Get sad             |
+| Məşğul olmək        | To Engage in something |

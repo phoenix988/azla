@@ -45,8 +45,10 @@
  | tualet hardadir     | where is the toilet |
  | duz gedın           | go straight         |
  | sola don            | turn left           |
- | saga don            | turn right          |
+ | sağa don            | turn right          |
  | avtobus və qatar     | bus and train       |
  | sabahın xeyir       | good morning        |
  | neynirsən            | what are you doing  |
- | öpürəm sen           | I kiss you          |
+ | öpürəm sən           | I kiss you          |
+ | Bütun               | Whole               |
+ | Qürur               | Proud               |

@@ -21,15 +21,10 @@ run="yes"
 purple="5"
 blue="12"
 
-
-# Sets the location of the Language files
-files=$(ls -R $(pwd)/words | grep org | sed 's/.org//g' | nl )
-
-files=$(tput setaf $blue && echo "$files")
-
 # Calculates the amount of correct answers
 correct_answers="0"
 incorrect_answers="0"
+
 
 # Welcome message function
 welcome() { \
@@ -39,35 +34,55 @@ dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my scr
 }
 
 
+# lets you choose your own file
+# by specify -f when running the script
+while getopts ":f:" opt; do
+  case $opt in
+    f)
+      files="$OPTARG"
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+
+if [ -z $files ] ; then
+
+echo " &> /dev/null"
+
+else
+
+
+check_file=$(echo $files | grep .org)
+
+
+[ -z "$check_file" ] && echo "not an org document" && exit
+
+
+fi
+
 
 # Function that let you choose which file you wanna use
 word_list() { \
 
+if [ -z $files ] ; then
 
-clear
 
-# Keeps running if the choice is empty
-while [ -z "$choice" ] ; do
-
-# Modify This in order to change the text
-#wordtext=$(tput setaf $purple && printf "Choose which list you want to use for learning\nThese files are available:\n\n$files")
 choice=$(find $(pwd)/words -iname "*.org" | awk -F "/" '{print $NF}' | sed -e 's/.org//g' |  fzf )
-
-
-
-# Prompt you to choose an org file document to practise from
-#read -p "$wordtext : " wordstolearn
-
-
-
-done
-
 
 # finds the file inside the word directory
 choice_file=$(find $(pwd)/words -iname "$choice.org"  )
 
+else
+
+# makes the correct variable if you did choose file manually
+choice_file=$(echo "$files")
 
 
+fi
 
 
 # will exit if it can't find the file
@@ -107,8 +122,12 @@ question() { \
 
     clear
 
+
+    # shuffle all the questions
     choice_file=$(echo $choice_file | shuf)
-     for cf in $choice_file  ; do
+
+
+    for cf in $choice_file  ; do
 
 
         azeri=$(echo $cf | awk -F ":" '{print $1}')
@@ -118,14 +137,9 @@ question() { \
     for en in $eng ; do
     for aze in $azeri ; do
 
-    check=$(echo $en | cut -c 1)
 
 
-    if [ $check = "_" ] ; then
-
-     check=""
-
-    elif [ "$language" = "azerbajan" ] ; then
+    if [ "$language" = "azerbajan" ] ; then
 
     # Makes the question if you choose to write answers in Azeri
     word=$(tput setaf $blue && echo $en | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g' | sed 's/.*/\u&/')
@@ -196,6 +210,7 @@ dialog --colors --title "\Z7\ZbRetry?" --yes-label "Yes" --no-label "No" --yesno
 welcome
 
 while [ $run = "yes" ] ; do
+
 
 word_list
 

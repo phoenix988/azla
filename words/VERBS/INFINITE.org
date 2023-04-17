@@ -35,24 +35,3 @@
 | Unutmaq            | To forget              |
 | Gəzmək              | To walk                |
 | Etmək               | To Do                  |
-| Düşünmək            | To Think               |
-| Bəyənmək            | To Like                |
-| Qəbul edmək         | To Accept              |
-| Redd edmək          | To Reject              |
-| Söhbət edmək        | To Talk                |
-| Tələsmək            | To Need                |
-| Gözləymək           | To Wait                |
-| Qoymmək             | To Leave               |
-| Qaytarmək           | To Return              |
-| Eşidmək             | To Hear                |
-| İdarə edmək         | To Manage              |
-| Özünü ifadə edmək   | To Express oneself     |
-| Sınaq edmək         | To Test                |
-| Müqavilə imzalaymək | To Sign a contract     |
-| İmtahan vermək      | To Take an exam        |
-| Təbrik edmək        | To Congratulate        |
-| Yardım edmək        | To Help                |
-| Böyüymək            | To Grow                |
-| Acı çəkmək          | To Suffer              |
-| Üzüntüyə düşmək     | To Get sad             |
-| Məşğul olmək        | To Engage in something |

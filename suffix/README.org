@@ -3,21 +3,15 @@
 #+AUTHOR: Karl Fredin
 
 * TABLE OF CONTENT
-- [[Present tense][Present Tense]]
-- [[Past Tense][Past Tense]]
-- [[Future Tense][Future Tense]]
+- [[Verbs][Verbs]]
+  - [[Present tense][Present Tense]]
+  - [[Past Tense][Past Tense]]
+  - [[Future Tense][Future Tense]]
+- [[Personal Pronunce][Personal Pronunce]]
+- [[Language Cases][Laungage Cases]]
 
 
 
-
-
-- Personal Pronunce
-
-
-
-
-
-- Language Cases
 
 
 

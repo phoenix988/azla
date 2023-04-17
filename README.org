@@ -2,6 +2,10 @@
 #+DESCRIPTION: azerbajani vocabulary words
 #+AUTHOR: Karl Fredin
 
+
+[[file:./images/wp2106881.jpg]]
+
+
 * TABLE OF CONTENTS
 - [[About][About My Project]]
 - [[Script][Script]]

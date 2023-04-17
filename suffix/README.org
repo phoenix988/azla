@@ -33,37 +33,52 @@
 
 **** Nominative
 - You add no suffix affter Nominative cases
+|-----------------+
+| Nominative Case |
+|-----------------+
+| No suffix       |
+|-----------------+
 **** Genitive
 - You add ın in un ün on the possesor (Add n if the last letter is a vowel)
 - You add ı i u ü on the possesed item (Add s if the last letter is a vowel)
+|----------------------------|
+| Genitive Case              |
+|----------------------------|
+| Possesor - nın nin nun nün |
+| Possesed - sı si su sü     |
+|----------------------------|
 **** Dative
 - This basically means to something like your going somewhere
+ |------------------|
+ | Dative Case - To |
+ |------------------|
+ | a ə or ya yə      |
+ |------------------|
+
 **** Accusative
 - Not sure abot this one when to use it
+ +-----------------|
+ | Accusative Case |
+ +-----------------|
+ | ı i u ü         |
+ | nı ni nu nü     |
+ +-----------------|
 **** Locative
 - This means that you are somewhere like your at a cafe
+ |----------------------|
+ | Locative Case  on at |
+ |----------------------|
+ | da də                 |
+ |----------------------|
 **** Ablative
 - This means that your from somewhere like from sweden for example
+ +--------------------|
+ | Ablative Case - From |
+ +--------------------|
+  | da dən |
+ +--------------------|
 
 
-|-----------------+------------------|
-| Nominative Case | Dative Case - To |
-|-----------------+------------------|
-| No suffix       | a ə or ya yə      |
-|-----------------+------------------|
-
-|----------------------------+-----------------|
-| Genitive Case              | Accusative Case |
-|----------------------------+-----------------|
-| Possesor - nın nin nun nün | ı i u ü         |
-| Possesed - sı si su sü     | nı ni nu nü     |
-|----------------------------+-----------------|
-
-|----------------------------+--------------------|
-| Locative Case  on at       | Ablative Case From |
-|----------------------------+--------------------|
-| da də                       | da dən              |
-|----------------------------+--------------------|
 
 *** Personal Pronunce
 

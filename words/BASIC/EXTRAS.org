@@ -4,27 +4,27 @@
 
 
 
-        | Azerbajani | English      |
-        |------------+--------------|
-        | Kitab      | Book         |
-        | Uşaq       | Child        |
-        | Öyrətmən    | Teacher      |
-        | Tələbə      | Student      |
-        | İstirahət   | Rest         |
-        | Yemək       | Food         |
-        | Su         | Water        |
-        | Təşkilat    | Organization |
-        | Şəhər       | City         |
-        | Köhnə       | Old          |
-        | Yeni       | New          |
-        | Gözəl       | Beautiful    |
-        | Aç         | Hungry       |
-        | Susuz      | Thirsty      |
-        | Çox        | Many, much   |
-        | Az         | Few, little  |
-        | Bura       | Here         |
-        | Orada      | There        |
-        | İndi       | Now          |
-        | Sonra      | Later        |
-        | Həyat       | Life         |
-        | tənbəl      | Lazy         |
+| Azerbajani | English      |
+|------------+--------------|
+| Kitab      | Book         |
+| Uşaq       | Child        |
+| Öyrətmən    | Teacher      |
+| Tələbə      | Student      |
+| İstirahət   | Rest         |
+| Yemək       | Food         |
+| Su         | Water        |
+| Təşkilat    | Organization |
+| Şəhər       | City         |
+| Köhnə       | Old          |
+| Yeni       | New          |
+| Gözəl       | Beautiful    |
+| Aç         | Hungry       |
+| Susuz      | Thirsty      |
+| Çox        | Many, much   |
+| Az         | Few, little  |
+| Bura       | Here         |
+| Orada      | There        |
+| Indi       | Now          |
+| Sonra      | Later        |
+| Həyat       | Life         |
+| tənbəl      | Lazy         |

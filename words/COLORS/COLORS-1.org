@@ -1,0 +1,19 @@
+#+title: Azerbajani Vocabulary
+#+DESCRIPTION: azerbajani vocabulary words
+#+AUTHOR: Karl Fredin
+
+
+| Azerbajani | English   |
+|------------+-----------|
+| Rənglər     | Colors    |
+| Qırmızı    | Red       |
+| Qara       | Black     |
+| Sarı       | yellow    |
+| Yaşıl      | green     |
+| Bənövşəyi   | purple    |
+| Mavi       | Blue      |
+| Narıncı    | orange    |
+| Boz        | Grey      |
+| Qəhvəyi     | brown     |
+| Çəhrayı     | pink      |
+| Göy        | dark blue |

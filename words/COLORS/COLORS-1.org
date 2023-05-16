@@ -1,4 +1,4 @@
-#+title: Azerbajani Vocabulary
+#+title: COLORS-1
 #+DESCRIPTION: azerbajani vocabulary words
 #+AUTHOR: Karl Fredin
 

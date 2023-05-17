@@ -7,29 +7,28 @@
 
 
 * TABLE OF CONTENTS
-- [[About][About My Project]]
-- [[Script][Script]]
-  - [[Variables][Variables]]
-  - [[Welcome Function][Welcome]]
-  - [[Options][Options]]
-  - [[Language Choice][Language]]
-  - [[Question][Question]]
-  - [[Try Again Function][Try Again]]
-  - [[Main Function][Main]]
-- [[suffix][Suffix]]
-- [[Example Words][Examples]]
-  - [[words/BASIC/BASICS.org][BASICS]]
-  - [[words/BASIC/EXTRAS.org][EXTRAS]]
-  - [[words/BASIC/GREETINGS.org][GREETINGS]]
-  - [[words/MONTHS/MONTHS.org][MONTHS]]
-  - [[words/MONTHS/WEEKDAYS.org][WEEKDAYS]]
-  - [[words/FAMILY/MEMBERS.org][FAMILY_MEMBERS]]
-  - [[words/VERBS/VERBS-INFINITE.org][VERBS_INFINITE]]
+- [[ABOUT]]
+- [[SCRIPT]]
+  - [[Variables][VARIABLES]]
+  - [[Welcome Function][WELCOME]]
+  - [[OPTIONS][OPTIONS]]
+  - [[LANGUAGE Choice][LANGUAGE]]
+  - [[QUESTION][QUESTION]]
+  - [[TRY Again Function][TRY AGAIN]]
+  - [[MAIN Function][MAIN]]
+- [[SUFFIX][SUFFIX]]
+- [[EXAMPLE Words][EXAMPLES]]
+  - [[WORDS/BASIC/BASICS.org][BASICS]]
+  - [[WORDS/BASIC/EXTRAS.org][EXTRAS]]
+  - [[WORDS/BASIC/GREETINGS.org][GREETINGS]]
+  - [[WORDS/MONTHS/MONTHS.org][MONTHS]]
+  - [[WORDS/MONTHS/WEEKDAYS.org][WEEKDAYS]]
+  - [[WORDS/FAMILY/MEMBERS.org][FAMILY_MEMBERS]]
+  - [[WORDS/VERBS/VERBS-INFINITE.org][VERBS_INFINITE]]
 
 
 
-
-*** About
+*** ABOUT
 #+CAPTION: ABOUT
 
 Some Important Azerbajani Vocabluary words to know that will help me learn the azerbajani language
@@ -37,10 +36,10 @@ There is also a script that kinda works like an exam and it will give you a sent
 And you need to translate it
 
 
-*** Script
+*** SCRIPT
 #+CAPTION: About my script included in this project
 
-**** Variables
+**** VARIABLES
 Add variables to the script for example it adds run=yes which
 makes it possible to keep running the script if you choose to do so when you are done with a session
 This is the variables it creates
@@ -79,9 +78,11 @@ blue="12"
 # Calculates the amount of correct answers
 correct_answers="0"
 incorrect_answers="0"
+
+
 #+END_SRC
 
-**** Welcome Function
+**** WELCOME FUNCTION
 This is just a simple welcome function
 This is the screen you first see when you launch the script
 #+BEGIN_SRC sh :tangle main.sh
@@ -93,7 +94,7 @@ dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my scr
 }
 #+END_SRC
 
-**** Options
+**** OPTIONS
 This part adds the -f switch which let you
 choose a file when you run the script this will skip
 the fzf selection in the script
@@ -129,9 +130,9 @@ check_file=$(echo $files | grep .org)
 fi
 
 
-#+END_SRC sh
+#+END_SRC
 
-**** Language Choice
+**** LANGUAGE CHOICE
 
 
 #+BEGIN_SRC sh :tangle main.sh
@@ -183,7 +184,7 @@ choice_file=$(cat "$choice_file" | tr -s ' ' | sed -e 's/^|//' -e 's/|$//' -e 's
 }
 #+END_SRC
 
-**** Question
+**** QUESTION
 
 #+BEGIN_SRC sh :tangle main.sh
 # Function that will ask you the question
@@ -194,7 +195,7 @@ question() { \
 
 
     # shuffle all the questions
-    choice_file=$(echo $choice_file | shuf)
+    choice_file=$(echo "$choice_file" | sort -R)
 
 
     for cf in $choice_file  ; do
@@ -265,9 +266,9 @@ done
 done
 
 }
-#+END_SRC sh
+#+END_SRC
 
-**** Try Again Function
+**** TRY AGAIN FUNCTION
 #+BEGIN_SRC sh :tangle main.sh
 # Function that will ask you if you want to Do another session
 tryagain() {
@@ -280,7 +281,7 @@ dialog --colors --title "\Z7\ZbRetry?" --yes-label "Yes" --no-label "No" --yesno
 
 #+END_SRC
 
-**** Main Function
+**** MAIN FUNCTION
 #+BEGIN_SRC sh :tangle main.sh
 welcome
 
@@ -313,11 +314,11 @@ echo -e "\e[1;31mIncorrect answers : $incorrect_answers"
 #+END_SRC
 
 
-*** Suffix
+*** SUFFIX
 #+CAPTION: About the rules of suffix in azerbajani language
 
 
-*** Example Words
+*** EXAMPLE WORDS
 #+CAPTION: Examples Word lists
 **** BASICS
 

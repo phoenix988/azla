@@ -25,14 +25,12 @@ blue="12"
 correct_answers="0"
 incorrect_answers="0"
 
-
 # Welcome message function
 welcome() { \
 
 dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my script that will help you pratice azerbajani words and sentences\\n\\n-Karl" 16 60
 
 }
-
 
 # lets you choose your own file
 # by specify -f when running the script
@@ -48,7 +46,6 @@ while getopts ":f:" opt; do
   esac
 done
 
-
 if [ -z $files ] ; then
 
 echo " &> /dev/null"
@@ -63,7 +60,6 @@ check_file=$(echo $files | grep .org)
 
 
 fi
-
 
 # Function that let you choose which file you wanna use
 word_list() { \
@@ -104,17 +100,13 @@ format() {
 
 #choice_file=$(cat "$choice_file" | grep -v Azer | sed -e 's/-//g' -e 's/+//g' | grep -v "^#" | sed 's/|//' | sed '/^[[:space:]]*$/d'   )
 #choice_file=$(echo "$choice_file" | sed 's/ | /:/g' | sed -e 's/|//g' -e 's/main.sh//g' -e 's/main-new.sh//g' -e 's/README.org//g' -e 's/suffix//g' -e 's/words//g' -e "s|$wordstolearn:||g" -e "s/BASICS//g")
-#
 #choice_file=$(echo "$choice_file" | tr -s '_' | sed -e 's/ /:/g' | tr -s ':'  | sed -e 's/^://g' -e 's/^$//g')
 clear
-
 
 choice_file=$(cat "$choice_file" | tr -s ' ' | sed -e 's/^|//' -e 's/|$//' -e 's/ | /:/' | grep -v "^#" | grep -vi eng | grep -vi aze | grep -vi "^-" | sed -e 's/ /_/g' | grep -v "*" )
 
 
 }
-
-
 
 # Function that will ask you the question
 # And determine if you answered correctly or not
@@ -124,7 +116,7 @@ question() { \
 
 
     # shuffle all the questions
-    choice_file=$(echo $choice_file | shuf)
+    choice_file=$(echo "$choice_file" | sort -R)
 
 
     for cf in $choice_file  ; do
@@ -173,7 +165,7 @@ question() { \
 
     # Compares your answer to the correct one
      if [ "$answer" = "$correct" ] ; then
-         
+
          correct_answers=$(expr "$correct_answers" "+" "1")
          dialog --colors --title "\Z7\ZbCorrect!!" --msgbox "\Z4Congratulations your answer was correct" 16 60
          clear
@@ -197,7 +189,6 @@ done
 }
 
 # Function that will ask you if you want to Do another session
-
 tryagain() {
 
 
@@ -205,7 +196,6 @@ dialog --colors --title "\Z7\ZbRetry?" --yes-label "Yes" --no-label "No" --yesno
 
 
 }
-     
 
 welcome
 
@@ -218,10 +208,8 @@ format
 
 language
 
-
-
 question
- 
+
 
 tryagain
 

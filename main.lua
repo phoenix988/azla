@@ -32,6 +32,13 @@ colors = {
 -- Sets fzf variable
 fzf = "fzf"
 
+special_i = "ı"
+special_a = "ə"
+special_u = "ü"
+special_c = "ç"
+special_s = "ş"
+special_g = "ğ"
+
 -- Sets variable that controls
 -- if you wanna keep running the script
 run = "yes"
@@ -177,6 +184,8 @@ function language()
 
 end
 
+
+
 -- Main function that prompt you to answer in azerbajani
 function question_main()
 
@@ -196,13 +205,27 @@ for i = 1, #wordlist do
     local choice = io.read()
     -- Sets your answer to all lowercase
     local choice = string.lower(choice)
---    local choice = choice:gsub("ü", "u")
+
+    --local choice = choice:gsub(special_u, "u")
+    --local choice = choice:gsub(special_g, "g")
+    --local choice = choice:gsub(special_s, "s")
+    --local choice = choice:gsub(special_i, "i")
+    --local choice = choice:gsub(special_a, "e")
+    --local choice = choice:gsub(special_c, "c")
+    --local correct_alt = correct:gsub(special_u, "u")
+    --local correct_alt = correct:gsub(special_g, "g")
+    --local correct_alt = correct:gsub(special_s, "s")
+    --local correct_alt = correct:gsub(special_i, "i")
+    --local correct_alt = correct:gsub(special_a, "e")
+    --local correct_alt = correct:gsub(special_c, "c")
+     
      
      -- Reset colors
      print(colors.reset)
+
      
      -- Calculates if your answer is correct
-     if choice == correct then
+     if choice == correct_alt then
 
        io.write(colors.green .. "Congratulations answer is correct!")
        io.read()
@@ -324,8 +347,9 @@ language()
 while run == "yes" do 
   
   session = session + 1
- 
+
   word_list()
+
    
   if language == "azerbajan" then 
     
@@ -337,6 +361,8 @@ while run == "yes" do
   
   end
 
+  wordlist = nil
+  
   -- Asks if you want to try again with another list
   do_again()
 

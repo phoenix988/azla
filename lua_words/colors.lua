@@ -16,7 +16,7 @@ wordlist = {
 
 
 return {
-wordlist,
+wordlist = wordlist
 }
 
 

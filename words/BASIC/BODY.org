@@ -1,0 +1,15 @@
+#+title: BODY WORD
+#+DESCRIPTION: azerbajani vocabulary words
+#+AUTHOR: Karl Fredin
+
+
+| Azerbajani | English     |
+|------------+-------------|
+| Baş        | head (Main) |
+| Qulaq      | ear         |
+| Saç        | hair        |
+| Bədən       | body        |
+| Qol        | arm         |
+| Əl         | hand        |
+| Bel        | back        |
+| Ayaq       | foot        |

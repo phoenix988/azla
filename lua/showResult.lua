@@ -7,6 +7,7 @@ local incorrect_answers = 0
 
 local function show_result(correct_answers)
 
+
    if correct_answers == nil then
       local dialog_empty = Gtk.MessageDialog {
          message_type = Gtk.MessageType.ERROR,

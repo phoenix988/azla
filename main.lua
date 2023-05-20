@@ -193,7 +193,7 @@ for i = 1, #wordlist do
   -- Sets the correct answer
   local correct = wordlist[i][1]
   local correct = string.lower(correct)
-  
+
   -- Sets the first letter to uppercase for the value inside of word
   local word = wordlist[i][2]
   local word_firstLetter = word:sub(1, 1):upper()
@@ -204,28 +204,13 @@ for i = 1, #wordlist do
     io.write(colors.blue .. "What is " .. colors.green .. word .. colors.blue ..  " in Azerbajani: " )
     local choice = io.read()
     -- Sets your answer to all lowercase
-    local choice = string.lower(choice)
-
-    --local choice = choice:gsub(special_u, "u")
-    --local choice = choice:gsub(special_g, "g")
-    --local choice = choice:gsub(special_s, "s")
-    --local choice = choice:gsub(special_i, "i")
-    --local choice = choice:gsub(special_a, "e")
-    --local choice = choice:gsub(special_c, "c")
-    --local correct_alt = correct:gsub(special_u, "u")
-    --local correct_alt = correct:gsub(special_g, "g")
-    --local correct_alt = correct:gsub(special_s, "s")
-    --local correct_alt = correct:gsub(special_i, "i")
-    --local correct_alt = correct:gsub(special_a, "e")
-    --local correct_alt = correct:gsub(special_c, "c")
-     
+    local choice = choice:lower()
      
      -- Reset colors
      print(colors.reset)
 
-     
      -- Calculates if your answer is correct
-     if choice == correct_alt then
+     if choice == correct then
 
        io.write(colors.green .. "Congratulations answer is correct!")
        io.read()
@@ -361,12 +346,15 @@ while run == "yes" do
   
   end
 
-  wordlist = nil
-  
+ 
   -- Asks if you want to try again with another list
   do_again()
 
   os.execute("clear")
+ 
+ if run == "run" then
+  wordlist = nil
+ end
 
 end
 

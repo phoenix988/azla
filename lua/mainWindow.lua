@@ -1,32 +1,34 @@
 -- Imports libaries we need
-local lgi = require("lgi")
-local Gtk = lgi.require("Gtk", "4.0")
-local GObject = lgi.require("GObject", "2.0")
-local GdkPixbuf = lgi.require('GdkPixbuf')
-local lfs = require("lfs")
-local os = require("os")
+local lgi               = require("lgi")
+local Gtk               = lgi.require("Gtk", "4.0")
+local GObject           = lgi.require("GObject", "2.0")
+local GdkPixbuf         = lgi.require('GdkPixbuf')
+local lfs               = require("lfs")
+local os                = require("os")
 
-local imageModule = require("lua/createImage")
-local create_image = imageModule.create_image
-
+-- Other imports and global variables
+-- Imports function to create images
+local imageModule       = require("lua/createImage")
+local create_image      = imageModule.create_image
 
 -- Imports window 2
-local appModule = require("lua/questionMain")
-local create_app2 = appModule.create_app2
+local appModule         = require("lua/questionMain")
+local create_app2       = appModule.create_app2
 
 -- Variables to make the application id
-local appID1 = "io.github.Phoenix988.azla.main.lua"
-local appTitle = "Azla"
-local app1 = Gtk.Application({ application_id = appID1 })
+local appID1            = "io.github.Phoenix988.azla.main.lua"
+local appTitle          = "Azla"
+local app1              = Gtk.Application({ application_id = appID1 })
 
 -- Gets users home directory
-local home = os.getenv("HOME")
-local imagePath = "/myrepos/azla/images/wp2106881.jpg"
+local home              = os.getenv("HOME")
+local imagePath         = "/myrepos/azla/images/wp2106881.jpg"
 
-local luaWordsPath = "lua_words"
+-- Variable to store word arrays
+local luaWordsPath      = "lua_words"
 
 -- Sets variable that will determine language choice
-local sharedVariable = "azerbajani"
+local sharedVariable    = "azerbajani"
 
 -- Creates the window where you input answers in azerbajani
 -- Makes the main startup window
@@ -84,7 +86,8 @@ function app1:on_startup()
     
        return luaFiles
     end
-
+    
+    -- Gets the lua files in word directory
     local directoryPath = luaWordsPath
     local luaFiles = getLuaFilesInDirectory(directoryPath)
 
@@ -112,7 +115,8 @@ function app1:on_startup()
           }
         }
     })
-
+    
+    -- Makes the combobox widgets for wordlists
     local comboWord = Gtk.ComboBox({
         model = modelWord,
         active = 0,
@@ -163,9 +167,10 @@ function app1:on_startup()
   
     local buttonExit = Gtk.Button({label = "Exit", width_request = 30, })
     
-     function buttonExit:on_clicked()
-        win:destroy()
-     end
+    -- Sets function to exit the application
+    function buttonExit:on_clicked()
+       win:destroy()
+    end
 
     -- Create the function when you press on start
     function button:on_clicked()
@@ -178,7 +183,8 @@ function app1:on_startup()
         local wordlistModule = require(getwordList)
         
         local wordlist = wordlistModule.wordlist
-    
+        
+        -- Starts the questions
         win:hide()
         local app2 = create_app2()
         app2:run()
@@ -207,6 +213,7 @@ function app1:on_startup()
 
 end
 
+-- Creates the function to import the shared variable
 function getSharedVariable()
     return sharedVariable
 end

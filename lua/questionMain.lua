@@ -1,36 +1,35 @@
 -- Imports of Libaries
-local lgi = require("lgi")
-local Gtk = lgi.require("Gtk", "4.0")
-local GObject = lgi.require("GObject", "2.0")
-local GdkPixbuf = lgi.require('GdkPixbuf')
-local lfs = require("lfs")
-local os = require("os")
+local lgi               = require("lgi")
+local Gtk               = lgi.require("Gtk", "4.0")
+local GObject           = lgi.require("GObject", "2.0")
+local GdkPixbuf         = lgi.require('GdkPixbuf')
+local lfs               = require("lfs")
+local os                = require("os")
 
 -- Other imports and global variables
 -- Imports function to create images
-local imageModule = require("lua/createImage")
-local create_image = imageModule.create_image
+local imageModule       = require("lua/createImage")
+local create_image      = imageModule.create_image
 
 -- Define home variable
-local home = os.getenv("HOME")
-
-local imagePath = "/myrepos/azla/images/wp2106881.jpg"
+local home              = os.getenv("HOME")
+local imagePath         = "/myrepos/azla/images/wp2106881.jpg"
 
 -- Define other variables used later in the application
-local question_labels = {}
-local entry_fields = {}
-local submit_buttons = {}
-local result_labels = {}
-local next_buttons = {}
+local question_labels   = {}
+local entry_fields      = {}
+local submit_buttons    = {}
+local result_labels     = {}
+local next_buttons      = {}
 
 -- Counts correct answers
-local correct_answers = 0
+local correct_answers   = 0
 local incorrect_answers = 0
 
 -- Sets app attributes
-local appID2 = "io.github.Phoenix988.azla.az.lua"
-local appTitle = "Azla Question"
-local app2 = Gtk.Application({ application_id = appID2 })
+local appID2            = "io.github.Phoenix988.azla.az.lua"
+local appTitle          = "Azla Question"
+local app2              = Gtk.Application({ application_id = appID2 })
 
 
 -- Function that calls a dialog box to show correct and incorrect answers

@@ -30,11 +30,11 @@
 
 **** Nominative
 - You add no suffix affter Nominative cases
-|-----------------+
+|-----------------|
 | Nominative Case |
-|-----------------+
+|-----------------|
 | No suffix       |
-|-----------------+
+|-----------------|
 **** Genitive
 - You add ın in un ün on the possesor (Add n if the last letter is a vowel)
 - You add ı i u ü on the possesed item (Add s if the last letter is a vowel)
@@ -54,12 +54,12 @@
 
 **** Accusative
 - Not sure abot this one when to use it
- +-----------------|
+ |-----------------|
  | Accusative Case |
- +-----------------|
+ |-----------------|
  | ı i u ü         |
  | nı ni nu nü     |
- +-----------------|
+ |-----------------|
 **** Locative
 - This means that you are somewhere like your at a cafe
  |----------------------|
@@ -69,11 +69,11 @@
  |----------------------|
 **** Ablative
 - This means that your from somewhere like from sweden for example
- +--------------------|
- | Ablative Case - From |
- +--------------------|
-  | da dən |
- +--------------------|
+ |----------------------+---|
+ | Ablative Case - From |   |
+ |----------------------+---|
+ | da dən                |   |
+ |----------------------+---|
 
 
 *** Personal Pronunce

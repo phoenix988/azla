@@ -1,8 +1,11 @@
 
 wordlist = {
-  {"aş" , "head"},
-  {"Qulaq","ear" },
-  {"Saç", "hair"}
+  {"aş", "head"},
+  {"Qulaq", "ear" },
+  {"Saç", "hair"},
+  {"Ağız", "Mouth" },
+  {"Burun", "Nose" },
+  {"Göz", "Eye" },
 }
 
 

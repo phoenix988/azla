@@ -1,4 +1,4 @@
-#+title: Learn Azerbajani
+#+title: AZLA Learn azerbajani
 #+DESCRIPTION: azerbajani vocabulary words
 #+AUTHOR: Karl Fredin
 
@@ -8,16 +8,9 @@
 
 * TABLE OF CONTENTS
 - [[ABOUT]]
-- [[SCRIPT]]
-  - [[Variables][VARIABLES]]
-  - [[Welcome Function][WELCOME]]
-  - [[OPTIONS][OPTIONS]]
-  - [[LANGUAGE Choice][LANGUAGE]]
-  - [[QUESTION][QUESTION]]
-  - [[TRY Again Function][TRY AGAIN]]
-  - [[MAIN Function][MAIN]]
+- [[DEPENDENCIES]]
 - [[SUFFIX][SUFFIX]]
-- [[EXAMPLE Words][EXAMPLES]]
+- [[EXAMPLE WORDS][EXAMPLE WORDS]]
   - [[WORDS/BASIC/BASICS.org][BASICS]]
   - [[WORDS/BASIC/EXTRAS.org][EXTRAS]]
   - [[WORDS/BASIC/GREETINGS.org][GREETINGS]]
@@ -25,301 +18,34 @@
   - [[WORDS/MONTHS/WEEKDAYS.org][WEEKDAYS]]
   - [[WORDS/FAMILY/MEMBERS.org][FAMILY_MEMBERS]]
   - [[WORDS/VERBS/VERBS-INFINITE.org][VERBS_INFINITE]]
+- [[RC.LUA]]
 
 
 
 *** ABOUT
 #+CAPTION: ABOUT
+Azla is a gui application that I wrote using lua to help me remeber azerbajani vocablurary words.
+It is not feature complete yet and There is a ton of ways I can make it better than it is right now.
+But right now it is usable. All my wordlist are located in lua_words.
 
-Some Important Azerbajani Vocabluary words to know that will help me learn the azerbajani language
-There is also a script that kinda works like an exam and it will give you a sentence in english or azerbajani.
-And you need to translate it
+*** DEPENDENCIES
+Libaries needed to run this app is lgi, lfs, G0Object and GdkPixbuf.
+If you just clone this repo and want to run this app you need to have those libaries installed
 
-
-*** SCRIPT
-#+CAPTION: About my script included in this project
-
-**** VARIABLES
-Add variables to the script for example it adds run=yes which
-makes it possible to keep running the script if you choose to do so when you are done with a session
-This is the variables it creates
-| Variable          | Value |
-|-------------------+-------|
-| run               |   yes |
-| purple            |     5 |
-| blue              |    12 |
-| correct_answers   |     0 |
-| incorrect_answers |     0 |
-
-#+BEGIN_SRC sh :tangle main.sh
-#!/bin/bash
-##____  _                      _
-#|  _ \| |__   ___   ___ _ __ (_)_  __
-#| |_) | '_ \ / _ \ / _ \ '_ \| \ \/ /
-#|  __/| | | | (_) |  __/ | | | |>  <
-#|_|   |_| |_|\___/ \___|_| |_|_/_/\_\
-#
-# -*- coding: utf-8 -*-
-##############################################
-### WELCOME TO MY LANGUAGE LEARNING SCRIPT ###
-#######################################################
-###### This is gonna help me practice azerbajani ######
-#######################################################
-
-# Sets variable that controls
-# if you wanna keep running the script
-# after you are done with a session
-run="yes"
-
-# Sets color used later in the script
-purple="5"
-blue="12"
-
-# Calculates the amount of correct answers
-correct_answers="0"
-incorrect_answers="0"
-
-
-#+END_SRC
-
-**** WELCOME FUNCTION
-This is just a simple welcome function
-This is the screen you first see when you launch the script
-#+BEGIN_SRC sh :tangle main.sh
-# Welcome message function
-welcome() { \
-
-dialog --colors --title "\Z7\ZbLearn Azerbajani!" --msgbox "\Z4Welcome to my script that will help you pratice azerbajani words and sentences\\n\\n-Karl" 16 60
-
-}
-#+END_SRC
-
-**** OPTIONS
-This part adds the -f switch which let you
-choose a file when you run the script this will skip
-the fzf selection in the script
-
-#+BEGIN_SRC sh :tangle main.sh
-# lets you choose your own file
-# by specify -f when running the script
-while getopts ":f:" opt; do
-  case $opt in
-    f)
-      files="$OPTARG"
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." >&2
-      exit 1
-      ;;
-  esac
-done
-
-if [ -z $files ] ; then
-
-echo " &> /dev/null"
-
-else
-
-
-check_file=$(echo $files | grep .org)
-
-
-[ -z "$check_file" ] && echo "not an org document" && exit
-
-
-fi
-
-
-#+END_SRC
-
-**** LANGUAGE CHOICE
-
-
-#+BEGIN_SRC sh :tangle main.sh
-# Function that let you choose which file you wanna use
-word_list() { \
-
-if [ -z $files ] ; then
-
-
-choice=$(find $(pwd)/words -iname "*.org" | awk -F "/" '{print $NF}' | sed -e 's/.org//g' |  fzf )
-
-# finds the file inside the word directory
-choice_file=$(find $(pwd)/words -iname "$choice.org"  )
-
-else
-
-# makes the correct variable if you did choose file manually
-choice_file=$(echo "$files")
-
-
-fi
-
-
-# will exit if it can't find the file
-[ -z $choice_file ] && clear && printf "File is empty exiting" && exit
-
-}
-
-#Function that ask you if you wanna write in English or Azerbajani
-language() { \
-
-dialog --colors --title "\Z7\ZbMake a choice" --yes-label "Azerbajan" --no-label "English" --yesno "\Z4Do you want your answers to be written in Azerbajani or English?" 8 60 && language=azerbajan || language=english
-
-}
-
-
-# Format the text
-# running sed a bunch of times to get a clean output
-format() {
-
-#choice_file=$(cat "$choice_file" | grep -v Azer | sed -e 's/-//g' -e 's/+//g' | grep -v "^#" | sed 's/|//' | sed '/^[[:space:]]*$/d'   )
-#choice_file=$(echo "$choice_file" | sed 's/ | /:/g' | sed -e 's/|//g' -e 's/main.sh//g' -e 's/main-new.sh//g' -e 's/README.org//g' -e 's/suffix//g' -e 's/words//g' -e "s|$wordstolearn:||g" -e "s/BASICS//g")
-#choice_file=$(echo "$choice_file" | tr -s '_' | sed -e 's/ /:/g' | tr -s ':'  | sed -e 's/^://g' -e 's/^$//g')
-clear
-
-choice_file=$(cat "$choice_file" | tr -s ' ' | sed -e 's/^|//' -e 's/|$//' -e 's/ | /:/' | grep -v "^#" | grep -vi eng | grep -vi aze | grep -vi "^-" | sed -e 's/ /_/g' | grep -v "*" )
-
-
-}
-#+END_SRC
-
-**** QUESTION
-
-#+BEGIN_SRC sh :tangle main.sh
-# Function that will ask you the question
-# And determine if you answered correctly or not
-question() { \
-
-    clear
-
-
-    # shuffle all the questions
-    choice_file=$(echo "$choice_file" | sort -R)
-
-
-    for cf in $choice_file  ; do
-
-
-        azeri=$(echo $cf | awk -F ":" '{print $1}')
-        eng=$(echo $cf | awk -F ":" '{print $NF}')
-
-
-    for en in $eng ; do
-    for aze in $azeri ; do
-
-
-
-    if [ "$language" = "azerbajan" ] ; then
-
-    # Makes the question if you choose to write answers in Azeri
-    word=$(tput setaf $blue && echo $en | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g' | sed 's/.*/\u&/')
-    question=$(tput setaf $purple && printf "Please Write your answer in Azerbajani?\n\n$word : ")
-
-
-    # Converts correct answer to all lowercase
-    correct=$(echo $aze | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g' | tr '[:upper:]' '[:lower:]')
-
-
-    elif [ "$language" = "english" ] ; then
-
-    # Makes the question if you choose to write answers in English
-    word=$(tput setaf $blue && echo "$aze" | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g')
-    question=$(tput setaf $purple && printf "Please Write your answer in English?\n\n$word : ")
-
-    # Converts correct answer to all lowercase
-    correct=$(echo $en | tr -s '_'  | sed -e 's/^_//g' -e 's/_$//g' -e 's/_/ /g' | tr '[:upper:]' '[:lower:]')
-
-    fi
-
-    # Uncomment this if you wanna use dialog
-    # answer=$(dialog --colors --title "\Z7\ZbQuestion" --inputbox "\Z4$question" --output-fd 1 8 60  )
-
-    # Using read to prompt for input
-    read -p "$question" answer
-
-    # Converts answer to all lowercase
-    answer=$(echo "$answer" | tr '[:upper:]' '[:lower:]' )
-
-
-    # Compares your answer to the correct one
-     if [ "$answer" = "$correct" ] ; then
-
-         correct_answers=$(expr "$correct_answers" "+" "1")
-         dialog --colors --title "\Z7\ZbCorrect!!" --msgbox "\Z4Congratulations your answer was correct" 16 60
-         clear
-
-     else
-
-
-         correct=$(echo $correct | sed 's/.*/\u&/')
-         answer=$(echo $answer | sed 's/.*/\u&/')
-         incorrect_answers=$(expr "$incorrect_answers" "+" "1")
-         dialog --colors --title "\Z7\ZbIncorrect!!" --msgbox "\Z4Sadly your answer is incorrect\ncorrect answer is $correct\nYour answer was $answer" 16 60
-         clear
-
-    fi
-
-
-done
-done
-done
-
-}
-#+END_SRC
-
-**** TRY AGAIN FUNCTION
-#+BEGIN_SRC sh :tangle main.sh
-# Function that will ask you if you want to Do another session
-tryagain() {
-
-
-dialog --colors --title "\Z7\ZbRetry?" --yes-label "Yes" --no-label "No" --yesno "\Z4Do you want to try again using another list or same list?" 8 60 && run=yes || run=no
-
-
-}
-
-#+END_SRC
-
-**** MAIN FUNCTION
-#+BEGIN_SRC sh :tangle main.sh
-welcome
-
-while [ $run = "yes" ] ; do
-
-
-word_list
-
-format
-
-language
-
-question
-
-
-tryagain
-
-choice=""
-
-done
-
-clear
-
-# Will print your correct answers and incorrects answers
-# All sessions combined
-echo -e "\e[1;32mCorrect answers : $correct_answers"
-
-echo -e "\e[1;31mIncorrect answers : $incorrect_answers"
-
-#+END_SRC
 
 
 *** SUFFIX
 #+CAPTION: About the rules of suffix in azerbajani language
+Click Here to Read about it
+[[https://github.com/phoenix988/azla/tree/dev/suffix][SUFFIX]]
 
 
 *** EXAMPLE WORDS
 #+CAPTION: Examples Word lists
+Some Important Azerbajani Vocabluary words to know that will help me learn the azerbajani language
+There is also a script that kinda works like an exam and it will give you a sentence in english or azerbajani.
+And you need to translate it
+
 **** BASICS
 
 This is some basics words in azerbajani
@@ -427,3 +153,371 @@ Family words in azerbajani
 | Yumaq       | to wash       |
 | Olmaq       | to be         |
 | Alğamaq     | to cry        |
+
+*** RC.LUA
+This is the main code that you run in order to launch the application.
+It also depends on some external modules located in lua folder.
+#+begin_src lua
+#!/usr/bin/env lua
+-- Imports libaries we need
+local lgi            = require("lgi")
+local Gtk            = lgi.require("Gtk", "4.0")
+local GObject        = lgi.require("GObject", "2.0")
+local GdkPixbuf      = lgi.require('GdkPixbuf')
+local lfs            = require("lfs")
+local io             = require("io")
+
+-- Imports window 1
+local appModule      = require("lua/mainWindow")
+local app1           = appModule.app1
+
+-- Import file exist module
+local fileExistModule = require("lua/fileExist")
+local fileExist       = fileExistModule.fileExists
+
+-- Sets terminal variable
+local terminal       = false
+
+-- Define a function to process the switches
+function processSwitches()
+  local i = 1
+  while i <= #arg do
+    local switch = arg[i]
+
+    if switch == "--help" or switch == "-h" then
+      -- Handle help switch
+      print("--help -h Print this help Message")
+      print("--term -t Open the terminal version of the app")
+      print("-t $ARG use a wordlist thats located in lua_words")
+      os.exit(0)
+
+    elseif switch == "--term" or switch == "-t" then
+      -- handle terminal switch
+      terminal = true
+
+      -- Check if input value is provided
+      -- will leave if no output is provided
+      local input = arg[i + 1]
+      if not input then
+         -- Wont do anything if you dont provide any argument
+         local no = ""
+      else
+
+         -- Will leave if the file doesn't exist
+         local filename = "lua_words/" .. input .. ".lua"
+         if not fileExists(filename) then
+           print("File does not exist:", filename)
+           os.exit(1)
+         end
+
+         -- Process the input file
+         require("lua_words/" .. input)
+         i = i + 1
+
+      end
+
+    else
+      -- Handle unrecognized switches or arguments
+      print("Unrecognized switch or argument:", switch)
+      os.exit(1)
+    end
+
+    i = i + 1
+  end
+end
+
+-- Process the switches
+processSwitches()
+
+
+-- Activate app1
+function app1:on_activate()
+  self.active_window:present()
+end
+
+-- Runs the GUI app if you dont specify --term (-t)
+if terminal == false then
+
+  app1:run()
+
+elseif terminal == true then
+  colors = {
+      reset = "\27[0m", -- Reset color
+      red = "\27[31m", -- Red
+      green = "\27[32m", -- Green
+      blue = "\27[34m", -- Blue
+  }
+
+  -- Sets fzf variable
+  local fzf               = "fzf"
+
+  -- Sets variable that controls
+  -- if you wanna keep running the script
+  local run               = "yes"
+
+  -- Calculates how many sessions you run
+  local session           = 0
+
+  -- Calculates the amount of correct answers
+  local correct_answers   = 0
+  local incorrect_answers = 0
+
+
+  -- Function to check if a program is installed
+  -- Usage: is_program_installed(program_name)
+  function is_program_installed(program_name)
+     local command = string.format("command -v %s >/dev/null 2>&1 && echo 'yes' || echo 'no'", program_name)
+     local handle = io.popen(command)
+     local result = handle:read("*a")
+     handle:close()
+     return result:match("yes") ~= nil
+  end
+
+  -- Welcome message function
+  function welcome()
+      print("Welcome to my script that will help you practice Azerbaijani words and sentences")
+      print("-Karl")
+      io.read()
+  end
+
+  -- Function that prompts you to choose word list
+  function word_list()
+
+     if wordlist == nil then
+        if files == nil or files == '' then
+            choice = io.popen("find " .. os.getenv("PWD") .. "/lua_words -iname \"*.lua\" | awk -F \"/\" '{print $NF}' | sed -e 's/.lua//g' | fzf"):read("*line")
+        else
+            choice_file = files
+        end
+     end
+
+     if wordlist == nil then
+        require("lua_words/" .. choice )
+     end
+
+     -- Function to Shuffle the wordlist array
+     local function shuffle(wordlist)
+         local rand = math.random
+         local iterations = #wordlist
+
+         for i = iterations, 2, -1 do
+             local j = rand(i)
+             wordlist[i], wordlist[j] = wordlist[j], wordlist[i]
+         end
+     end
+
+     -- shuffle the array to make the questions random
+     shuffle(wordlist)
+
+     end
+
+     -- Function that asks you which language root you want to take
+  function language()
+    -- Keeps running if you make incorrect choice
+    language = "empty"
+
+    -- Keeps running if you make invalid choice
+    while language == "empty" do
+      local question = "Choose which Language you want your questions to be in ((A)zerbajan/(E)nglish/): "
+      io.write(colors.blue .. question)
+      print(colors.reset)
+      local choice = io.read()
+
+      -- Statement that sets the language variable depending on choice
+      if choice == "A" or choice == "a" then
+          -- Perform action for choice A
+          language="azerbajan"
+      elseif choice == "E" or choice == "e" then
+          -- Perform action for choice E
+          language="english"
+      else
+          -- Invalid choice
+          print("Invalid choice, Try again")
+      end
+
+    end
+
+    os.execute("clear")
+
+  end
+
+
+  -- Main function that prompt you to answer in azerbajani
+  function question_main()
+
+    for i = 1, #wordlist do
+      -- Sets the correct answer
+      local correct = wordlist[i][1]
+      local correct = string.lower(correct)
+
+      -- Sets the first letter to uppercase for the value inside of word
+      local word = wordlist[i][2]
+      local word_firstLetter = word:sub(1, 1):upper()
+      local word_restofword = word:sub(2)
+      local word = word_firstLetter .. word_restofword
+
+        -- asks you the questions
+        io.write(colors.blue .. "What is " .. colors.green .. word .. colors.blue ..  " in Azerbajani: " )
+        local choice = io.read()
+        -- Sets your answer to all lowercase
+        local choice = choice:lower()
+
+         -- Reset colors
+         print(colors.reset)
+
+         -- Calculates if your answer is correct
+         if choice == correct then
+
+           io.write(colors.green .. "Congratulations answer is correct!")
+           io.read()
+           os.execute("clear")
+           correct_answers = correct_answers + 1
+
+           print(colors.reset)
+
+         else
+
+           -- Only runs if your answer is incorrect
+           local firstLetter = correct:sub(1, 1):upper()
+           local restofword = correct:sub(2)
+           local correct = firstLetter .. restofword
+
+           io.write(colors.red .. "Sadly your answer is not correct")
+           print("")
+           io.write("Correct answer is: " .. correct .. ": ")
+           io.write("Your answer was: " .. choice .. ": ")
+           io.read()
+           os.execute("clear")
+           incorrect_answers = incorrect_answers + 1
+
+           print(colors.reset)
+
+         end
+    end
+
+  end
+
+  -- Alternative function that prompt you to answer in english
+  function question_alt()
+    for i = 1, #wordlist do
+        local correct = wordlist[i][2]
+        local word = wordlist[i][1]
+
+        io.write("What is " .. word ..  " in English: " )
+        local choice = io.read()
+        -- converts to lowercase
+        local choice = string.lower(choice)
+
+         if choice == correct then
+
+           io.write("Congratulations answer is correct!")
+           io.read()
+           os.execute("clear")
+           correct_answers = correct_answers + 1
+
+         else
+
+           -- Converts to uppercase
+           local firstLetter = correct:sub(1, 1):upper()
+           local restofword = correct:sub(2)
+           local correct = firstLetter .. restofword
+
+           io.write("Sadly your answer is not correct")
+           print("")
+           io.write("Correct answer is: " .. correct .. ": ")
+           io.read()
+           os.execute("clear")
+           incorrect_answers = incorrect_answers + 1
+
+         end
+
+    end
+  end
+
+  -- Function to run the script again if you choose to
+  function do_again()
+      -- Makes local check function
+      -- while loop will keep running if you make incorrect answer
+      local check = "false"
+
+      while check == "false" do
+
+        io.write("Do you want to do another round? [y/n]")
+        local choice = io.read()
+
+        if choice == "y" or choice == "Y" then
+
+          check = "true"
+          io.write("You did choose to do another round  ")
+          io.read()
+
+        elseif choice == "n" or choice == "N" then
+
+          check = "true"
+          run = "no"
+
+        else
+
+          print("Invalid choice")
+
+        end
+
+      end
+
+  end
+
+  -- Calls all the function
+  os.execute("clear")
+
+  if is_program_installed(fzf) then
+     print("")
+  else
+     print(fzf .. " is not installed: leaving")
+     os.exit(0)
+  end
+
+  -- Process the switches
+  processSwitches()
+
+  -- Welcome message
+  welcome()
+
+  -- Asks if you want to write in english or azerbajani
+  language()
+
+  while run == "yes" do
+
+    session = session + 1
+
+    word_list()
+
+
+    if language == "azerbajan" then
+
+         question_main()
+
+    elseif language == "english" then
+
+         question_alt()
+
+    end
+
+
+    -- Asks if you want to try again with another list
+    do_again()
+
+    -- Clear screen
+    os.execute("clear")
+
+   if run == "run" then
+    wordlist = nil
+   end
+
+  end
+
+  print("Your correct answers over " .. session .. " sessions" )
+  print("Correct: " .. correct_answers)
+  print("İncorrect: " .. incorrect_answers)
+
+end
+#+end_src

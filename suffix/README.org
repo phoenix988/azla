@@ -57,8 +57,8 @@
  +-----------------|
  | Accusative Case |
  +-----------------|
- | ı i u ü         |
- | nı ni nu nü     |
+ | ı i u ü     |
+ | nı ni nu nü |
  +-----------------|
 **** Locative
 - This means that you are somewhere like your at a cafe
@@ -72,7 +72,7 @@
  +--------------------|
  | Ablative Case - From |
  +--------------------|
-  | da dən |
+  | da dən |   |
  +--------------------|
 
 

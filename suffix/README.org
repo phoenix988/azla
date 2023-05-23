@@ -59,7 +59,7 @@
  |-----------------|
  | ı i u ü         |
  | nı ni nu nü     |
- +-----------------|
+ |-----------------|
 **** Locative
 - This means that you are somewhere like your at a cafe
  |----------------------|

@@ -180,7 +180,7 @@ local function create_app2()
       elseif languageChoice == "english" then
          languageNumber_1 = 2
          languageNumber_2 = 1
-         languageString = "in Enlish"
+         languageString = "in English"
       end
      
       -- Iterate over the wordlist using a for loop

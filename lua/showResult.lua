@@ -1,10 +1,16 @@
+-- Function to show the result in my GTK app
+-- This is not in use I have this code snippet in
+-- QuestionMain.lua because I couldnt make it to work using this file
 
+-- Imports libaries
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
 
+-- Sets correct answer variables
 local correct_answers = 0
 local incorrect_answers = 0
 
+-- Defines the function
 local function show_result(correct_answers)
 
 
@@ -44,6 +50,7 @@ local function show_result(correct_answers)
  
 end
 
+-- Returns all avriables we need to import
 return { show_result = show_result,
          correct_answers = correct_answers, 
          incorrect_answers = incorrect_answers }

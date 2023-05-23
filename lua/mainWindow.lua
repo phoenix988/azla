@@ -29,6 +29,7 @@ local luaWordsPath      = "lua_words"
 
 -- Sets variable that will determine language choice
 local sharedVariable    = "azerbajani"
+local winSizeWidth, winSizeHeight           
 
 -- Creates the window where you input answers in azerbajani
 -- Makes the main startup window
@@ -43,7 +44,7 @@ function app1:on_startup()
         decorated = true,
         deletable = true,
      })
-        
+
     
     -- Makes the main box widget to be used 
     local box = Gtk.Box({
@@ -60,6 +61,18 @@ function app1:on_startup()
         margin_start  = 40,
         margin_end    = 40
     })
+
+    -- Some labels used on the startup window
+    local labelLanguage = Gtk.Label({ label = "Choose Language you want to write answers in:" })
+    local labelWordList = Gtk.Label({ label = "Choose your wordlist",  height_request = 50, })
+    local labelWelcome =  Gtk.Label({ 
+                          label = "Welcome to AZLA",
+                          width_request = 200,  -- Set the desired width
+                          height_request = 100,
+                          wrap = true })
+
+    labelWelcome:set_markup("<span size='20000'>" .. labelWelcome.label .. "</span>"  )
+
 
     -- Model for the combo box
     local model = Gtk.ListStore.new({ GObject.Type.STRING })
@@ -150,18 +163,7 @@ function app1:on_startup()
     end
 
 
-      -- Some labels used on the startup window
-    local labelLanguage = Gtk.Label({ label = "Choose Language you want to write answers in:" })
-    local labelWordList = Gtk.Label({ label = "Choose your wordlist",  height_request = 50, })
-    local labelWelcome =  Gtk.Label({ 
-                          label = "Welcome to AZLA",
-                          width_request = 200,  -- Set the desired width
-                          height_request = 100,
-                          wrap = true })
-
-    labelWelcome:set_markup("<span size='20000'>" .. labelWelcome.label .. "</span>"  )
-
-    
+        
     -- Create the start button
     local button = Gtk.Button({label = "Start", width_request = 100})
   
@@ -213,13 +215,19 @@ function app1:on_startup()
 
 end
 
+
 -- Creates the function to import the shared variable
 function getSharedVariable()
     return sharedVariable
 end
 
+function getWinSize()
+    return winSize
+end
+
 -- Export the necessary functions and variables
 return {
     app1 = app1,
-    getSharedVariable = getSharedVariable
+    getSharedVariable = getSharedVariable,
+    getWinSize = getWinSize
 }

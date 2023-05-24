@@ -1,0 +1,11 @@
+#!/bin/bash
+# Script that will run my Azla Gui
+# Used to practise azerbajani
+# But techincally you can use it for any language
+# Keep in mind tho that you need to add words manually
+
+LOCATION="$HOME/myrepos/azla/"
+
+cd $LOCATION
+
+exec $LOCATION/rc.lua

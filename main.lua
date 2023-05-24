@@ -17,6 +17,9 @@
 -- This is a rewritten version in lua
 -- Initially I wrote it using a shell script
 
+-- NOTE: This is just a terminal script
+-- Not the gui version
+
 -- Imports some libaries
 require("os")
 require("io")

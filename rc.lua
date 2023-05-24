@@ -6,6 +6,9 @@ local GObject        = lgi.require("GObject", "2.0")
 local GdkPixbuf      = lgi.require('GdkPixbuf')
 local lfs            = require("lfs")
 local io             = require("io")
+local os             = require("os")
+
+local home           = os.getenv("HOME")
 
 -- Imports window 1
 local appModule      = require("lua/mainWindow")
@@ -18,6 +21,22 @@ local fileExist       = fileExistModule.fileExists
 -- Sets terminal variable
 local terminal       = false
 
+local cacheFile      = home .. "/.cache/azla.lua"
+
+if not fileExists(cacheFile) then
+      local file = io.open(cacheFile, "w")
+
+      file:write("config = {\n")
+      file:write("    word_set = 1,\n")
+      file:write("    lang_set = 0,\n")
+      file:write("    default_width = 600,\n")
+      file:write("    default_height = 800,\n")
+      file:write("}")
+   
+       -- Close the file
+       file:close()
+
+end
 -- Define a function to process the switches
 function processSwitches()
   local i = 1

@@ -117,12 +117,19 @@ local function create_app2()
 
   -- Create the main window function
   function app2:on_activate()
+      
+      local mainWindowModule = require("lua/mainWindow")
+      local getWidth = mainWindowModule.getWindowWidth
+      local getHeight = mainWindowModule.getWindowHeight
+      local width = getWindowWidth()
+      local height = getWindowHeight()
+
       local win = Gtk.ApplicationWindow({
          title = appTitle,
          application = self,
          class = "Azla",
-         default_width = 600,
-         default_height = 600,
+         default_width = width,
+         default_height = height,
          on_destroy = Gtk.main_quit,
          decorated = true,
          deletable = true,
@@ -169,8 +176,8 @@ local function create_app2()
       
       -- Imports the variable needed to determine which language you choose
       local mainWindowModule = require("lua/mainWindow")
-      local getSharedVariable = mainWindowModule.getSharedVariable
-      local languageChoice = getSharedVariable()
+      local getLanguageChoice = mainWindowModule.getLanguageChoice
+      local languageChoice = getLanguageChoice()
 
       -- Sets the variables depending on choice
       if languageChoice == "azerbajani" then
@@ -220,6 +227,7 @@ local function create_app2()
   
           -- Create result label for each question
           result_labels[i] = Gtk.Label()
+
   
           -- Define the callback function for the submit button
           submit_buttons[i].on_clicked = function()
@@ -230,6 +238,7 @@ local function create_app2()
                correct_answers = correct_answers + 1
                result_labels[i].label = "Congratulations, your answer is correct!"
                result_labels[i]:set_markup("<span foreground='green'>" .. result_labels[i].label .. "</span>")
+               result_labels[i]:set_markup("<span size='18000'>" .. result_labels[i].label .. "</span>"  )
                submit_buttons[i]:set_visible(false)
                next_buttons[i]:set_visible(true)
   
@@ -238,6 +247,7 @@ local function create_app2()
                incorrect_answers = incorrect_answers + 1
                result_labels[i].label = "Sorry, your answer is incorrect. Correct answer: " .. correct
                result_labels[i]:set_markup("<span foreground='red'>" .. result_labels[i].label .. "</span>")
+               result_labels[i]:set_markup("<span size='18000'>" .. result_labels[i].label .. "</span>"  )
                submit_buttons[i]:set_visible(false)
                next_buttons[i]:set_visible(true)
   
@@ -296,7 +306,7 @@ local function create_app2()
   
       end
       
-       -- Makes result button to show your result
+      -- Makes result button to show your result
       local resultButton = Gtk.Button({label = "Show Result"})
       
       -- Makes exit button to exit
@@ -307,11 +317,14 @@ local function create_app2()
           show_result(correct_answers)
       end
       
+      -- Imports window variable from mainWindow
       local mainWindowModule = require("lua/mainWindow")
       local mainWindow = mainWindowModule.app1
       
       -- Defines the function of Exitbutton
       function exitButton:on_clicked()
+          incorrect_answers = 0
+          correct_answers   = 0
           win:destroy()
           mainWindow:activate()
       end
@@ -338,7 +351,6 @@ end -- End of create_app2 function
 
 -- Returns the functions
 return {app2 = app2, create_app2 = create_app2 }
-
 
 
 

@@ -45,6 +45,9 @@ sudo luarocks install filesystem luautf8
 All you need to do to install this is to run install.sh.
 Remember that you need to install all dependencies manually
 #+begin_src sh
+git clone https://github.com/phoenix988/azla.git
+
+cd azla
 
 ./install.sh
 

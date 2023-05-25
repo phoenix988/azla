@@ -9,6 +9,8 @@
 * TABLE OF CONTENTS
 - [[ABOUT]]
 - [[DEPENDENCIES]]
+  - [[ARCH]]
+- [[INSTALL]]
 - [[SUFFIX][SUFFIX]]
 - [[EXAMPLE WORDS][EXAMPLE WORDS]]
   - [[WORDS/BASIC/BASICS.org][BASICS]]
@@ -32,20 +34,27 @@ But right now it is usable. All my wordlist are located in lua_words.
 Libaries needed to run this app is lgi, lfs, G0Object and GdkPixbuf.
 If you just clone this repo and want to run this app you need to have those libaries installed
 
+**** ARCH
 on arch you can run these commands to get all dependencies you need manually
 #+begin_src sh
 paru -S luarocks gtk4 lua-lgi-git
 
 sudo luarocks install filesystem luautf8
 #+end_src
+*** INSTALL
+All you need to do to install this is to run install.sh.
+Remember that you need to install all dependencies manually
+#+begin_src sh
 
+./install.sh
+
+#+end_src
 
 
 *** SUFFIX
 #+CAPTION: About the rules of suffix in azerbajani language
 Click Here to Read about it
 [[https://github.com/phoenix988/azla/tree/dev/suffix][SUFFIX]]
-
 
 *** EXAMPLE WORDS
 #+CAPTION: Examples Word lists

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Azla
+Icon=/opt/azla/images/flag.jpg
+Exec=azla
+Terminal=false

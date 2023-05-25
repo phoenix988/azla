@@ -4,8 +4,16 @@
 # But techincally you can use it for any language
 # Keep in mind tho that you need to add words manually
 
-LOCATION="$HOME/myrepos/azla/"
+LOCATION="/opt/azla"
 
 cd $LOCATION
 
-exec $LOCATION/rc.lua
+if [ "$1" = "--term" ]; then
+
+  exec $LOCATION/rc.lua --term
+  
+else 
+
+  exec $LOCATION/rc.lua
+
+fi

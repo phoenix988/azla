@@ -29,6 +29,7 @@ local loadConfigModule  = require("lua/loadConfig")
 local loadConfig        = loadConfigModule.load_config
 local loadConfigCustom  = loadConfigModule.load_config_custom
 
+-- Imports fileexist module
 local fileExistModule = require("lua/fileExist")
 local fileExist       = fileExistModule.fileExists
 
@@ -40,6 +41,7 @@ local exportLanguageChoice    = "azerbajani"
 local width
 local height 
 
+-- load cachefile config
 local cacheFile          = home .. "/.cache/azla.lua"
 local configPath         = loadConfig(cacheFile)
 
@@ -49,8 +51,10 @@ if config == nil then
    config = ({})
 end
 
+-- Sets path of customConfig
 local customConfig       = home .. "/.config/azla.lua"
 
+-- Creates the config array if the custom file exist
 if fileExist(customConfig) then
    local customPath = loadConfigCustom(customConfig) --Custom config exist
 else
@@ -61,12 +65,29 @@ end
 -- Makes the main startup window
 function app1:on_startup()
 
-    if config.default_width == nil then
-        config.default_width = 600
-    end   
-    
-    if config.default_height == nil then
-        config.default_height = 800
+    if fileExist(customConfig) then
+       if custom.default_height == nil then
+           config.default_height = 800
+       else
+           config.default_height = custom.default_height
+       end
+
+       if custom.default_width == nil then
+           config.default_width = 800
+       else 
+           config.default_width = custom.default_width
+       end
+
+    else
+
+       if config.default_width == nil then
+           config.default_width = 600
+       end   
+       
+       if config.default_height == nil then
+           config.default_height = 800
+       end
+
     end
 
     -- Creates the window
@@ -210,12 +231,28 @@ function app1:on_startup()
        -- Use custom config if it exist
        -- Otherwise it use defaults
        if fileExist(customConfig) then
-          local defaultLang = custom.lang_set
+          if custom.lang_set == nil then
+             if config.lang_set == nil then
+                defaultLang = 0
+             else
+                defaultLang = config.lang_set
+             end
+          else
+             defaultLang = custom.lang_set
+          end
           combo:set_active(defaultLang)
+          
+          if defaultLang == 0 then
+              exportLanguageChoice = "azerbajani"
+          else
+              exportLanguageChoice = "english"
+          end
        else
           if config.lang_set == nil then 
             combo:set_active(0)
+          
           else
+             
              local defaultLang = config.lang_set
              combo:set_active(defaultLang)
              if defaultLang == 0 then
@@ -229,6 +266,7 @@ function app1:on_startup()
 
 
     -- Changes the 'label' text when user change the combo box value
+    -- Also updates the cache file so it remembers the last choice when you exit the app
     function combo:on_changed()
         -- Gets the current active combo number
         local n = self:get_active()
@@ -245,8 +283,10 @@ function app1:on_startup()
         end
 
         searchString = "lang_set" -- String to search for
-        local newText     = "   lang_set = " .. n
-        local newTextWord = "   word_set = " .. n_w
+        local newText       = "   lang_set = " .. n
+        local newTextWord   = "   word_set = " .. n_w
+        local newTextHeight = "   default_height = 800" 
+        local newTextWidth  = "   default_width = 600"
         local file = io.open(cacheFile, "r")
         if file then
             local lineCount = 0
@@ -270,6 +310,8 @@ function app1:on_startup()
                file:write("config = { \n")
                file:write(lines[lineCount] .. ",", "\n")
                file:write(newTextWord .. ",", "\n")
+               file:write(newTextHeight .. ",", "\n")
+               file:write(newTextWidth .. ",", "\n")
                file:write("}")
                file:close()
                print("File modified successfully.")
@@ -284,7 +326,8 @@ function app1:on_startup()
     end
     
     
-      -- Changes the 'label' text when user change the combo box value
+    -- Changes the 'label' text when user change the combo box value
+    -- Also updates the cache file so it remembers the last choice when you exit the app
     function comboWord:on_changed()
         local n = self:get_active()
         local n_w = combo:get_active()
@@ -292,8 +335,10 @@ function app1:on_startup()
        
         
         searchString = "word_set" -- String to search for
-        local newText     = "   lang_set = " .. n_w
-        local newTextWord = "   word_set = " .. n
+        local newText       = "   lang_set = " .. n_w
+        local newTextWord   = "   word_set = " .. n
+        local newTextHeight = "   default_height = 800" 
+        local newTextWidth  = "   default_width = 600"
         local file = io.open(cacheFile, "r")
         if file then
             local lineCount = 0
@@ -317,6 +362,8 @@ function app1:on_startup()
                file:write("config = { \n")
                file:write(lines[lineCount] .. ",", "\n")
                file:write(newTextWord .. ",", "\n")
+               file:write(newTextHeight .. ",", "\n")
+               file:write(newTextWidth .. ",", "\n")
                file:write("}")
                file:close()
                print("File modified successfully.")
@@ -336,7 +383,16 @@ function app1:on_startup()
        comboWord:set_active(1)
     else
        if fileExist(customConfig) then
-          local defaultWord = custom.word_set
+          if custom.word_set == nil then
+             if config.word_set == nil then
+               defaultWord = 0
+             else
+               defaultWord = config.word_set
+             end
+
+          else
+             defaultWord = custom.word_set
+          end
           comboWord:set_active(defaultWord)
        else 
           if config.word_set == nil then 
@@ -352,8 +408,9 @@ function app1:on_startup()
 
     -- Create Buttons --START    
     -- Create the start button
-    local button = Gtk.Button({label = "Start", width_request = 100})
+    local buttonStart = Gtk.Button({label = "Start", width_request = 100})
   
+    -- Create the Exit button
     local buttonExit = Gtk.Button({label = "Exit", width_request = 30, })
     
     -- Sets function to exit the application
@@ -362,7 +419,7 @@ function app1:on_startup()
     end
 
     -- Create the function when you press on start
-    function button:on_clicked()
+    function buttonStart:on_clicked()
      -- stack:set_visible_child_name("second")
         local active = combo:get_active()
         local activeWord = comboWord:get_active()
@@ -397,11 +454,13 @@ function app1:on_startup()
     box:append(combo)
     box:append(labelWordList)
     box:append(comboWord)
-    box:append(button)
+    box:append(buttonStart)
     box:append(labelSept)
     
+    -- Add widgets to secondary box
     boxAlt:append(buttonExit)
 
+    -- Appends bot boxes to the main one
     boxMain:append(box)
     boxMain:append(boxAlt)
 
@@ -410,16 +469,17 @@ function app1:on_startup()
 end
 
 
--- Creates the function to import the shared variable
+-- Creates the function to import the language variable
 function getLanguageChoice()
     return exportLanguageChoice
 end
 
+-- Returns the window height
 function getWindowHeight()
     return height
 end
 
-
+-- Returns the window width
 function getWindowWidth()
     return width
 end

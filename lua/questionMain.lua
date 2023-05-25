@@ -13,7 +13,7 @@ local create_image      = imageModule.create_image
 
 -- Define home variable
 local home              = os.getenv("HOME")
-local imagePath         = "/myrepos/azla/images/wp2106881.jpg"
+local imagePath         = "/opt/azla/images/flag.jpg"
 
 -- Define other variables used later in the application
 local question_labels   = {}
@@ -31,46 +31,9 @@ local appID2            = "io.github.Phoenix988.azla.az.lua"
 local appTitle          = "Azla Question"
 local app2              = Gtk.Application({ application_id = appID2 })
 
-
--- Function that calls a dialog box to show correct and incorrect answers
-local function show_result(correct_answers)
-
-
-   if correct_answers == nil then
-      local dialog_empty = Gtk.MessageDialog {
-         message_type = Gtk.MessageType.ERROR,
-         buttons = Gtk.ButtonsType.OK,
-         text = "No session run",
-         }
-
-     dialog_empty:show()
-
-     dialog_empty.on_response = function(dialog_empty, response_id)
-               if response_id == Gtk.ResponseType.OK then
-                   dialog_empty:close()  -- Close the dialog
-               end
-           end
-
-   else
-
-    local dialog = Gtk.MessageDialog {
-        message_type = Gtk.MessageType.INFO,
-        buttons = Gtk.ButtonsType.OK,
-        text = "Correct answers: " .. correct_answers,
-        secondary_text = "Incorrect answers: " .. incorrect_answers,
-       }
-     
-      dialog.on_response = function(dialog, response_id)
-           if response_id == Gtk.ResponseType.OK then
-               dialog:close()  -- Close the dialog
-           end
-         end
-
-      dialog:show()
-
-   end
- 
-end
+-- Import the show_result function from resultModule.lua
+local resultModule = require("lua/showResult")
+local show_result = resultModule.show_result
 
 -- Calculates current question
 local currentQuestion = 1
@@ -107,7 +70,6 @@ local function switchQuestion()
 end
 
 
-
 local function create_app2()
     -- Create the application object
     local app2 = Gtk.Application({
@@ -136,25 +98,40 @@ local function create_app2()
       })
 
   
+      local boxMain = Gtk.Box({
+          orientation = Gtk.Orientation.VERTICAL,
+          spacing = 10,
+      })
+
       -- Makes the main box widget to be used 
       local box = Gtk.Box({
           orientation = Gtk.Orientation.VERTICAL,
           spacing = 10,
-          width_request  = 200,
-          height_request = 400,
           halign = Gtk.Align.FILL,
           valign = Gtk.Align.CENTER,
           hexpand = true,
           vexpand = true,
-          margin_top    = 200,
-          margin_bottom = 200,
+          margin_top    = 30,
+          margin_bottom = 30,
           margin_start  = 200,
           margin_end    = 200
       })
 
-  
+      local boxAlt = Gtk.Box({
+          orientation = Gtk.Orientation.VERTICAL,
+          spacing = 10,
+          halign = Gtk.Align.FILL,
+          valign = Gtk.Align.CENTER,
+          hexpand = true,
+          vexpand = true,
+          margin_top    = 40,
+          margin_bottom = 40,
+          margin_start  = 30,
+          margin_end    = 30
+      })
+
       -- Creates image for the app
-      local image = create_image(home .. imagePath)
+      local image = create_image(imagePath)
       image:set_size_request(200, 150)
        
       -- Appends the image on the top
@@ -175,7 +152,6 @@ local function create_app2()
       shuffle(wordlist)
       
       -- Imports the variable needed to determine which language you choose
-      local mainWindowModule = require("lua/mainWindow")
       local getLanguageChoice = mainWindowModule.getLanguageChoice
       local languageChoice = getLanguageChoice()
 
@@ -285,6 +261,8 @@ local function create_app2()
       labelEndCorrect = Gtk.Label()
       -- Counts incorrect answers
       labelEndIncorrect = Gtk.Label()
+
+      local labelSept = Gtk.Label({label = ""})
   
       -- Creates the restart button if you want to restart the list
       restartButton = Gtk.Button({label = "Restart"})
@@ -309,12 +287,15 @@ local function create_app2()
       -- Makes result button to show your result
       local resultButton = Gtk.Button({label = "Show Result"})
       
+      -- Create back button to go back to main
+      local backButton = Gtk.Button({label = "Go Back"})
+      
       -- Makes exit button to exit
       local exitButton = Gtk.Button({label = "Exit"})
       
       -- Defines the function of Resultbutton
       function resultButton:on_clicked()
-          show_result(correct_answers)
+          show_result(correct_answers, incorrect_answers)
       end
       
       -- Imports window variable from mainWindow
@@ -322,11 +303,15 @@ local function create_app2()
       local mainWindow = mainWindowModule.app1
       
       -- Defines the function of Exitbutton
-      function exitButton:on_clicked()
+      function backButton:on_clicked()
           incorrect_answers = 0
           correct_answers   = 0
           win:destroy()
           mainWindow:activate()
+      end
+
+      function exitButton:on_clicked()
+          win:destroy()
       end
   
       -- Appends these widgets to box
@@ -335,7 +320,11 @@ local function create_app2()
       box:append(labelEndIncorrect)
       box:append(resultButton)
       box:append(restartButton)
+      box:append(labelSept)
+      box:append(backButton)
+      box:append(labelSept)
       box:append(exitButton)
+
   
       -- Appends box to the main window
       win.child = box

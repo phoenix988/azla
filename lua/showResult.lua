@@ -6,15 +6,13 @@
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
 
--- Sets correct answer variables
 local correct_answers = 0
 local incorrect_answers = 0
 
 -- Defines the function
-local function show_result(correct_answers)
-
-
-   if correct_answers == nil then
+local function show_result(correct_answers, incorrect_answers)
+   -- Sets correct answer variables
+   if correct_answers and incorrect_answers == nil then
       local dialog_empty = Gtk.MessageDialog {
          message_type = Gtk.MessageType.ERROR,
          buttons = Gtk.ButtonsType.OK,
@@ -51,8 +49,6 @@ local function show_result(correct_answers)
 end
 
 -- Returns all avriables we need to import
-return { show_result = show_result,
-         correct_answers = correct_answers, 
-         incorrect_answers = incorrect_answers }
+return { show_result = show_result}
 
 

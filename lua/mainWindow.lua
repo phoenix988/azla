@@ -22,7 +22,7 @@ local app1              = Gtk.Application({ application_id = appID1 })
 
 -- Gets users home directory
 local home              = os.getenv("HOME")
-local imagePath         = "/myrepos/azla/images/wp2106881.jpg"
+local imagePath         = "/opt/azla/images/flag.jpg"
 
 -- Imports Config function
 local loadConfigModule  = require("lua/loadConfig")
@@ -81,7 +81,11 @@ function app1:on_startup()
         deletable = true,
      })
 
-    
+    local boxMain = Gtk.Box({
+        orientation = Gtk.Orientation.VERTICAL,
+        spacing = 10,
+    })
+     
     -- Makes the main box widget to be used 
     local box = Gtk.Box({
         orientation = Gtk.Orientation.VERTICAL,
@@ -98,6 +102,20 @@ function app1:on_startup()
         margin_end    = 40
     })
 
+    local boxAlt = Gtk.Box({
+        orientation = Gtk.Orientation.VERTICAL,
+        spacing = 0,
+        width_request  = 50,
+        height_request = 50,
+        halign = Gtk.Align.FILL,
+        valign = Gtk.Align.BOTTOM,
+        hexpand = true,
+        vexpand = true,
+        margin_start  = 40,
+        margin_end    = 40
+    })
+
+
     -- Some labels used on the startup window
     local labelLanguage = Gtk.Label({ label = "Choose Language you want to write answers in:" })
     local labelWordList = Gtk.Label({ label = "Choose your wordlist",  height_request = 50, })
@@ -106,8 +124,10 @@ function app1:on_startup()
                           width_request = 200,  -- Set the desired width
                           height_request = 100,
                           wrap = true })
+    local labelSept = Gtk.Label({label = ""})
     -- Sets size of labels
     labelWelcome:set_markup("<span size='20000'>" .. labelWelcome.label .. "</span>"  )
+    labelSept:set_markup("<span size='40000'>" .. labelSept.label .. "</span>"  )
 
 
     -- Combo box --START
@@ -198,9 +218,15 @@ function app1:on_startup()
           else
              local defaultLang = config.lang_set
              combo:set_active(defaultLang)
+             if defaultLang == 0 then
+                 exportLanguageChoice = "azerbajani"
+             else
+                 exportLanguageChoice = "english"
+             end
           end   
        end 
     end
+
 
     -- Changes the 'label' text when user change the combo box value
     function combo:on_changed()
@@ -359,7 +385,7 @@ function app1:on_startup()
     -- Create Buttons --END    
 
     -- Creates the image
-    local image = create_image(home .. imagePath)
+    local image = create_image(imagePath)
 
     -- Sets the size of the image
     image:set_size_request(200, 150)
@@ -372,10 +398,15 @@ function app1:on_startup()
     box:append(labelWordList)
     box:append(comboWord)
     box:append(button)
-    box:append(buttonExit)
+    box:append(labelSept)
+    
+    boxAlt:append(buttonExit)
+
+    boxMain:append(box)
+    boxMain:append(boxAlt)
 
     -- Appends box to the main window
-    win.child = box
+    win.child = boxMain
 end
 
 

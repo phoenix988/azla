@@ -3,6 +3,7 @@ local lgi               = require("lgi")
 local Gtk               = lgi.require("Gtk", "4.0")
 local GObject           = lgi.require("GObject", "2.0")
 local GdkPixbuf         = lgi.require('GdkPixbuf')
+local gio               = require("lgi").Gio
 local lfs               = require("lfs")
 local os                = require("os")
 
@@ -131,11 +132,11 @@ local function create_app2()
       })
 
       -- Creates image for the app
-      local image = create_image(imagePath)
-      image:set_size_request(200, 150)
+      local image_2 = create_image(imagePath)
+      image_2:set_size_request(200, 150)
        
       -- Appends the image on the top
-      box:append(image)
+      box:append(image_2)
   
       -- Function to Shuffle the wordlist array
       local function shuffle(wordlist)
@@ -184,7 +185,7 @@ local function create_app2()
           -- Create entry field for each question
           entry_fields[i] = Gtk.Entry()
 
-          entry_fields[i]:set_size_request(200, 100) -- Set width = 200, height = 100
+          entry_fields[i]:set_size_request(200, 50) -- Set width = 200, height = 100
   
           -- Create submit button for each question
           submit_buttons[i] = Gtk.Button {
@@ -251,8 +252,6 @@ local function create_app2()
          box:append(submit_buttons[i])
          box:append(next_buttons[i])
   
-  
-  
       end -- End for loop
   
       -- Creates the labels shown at the end
@@ -262,7 +261,9 @@ local function create_app2()
       -- Counts incorrect answers
       labelEndIncorrect = Gtk.Label()
 
-      local labelSept = Gtk.Label({label = ""})
+      local labelSeperator = Gtk.Label({label = "_____________________________________________________________________________"})
+
+      labelSeperator:set_markup("<span foreground='#7dcfff'>" .. labelSeperator.label .. "</span>")
   
       -- Creates the restart button if you want to restart the list
       restartButton = Gtk.Button({label = "Restart"})
@@ -291,7 +292,7 @@ local function create_app2()
       local backButton = Gtk.Button({label = "Go Back"})
       
       -- Makes exit button to exit
-      local exitButton = Gtk.Button({label = "Exit"})
+      local exitButton = Gtk.Button({label = "Exit", margin_top = 50})
       
       -- Defines the function of Resultbutton
       function resultButton:on_clicked()
@@ -320,9 +321,7 @@ local function create_app2()
       box:append(labelEndIncorrect)
       box:append(resultButton)
       box:append(restartButton)
-      box:append(labelSept)
       box:append(backButton)
-      box:append(labelSept)
       box:append(exitButton)
 
   
@@ -340,8 +339,4 @@ end -- End of create_app2 function
 
 -- Returns the functions
 return {app2 = app2, create_app2 = create_app2 }
-
-
-
-
 

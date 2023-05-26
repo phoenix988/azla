@@ -38,6 +38,8 @@ local luaWordsPath      = "lua_words"
 
 -- Sets variable that will determine language choice
 local exportLanguageChoice    = "azerbajani"
+
+-- Sets window width and height empty variable
 local width
 local height 
 
@@ -64,7 +66,9 @@ end
 -- Creates the window where you input answers in azerbajani
 -- Makes the main startup window
 function app1:on_startup()
-
+    
+    -- Gets the width and height to set on the window
+    -- You can configure this in a config file
     if fileExist(customConfig) then
        if custom.default_height == nil then
            config.default_height = 800
@@ -101,13 +105,14 @@ function app1:on_startup()
         decorated = true,
         deletable = true,
      })
-
+    
+    -- Makes the main box widget to be used 
     local boxMain = Gtk.Box({
         orientation = Gtk.Orientation.VERTICAL,
         spacing = 10,
     })
      
-    -- Makes the main box widget to be used 
+    -- Makes some other boxes
     local box = Gtk.Box({
         orientation = Gtk.Orientation.VERTICAL,
         spacing = 10,
@@ -122,7 +127,8 @@ function app1:on_startup()
         margin_start  = 40,
         margin_end    = 40
     })
-
+ 
+    -- Makes secondary box
     local boxAlt = Gtk.Box({
         orientation = Gtk.Orientation.VERTICAL,
         spacing = 0,
@@ -138,33 +144,42 @@ function app1:on_startup()
 
 
     -- Some labels used on the startup window
+    -- Language Label
     local labelLanguage = Gtk.Label({ label = "Choose Language you want to write answers in:" })
+
+    -- Word list label
     local labelWordList = Gtk.Label({ label = "Choose your wordlist",  height_request = 50, })
+
+    -- Welcome label for welcome message
     local labelWelcome =  Gtk.Label({ 
                           label = "Welcome to AZLA",
                           width_request = 200,  -- Set the desired width
                           height_request = 100,
                           wrap = true })
     local labelSept = Gtk.Label({label = ""})
-    -- Sets size of labels
+ 
+    -- Sets size of the labels
     labelWelcome:set_markup("<span size='20000'>" .. labelWelcome.label .. "</span>"  )
     labelSept:set_markup("<span size='40000'>" .. labelSept.label .. "</span>"  )
 
 
     -- Combo box --START
+    -- Here I am configuiring the combo box widgets for Azla 
+    -- Where you make some choice
+
     -- Model for the combo box
     local model = Gtk.ListStore.new({ GObject.Type.STRING })
 
     -- Model for the second combo box
     local modelWord = Gtk.ListStore.new({ GObject.Type.STRING })
   
-    -- Define language options
+    -- Define language options for language combo box
     local items = {
       "Azerbaijan",
       "English"
     }
 
-    -- Function to list all word files
+    -- Function to list all word files inside lua_words
     local function getLuaFilesInDirectory(directory)
        local luaFiles = {}
  
@@ -179,11 +194,11 @@ function app1:on_startup()
        return luaFiles --Returns luaFiles variable to be used later
     end
     
-    -- Gets the lua files in word directory
+    -- Calls the getluafilesdirectory function
     local directoryPath = luaWordsPath
     local luaFiles = getLuaFilesInDirectory(directoryPath)
 
-    -- Add the items to the model
+    -- Add the items to the language model
     for _, name in ipairs(items) do
         model:append({ name })
     end
@@ -208,7 +223,7 @@ function app1:on_startup()
         }
     })
     
-    -- Makes the combobox widgets for wordlists
+    -- Makes the combobox widget for wordlists
     local comboWord = Gtk.ComboBox({
         model = modelWord,
         active = 0,
@@ -221,7 +236,7 @@ function app1:on_startup()
         }
     })
     
-    -- Makes empty array ti store my wordslist
+    -- Makes empty array to store my wordslist
     local wordlist = {}
     
     --If config file doesn't exist then it will set default value here
@@ -230,6 +245,8 @@ function app1:on_startup()
     else
        -- Use custom config if it exist
        -- Otherwise it use defaults
+       -- Can probably make this better, right now it's just 
+       -- a bunch of nested if statements
        if fileExist(customConfig) then
           if custom.lang_set == nil then
              if config.lang_set == nil then
@@ -271,6 +288,10 @@ function app1:on_startup()
         -- Gets the current active combo number
         local n = self:get_active()
         local n_w = comboWord:get_active()
+        
+        -- Gets the dimensions of the screen
+        width  = win:get_allocated_width()
+        height = win:get_allocated_height()
         labelLanguage.label = "Option "..n.." selected ("..items[n + 1]..")"
         if n == 0 then
            -- Determines which languages to use
@@ -282,47 +303,31 @@ function app1:on_startup()
            exportLanguageChoice = "english"
         end
 
-        searchString = "lang_set" -- String to search for
-        local newText       = "   lang_set = " .. n
-        local newTextWord   = "   word_set = " .. n_w
-        local newTextHeight = "   default_height = 800" 
-        local newTextWidth  = "   default_width = 600"
-        local file = io.open(cacheFile, "r")
+        configReplace =  {
+           word_set = n_w,
+           lang_set = n,
+           default_width = width,
+           default_height = height
+           }
+
+        -- Replace the cacheFile with the new values
+        config = configReplace
+
+        -- Write the updated config back to the file
+        local file = io.open(cacheFile, "w")
         if file then
-            local lineCount = 0
-            for line in file:lines() do
-              lineCount = lineCount + 1
-              if string.find(line, searchString) then
-                  break
-              end
-            end
-
-           local lines = {}
-           for line in file:lines() do
-               table.insert(lines, line)
+           file:write("config = {\n")
+           for key, value in pairs(config) do
+              file:write("   " .. key .. " = " .. tostring(value) .. ",\n")
            end
-           
+           file:write("}\n")
            file:close()
-           lines[lineCount] = newText
-           
-           file = io.open(cacheFile, "w")
-           if file then
-               file:write("config = { \n")
-               file:write(lines[lineCount] .. ",", "\n")
-               file:write(newTextWord .. ",", "\n")
-               file:write(newTextHeight .. ",", "\n")
-               file:write(newTextWidth .. ",", "\n")
-               file:write("}")
-               file:close()
-               print("File modified successfully.")
-           else
-               print("Failed to open the file for writing.")
-           end
-       
-       else
-           print("Failed to open the file for reading.")
-
+           print("Config file updated successfully.")
+        else
+           print("Failed to open config file.")
         end
+
+        
     end
     
     
@@ -331,50 +336,41 @@ function app1:on_startup()
     function comboWord:on_changed()
         local n = self:get_active()
         local n_w = combo:get_active()
-        labelWordList.label = "WordList "..n.." selected ("..luaFiles[n + 1]..")"
-       
+
+        -- Gets the screens dimensions
+        width  = win:get_allocated_width()
+        height = win:get_allocated_height()
         
-        searchString = "word_set" -- String to search for
-        local newText       = "   lang_set = " .. n_w
-        local newTextWord   = "   word_set = " .. n
-        local newTextHeight = "   default_height = 800" 
-        local newTextWidth  = "   default_width = 600"
-        local file = io.open(cacheFile, "r")
-        if file then
-            local lineCount = 0
-            for line in file:lines() do
-              lineCount = lineCount + 1
-              if string.find(line, searchString) then
-                  break
-              end
-            end
-
-           local lines = {}
-           for line in file:lines() do
-               table.insert(lines, line)
-           end
-           
-           file:close()
-           lines[lineCount] = newText
-           
-           file = io.open(cacheFile, "w")
-           if file then
-               file:write("config = { \n")
-               file:write(lines[lineCount] .. ",", "\n")
-               file:write(newTextWord .. ",", "\n")
-               file:write(newTextHeight .. ",", "\n")
-               file:write(newTextWidth .. ",", "\n")
-               file:write("}")
-               file:close()
-               print("File modified successfully.")
-           else
-               print("Failed to open the file for writing.")
-           end
+        -- Updates label when you change option
+        labelWordList.label = "WordList "..n.." selected ("..luaFiles[n + 1]..")"
+        
        
-       else
-           print("Failed to open the file for reading.")
+        configReplace =  {
+           word_set = n,
+           lang_set = n_w,
+           width_default = width,
+           height_default = height
+           }
 
+
+        -- Replace the cacheFile with the new values
+        config = configReplace
+
+        -- Write the updated config back to the file
+        local file = io.open(cacheFile, "w")
+        if file then
+           file:write("config = {\n")
+           for key, value in pairs(config) do
+              file:write("   " .. key .. " = " .. tostring(value) .. ",\n")
+           end
+           file:write("}\n")
+           file:close()
+           print("Config file updated successfully.")
+        else
+           print("Failed to open config file.")
         end
+
+
 
     end
 
@@ -413,14 +409,45 @@ function app1:on_startup()
     -- Create the Exit button
     local buttonExit = Gtk.Button({label = "Exit", width_request = 30, })
     
-    -- Sets function to exit the application
+    -- Sets function to run when you click the exit button
     function buttonExit:on_clicked()
+        local n = comboWord:get_active()
+        local n_w = combo:get_active()
+
+        -- Gets the screens dimensions
+        width  = win:get_allocated_width()
+        height = win:get_allocated_height()
+
+       configReplace =  {
+           word_set = n,
+           lang_set = n_w,
+           default_width = width,
+           default_height = height
+           }
+
+        -- Replace the cacheFile with the new values
+        config = configReplace
+
+        -- Write the updated config back to the file
+        local file = io.open(cacheFile, "w")
+        if file then
+           file:write("config = {\n")
+           for key, value in pairs(config) do
+              file:write("   " .. key .. " = " .. tostring(value) .. ",\n")
+           end
+           file:write("}\n")
+           file:close()
+           print("Config file updated successfully.")
+        else
+           print("Failed to open config file.")
+        end
+
+        -- Destroys the window
        win:destroy()
     end
 
     -- Create the function when you press on start
     function buttonStart:on_clicked()
-     -- stack:set_visible_child_name("second")
         local active = combo:get_active()
         local activeWord = comboWord:get_active()
         local activeWord = activeWord + 1
@@ -460,13 +487,13 @@ function app1:on_startup()
     -- Add widgets to secondary box
     boxAlt:append(buttonExit)
 
-    -- Appends bot boxes to the main one
+    -- Appends both boxes to the main one
     boxMain:append(box)
     boxMain:append(boxAlt)
 
     -- Appends box to the main window
     win.child = boxMain
-end
+end -- End of the app function
 
 
 -- Creates the function to import the language variable

@@ -143,11 +143,11 @@ function app1:on_startup()
     })
 
 
-    -- Some labels used on the startup window
+    -- Some labels used on the startup window --START
     -- Language Label
     local labelLanguage = Gtk.Label({ label = "Choose Language you want to write answers in:" })
 
-    -- Word list label
+         -- Word list label
     local labelWordList = Gtk.Label({ label = "Choose your wordlist",  height_request = 50, })
 
     -- Welcome label for welcome message
@@ -161,6 +161,8 @@ function app1:on_startup()
     -- Sets size of the labels
     labelWelcome:set_markup("<span size='20000'>" .. labelWelcome.label .. "</span>"  )
     labelSept:set_markup("<span size='40000'>" .. labelSept.label .. "</span>"  )
+
+    -- Label --END
 
 
     -- Combo box --START
@@ -198,7 +200,7 @@ function app1:on_startup()
     local directoryPath = luaWordsPath
     local luaFiles = getLuaFilesInDirectory(directoryPath)
 
-    -- Add the items to the language model
+        -- Add the items to the language model
     for _, name in ipairs(items) do
         model:append({ name })
     end
@@ -280,7 +282,14 @@ function app1:on_startup()
           end   
        end 
     end
+ 
+    -- set default label of labelWordList
+    local wordActive = comboWord:get_active()
+    local labelWordStringStart = luaFiles[wordActive + 1]
+    local last = string.match(labelWordStringStart, "[^/]+$")
+    local last = string.match(last, "([^.]+).")
 
+    labelWordList.label = "WordList "..wordActive.." selected (".. last ..")"
 
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app
@@ -341,8 +350,13 @@ function app1:on_startup()
         width  = win:get_allocated_width()
         height = win:get_allocated_height()
         
+        -- Only get the list name
+        newStr = luaFiles[n + 1]
+        last = string.match(newStr, "[^/]+$")
+        last = string.match(last, "([^.]+).")
+
         -- Updates label when you change option
-        labelWordList.label = "WordList "..n.." selected ("..luaFiles[n + 1]..")"
+        labelWordList.label = "WordList "..n.." selected (".. last ..")"
         
        
         configReplace =  {

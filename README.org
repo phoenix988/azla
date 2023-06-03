@@ -21,6 +21,7 @@
   - [[WORDS/FAMILY/MEMBERS.org][FAMILY_MEMBERS]]
   - [[WORDS/VERBS/VERBS-INFINITE.org][VERBS_INFINITE]]
 - [[RC.LUA]]
+- [[LICENSE]]
 
 
 
@@ -45,6 +46,9 @@ sudo luarocks install filesystem luautf8
 All you need to do to install this is to run install.sh.
 Remember that you need to install all dependencies manually
 #+begin_src sh
+git clone https://github.com/phoenix988/azla.git
+
+cd azla
 
 ./install.sh
 
@@ -537,3 +541,6 @@ elseif terminal == true then
 
 end
 #+end_src
+
+* LICENSE
+[[https://choosealicense.com/licenses/mit/][MIT]]

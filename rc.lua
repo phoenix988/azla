@@ -8,16 +8,27 @@ local lfs            = require("lfs")
 local io             = require("io")
 local os             = require("os")
 
+-- Gets the current directory
+local currentDir = debug.getinfo(1, "S").source:sub(2)
+currentDir = currentDir:match("(.*/)") or ""
+
+-- Append the current directory to the package path
+package.path = currentDir .. "?.lua;" .. package.path
+
+-- Imports init file
+local import         = require("lua.init")
+
 -- Sets home variable
 local home           = os.getenv("HOME")
 
--- Imports window 1
-local appModule      = require("lua/mainWindow")
-local app1           = appModule.app1
+local luaWordsPath      = currentDir .. "words"
+local luaWordsModule    = "lua.words"
 
--- Import file exist module
-local fileExistModule = require("lua/fileExist")
-local fileExist       = fileExistModule.fileExists
+-- File exist function
+local fileExist       = import.fileExists
+
+-- Main window
+local app1            = import.app1
 
 -- Sets terminal variable
 local terminal       = false
@@ -66,14 +77,14 @@ function processSwitches()
       else
  
          -- Will leave if the file doesn't exist
-         local filename = "lua_words/" .. input .. ".lua"
+         local filename = luaWordsPath .. input .. ".lua"
          if not fileExists(filename) then
            print("File does not exist:", filename)
            os.exit(1)
          end
 
          -- Process the input file
-         require("lua_words/" .. input)
+         require(luaWordsModule .. input)
          i = i + 1
           
       end
@@ -151,14 +162,14 @@ elseif terminal == true then
       
      if wordlist == nil then
         if files == nil or files == '' then
-            choice = io.popen("find " .. os.getenv("PWD") .. "/lua_words -iname \"*.lua\" | awk -F \"/\" '{print $NF}' | sed -e 's/.lua//g' | fzf"):read("*line")
+            choice = io.popen("find " .. os.getenv("PWD") .. "/lua/words -iname \"*.lua\" | awk -F \"/\" '{print $NF}' | sed -e 's/.lua//g' | fzf"):read("*line")
         else
             choice_file = files
         end
      end
         
      if wordlist == nil then
-        require("lua_words/" .. choice )
+        wordlist = require(luaWordsModule .. "." .. choice )
      end
      
      -- Function to Shuffle the wordlist array

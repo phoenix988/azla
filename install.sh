@@ -7,7 +7,6 @@ INSTALL_PATH=/opt/azla
 
 # all files we need to move to INSTALL_PATH
 declare -a items=(
-   "lua_words"
    "rc.lua"
    "lua"
    "images"

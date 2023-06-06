@@ -9,19 +9,28 @@ local os                = require("os")
 
 -- Other imports and global variables
 -- Imports function to create images
-local imageModule       = require("lua/createImage")
+local imageModule       = require("lua.createImage")
 local create_image      = imageModule.create_image
 
 -- Define home variable
 local home              = os.getenv("HOME")
 local imagePath         = "/opt/azla/images/flag.jpg"
 
+-- Cache file path
+local cacheFile          = home .. "/.cache/azla.lua"
+
+-- Import function to write to cache file
+local writeToConfigModule   = require("lua.settings")
+local writeTo_config        = writeToConfigModule.writeTo_config
+local configReplace         = writeToConfigModule.setconfigReplace
+
 -- Define other variables used later in the application
-local question_labels   = {}
-local entry_fields      = {}
-local submit_buttons    = {}
-local result_labels     = {}
-local next_buttons      = {}
+local question_labels    = {}
+local entry_fields       = {}
+local submit_buttons     = {}
+local result_labels      = {}
+local next_buttons       = {}
+local show_result_labels = {}
 
 -- Counts correct answers
 local correct_answers   = 0
@@ -33,55 +42,26 @@ local appTitle          = "Azla Question"
 local app2              = Gtk.Application({ application_id = appID2 })
 
 -- Import the show_result function from resultModule.lua
-local resultModule = require("lua/showResult")
+local resultModule = require("lua.showResult")
 local show_result = resultModule.show_result
+
+local import = require("lua.switchQuestion")
+local switchQuestion = import.switchQuestion
 
 -- Calculates current question
 local currentQuestion = 1
 
--- Function so it switch question after you submit your answer
-local function switchQuestion()
-     currentQuestion = currentQuestion + 1
-     if currentQuestion > #wordlist then
-        labelEnd.label = "You reached the last question"
-        labelEnd:set_markup("<span foreground='green'>" .. labelEnd.label .. "</span>")
-        restartButton:set_visible(true)
-        labelEndCorrect.label = "correct: " .. correct_answers
-        labelEndCorrect:set_markup("<span foreground='green'>" .. labelEndCorrect.label .. "</span>")
-        labelEndIncorrect.label = "Incorrect: " .. incorrect_answers
-        labelEndIncorrect:set_markup("<span foreground='red'>" .. labelEndIncorrect.label .. "</span>")
-
-     end
-
-     -- Hide all question elements
-     for i = 1, #wordlist do
-        question_labels[i]:set_visible(false)
-        entry_fields[i]:set_visible(false)
-        submit_buttons[i]:set_visible(false)
-        result_labels[i]:set_visible(false)
-        next_buttons[i]:set_visible(false)
-     end
-
-     -- Show the active question elements
-     question_labels[currentQuestion]:set_visible(true)
-     entry_fields[currentQuestion]:set_visible(true)
-     submit_buttons[currentQuestion]:set_visible(true)
-     result_labels[currentQuestion]:set_visible(true)
-     next_buttons[currentQuestion]:set_visible(false)
-end
-
-
 local function create_app2()
-    -- Create the application object
-    local app2 = Gtk.Application({
-        application_id = appID2,
-        flags = {"HANDLES_OPEN"}
-    })
+  -- Create the application object
+  local app2 = Gtk.Application({
+      application_id = appID2,
+      flags = {"HANDLES_OPEN"}
+  })
 
   -- Create the main window function
   function app2:on_activate()
       
-      local mainWindowModule = require("lua/mainWindow")
+      local mainWindowModule = require("lua.mainWindow")
       local getWidth = mainWindowModule.getWindowWidth
       local getHeight = mainWindowModule.getWindowHeight
       local width = getWindowWidth()
@@ -137,9 +117,13 @@ local function create_app2()
        
       -- Appends the image on the top
       box:append(image_2)
+
+      local getWordList = mainWindowModule.getWordList
+      local wordlist = getWordList()
   
       -- Function to Shuffle the wordlist array
       local function shuffle(wordlist)
+
           local rand = math.random
           local iterations = #wordlist
       
@@ -199,12 +183,25 @@ local function create_app2()
           next_buttons[i].on_clicked = function ()
               question_labels[currentQuestion]:set_visible(false)
               -- Move to the next question
-              switchQuestion()
+              switchQuestion(correct_answers, 
+              incorrect_answers, 
+              question_labels,
+              entry_fields,
+              submit_buttons,
+              result_labels,
+              next_buttons,
+              labelEnd,
+              labelEndCorrect,
+              labelEndIncorrect,
+              restartButton,
+              summaryButton,
+              backButton)
           end
   
           -- Create result label for each question
           result_labels[i] = Gtk.Label()
 
+          show_result_labels[i]   = Gtk.Label({visible = false})
   
           -- Define the callback function for the submit button
           submit_buttons[i].on_clicked = function()
@@ -214,6 +211,9 @@ local function create_app2()
           if choice == correct then
                correct_answers = correct_answers + 1
                result_labels[i].label = "Congratulations, your answer is correct!"
+               show_result_labels[i].label = "Correct: " .. correct .. " Answer: " .. choice
+               show_result_labels[i]:set_markup("<span foreground='green'>" .. show_result_labels[i].label .. "</span>")
+               show_result_labels[i]:set_markup("<span size='15000'>" .. show_result_labels[i].label .. "</span>"  )
                result_labels[i]:set_markup("<span foreground='green'>" .. result_labels[i].label .. "</span>")
                result_labels[i]:set_markup("<span size='18000'>" .. result_labels[i].label .. "</span>"  )
                submit_buttons[i]:set_visible(false)
@@ -223,6 +223,9 @@ local function create_app2()
                 
                incorrect_answers = incorrect_answers + 1
                result_labels[i].label = "Sorry, your answer is incorrect. Correct answer: " .. correct
+               show_result_labels[i].label = "Correct: " .. correct .. " Answer: " .. choice
+               show_result_labels[i]:set_markup("<span foreground='red'>" .. show_result_labels[i].label .. "</span>")
+               show_result_labels[i]:set_markup("<span size='15000'>" .. show_result_labels[i].label .. "</span>"  )
                result_labels[i]:set_markup("<span foreground='red'>" .. result_labels[i].label .. "</span>")
                result_labels[i]:set_markup("<span size='18000'>" .. result_labels[i].label .. "</span>"  )
                submit_buttons[i]:set_visible(false)
@@ -251,6 +254,7 @@ local function create_app2()
          box:append(result_labels[i])
          box:append(submit_buttons[i])
          box:append(next_buttons[i])
+         box:append(show_result_labels[i])
   
       end -- End for loop
   
@@ -278,18 +282,56 @@ local function create_app2()
           correct_answers = 0
           incorrect_answers = 0
           currentQuestion = 1  -- Start from the first question if reached the end
+
+          import.setQuestion(currentQuestion)
           
           -- Relaunch the app
           win:destroy()
           app2:activate()
-  
+
       end
       
       -- Makes result button to show your result
       local resultButton = Gtk.Button({label = "Show Result"})
+
+      summaryButton = Gtk.Button({label = "Summary"})
+      hidesummaryButton = Gtk.Button({label = "Hide"})
+ 
+      summaryButton:set_visible(false)
+      hidesummaryButton:set_visible(false)
+
+      function summaryButton:on_clicked()
+
+         for i = 1, #wordlist do
+            show_result_labels[i]:set_visible(true)
+         end
+
+          labelEnd:set_visible(false)
+          labelEndCorrect:set_visible(false)
+          labelEndIncorrect:set_visible(false)
+          resultButton:set_visible(false)
+          summaryButton:set_visible(false)
+          hidesummaryButton:set_visible(true)
+
+      end
+
+      function hidesummaryButton:on_clicked()
+
+         for i = 1, #wordlist do
+            show_result_labels[i]:set_visible(false)
+         end
+
+          labelEnd:set_visible(true)
+          labelEndCorrect:set_visible(true)
+          labelEndIncorrect:set_visible(true)
+          resultButton:set_visible(true)
+          summaryButton:set_visible(true)
+          hidesummaryButton:set_visible(false)
+
+      end
       
       -- Create back button to go back to main
-      local backButton = Gtk.Button({label = "Go Back"})
+      backButton = Gtk.Button({label = "Go Back"})
       
       -- Makes exit button to exit
       local exitButton = Gtk.Button({label = "Exit", margin_top = 50})
@@ -300,19 +342,52 @@ local function create_app2()
       end
       
       -- Imports window variable from mainWindow
-      local mainWindowModule = require("lua/mainWindow")
+      local mainWindowModule = require("lua.mainWindow")
       local mainWindow = mainWindowModule.app1
       
       -- Defines the function of Exitbutton
       function backButton:on_clicked()
+          -- Resets the variables that keep tracks of current 
+          -- question and correct answers
+          correct_answers = 0
           incorrect_answers = 0
-          correct_answers   = 0
+          currentQuestion = 1  -- Start from the first question if reached the end
+
+          import.setQuestion(currentQuestion)
+          
           win:destroy()
           mainWindow:activate()
       end
 
       function exitButton:on_clicked()
-          win:destroy()
+
+          local mainWindowModule = require("lua.mainWindow")
+
+          local getSettingList = mainWindowModule.getSettingList
+          local settingList = getSettingList()
+          
+          width  = win:get_allocated_width()
+          height = win:get_allocated_height()
+          word = settingList.word
+          lang = settingList.lang
+
+        local configReplace = setconfigReplace(word,lang,width,height)
+        -- Replace the cacheFile with the new values
+        config = configReplace
+        
+        -- Runs function to replace
+        writeTo_config(cacheFile,config)
+          
+        win:destroy()
+        mainWindow:quit()
+      end
+
+      checkBox = Gtk.CheckButton({label = "Save", valign = Gtk.Align.Center , margin_top = 50})
+
+      function checkBox:on_toggled()
+         if checkBox.active then
+            print("button activated")
+         end
       end
   
       -- Appends these widgets to box
@@ -320,9 +395,12 @@ local function create_app2()
       box:append(labelEndCorrect)
       box:append(labelEndIncorrect)
       box:append(resultButton)
+      box:append(summaryButton)
+      box:append(hidesummaryButton)
       box:append(restartButton)
       box:append(backButton)
       box:append(exitButton)
+      box:append(checkBox)
 
   
       -- Appends box to the main window

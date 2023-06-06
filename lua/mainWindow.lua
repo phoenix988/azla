@@ -8,11 +8,11 @@ local os                = require("os")
 
 -- Other imports and global variables
 -- Imports function to create images
-local imageModule       = require("lua/createImage")
+local imageModule       = require("lua.createImage")
 local create_image      = imageModule.create_image
 
 -- Imports window 2
-local appModule         = require("lua/questionMain")
+local appModule         = require("lua.questionMain")
 local create_app2       = appModule.create_app2
 
 -- Variables to make the application id
@@ -25,16 +25,26 @@ local home              = os.getenv("HOME")
 local imagePath         = "/opt/azla/images/flag.jpg"
 
 -- Imports Config function
-local loadConfigModule  = require("lua/loadConfig")
+local loadConfigModule  = require("lua.loadConfig")
 local loadConfig        = loadConfigModule.load_config
 local loadConfigCustom  = loadConfigModule.load_config_custom
 
 -- Imports fileexist module
-local fileExistModule = require("lua/fileExist")
+local fileExistModule = require("lua.fileExist")
 local fileExist       = fileExistModule.fileExists
 
+-- Import function to write to cache file
+local writeToConfigModule   = require("lua.settings")
+local writeTo_config        = writeToConfigModule.writeTo_config
+local configReplace         = writeToConfigModule.setconfigReplace
+
+-- Gets current directory
+local currentDir = debug.getinfo(1, "S").source:sub(2)
+currentDir       = currentDir:match("(.*/)") or ""
+
 -- Variable to store word arrays
-local luaWordsPath      = "lua_words"
+local luaWordsPath      = currentDir .. "words"
+local luaWordsModule    = "lua.words"
 
 -- Sets variable that will determine language choice
 local exportLanguageChoice    = "azerbajani"
@@ -42,6 +52,8 @@ local exportLanguageChoice    = "azerbajani"
 -- Sets window width and height empty variable
 local width
 local height 
+
+local wordlist
 
 -- load cachefile config
 local cacheFile          = home .. "/.cache/azla.lua"
@@ -63,13 +75,20 @@ else
    local custom = ({}) --Custom config file doesn't exist
 end
 
+
 -- Creates the window where you input answers in azerbajani
 -- Makes the main startup window
 function app1:on_startup()
-    
+
     -- Gets the width and height to set on the window
     -- You can configure this in a config file
     if fileExist(customConfig) then
+       -- Prints error if you dont name the variable custom inside the setting file
+       if custom == nil then
+           print("Error in config")
+           os.exit()
+       end
+       
        if custom.default_height == nil then
            config.default_height = 800
        else
@@ -164,7 +183,6 @@ function app1:on_startup()
 
     -- Label --END
 
-
     -- Combo box --START
     -- Here I am configuiring the combo box widgets for Azla 
     -- Where you make some choice
@@ -200,16 +218,18 @@ function app1:on_startup()
     local directoryPath = luaWordsPath
     local luaFiles = getLuaFilesInDirectory(directoryPath)
 
-        -- Add the items to the language model
+    -- Add the items to the language model
     for _, name in ipairs(items) do
         model:append({ name })
     end
   
     -- Add items to the wordfile combo box
     for _, luafiles in ipairs(luaFiles) do
-        local luafilesFormatFirst = string.gsub(luafiles, "lua_words/", "")
+        local luafilesFormatFirst = string.gsub(luafiles, "lua", "")
         local luafilesFormatSecond = string.gsub(luafilesFormatFirst, ".lua", "")
-        modelWord:append({ luafilesFormatSecond })
+        local last = string.match(luafilesFormatSecond, "[^/]+$")
+        local last = string.match(last, "([^.]+).")
+        modelWord:append({ last })
     end
 
     -- Makes the combobox widgets
@@ -237,9 +257,6 @@ function app1:on_startup()
           }
         }
     })
-    
-    -- Makes empty array to store my wordslist
-    local wordlist = {}
     
     --If config file doesn't exist then it will set default value here
     if config == nil then
@@ -301,6 +318,9 @@ function app1:on_startup()
         -- Gets the dimensions of the screen
         width  = win:get_allocated_width()
         height = win:get_allocated_height()
+        word   = n_w
+        lang   = n
+        
         labelLanguage.label = "Option "..n.." selected ("..items[n + 1]..")"
         if n == 0 then
            -- Determines which languages to use
@@ -312,33 +332,18 @@ function app1:on_startup()
            exportLanguageChoice = "english"
         end
 
-        configReplace =  {
-           word_set = n_w,
-           lang_set = n,
-           default_width = width,
-           default_height = height
-           }
+        local configReplace = setconfigReplace(word,lang,width,height)
 
         -- Replace the cacheFile with the new values
         config = configReplace
 
-        -- Write the updated config back to the file
-        local file = io.open(cacheFile, "w")
-        if file then
-           file:write("config = {\n")
-           for key, value in pairs(config) do
-              file:write("   " .. key .. " = " .. tostring(value) .. ",\n")
-           end
-           file:write("}\n")
-           file:close()
-           print("Config file updated successfully.")
-        else
-           print("Failed to open config file.")
-        end
-
+        writeTo_config(cacheFile,config)
         
     end
     
+        settings = {}
+        settings.word = comboWord:get_active()
+        settings.lang = combo:get_active()
     
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app
@@ -346,9 +351,16 @@ function app1:on_startup()
         local n = self:get_active()
         local n_w = combo:get_active()
 
+        settings.word = n
+        settings.lang = n_w
+
         -- Gets the screens dimensions
         width  = win:get_allocated_width()
         height = win:get_allocated_height()
+        
+        -- Sets variables
+        word = n
+        lang = n_w
         
         -- Only get the list name
         newStr = luaFiles[n + 1]
@@ -358,34 +370,13 @@ function app1:on_startup()
         -- Updates label when you change option
         labelWordList.label = "WordList "..n.." selected (".. last ..")"
         
+        local configReplace = setconfigReplace(word,lang,width,height)
        
-        configReplace =  {
-           word_set = n,
-           lang_set = n_w,
-           width_default = width,
-           height_default = height
-           }
-
-
         -- Replace the cacheFile with the new values
         config = configReplace
 
-        -- Write the updated config back to the file
-        local file = io.open(cacheFile, "w")
-        if file then
-           file:write("config = {\n")
-           for key, value in pairs(config) do
-              file:write("   " .. key .. " = " .. tostring(value) .. ",\n")
-           end
-           file:write("}\n")
-           file:close()
-           print("Config file updated successfully.")
-        else
-           print("Failed to open config file.")
-        end
-
-
-
+        writeTo_config(cacheFile,config)
+        
     end
 
     --If config file doesn't exist then it will set default value here
@@ -425,51 +416,35 @@ function app1:on_startup()
     
     -- Sets function to run when you click the exit button
     function buttonExit:on_clicked()
-        local n = comboWord:get_active()
-        local n_w = combo:get_active()
+       local n = comboWord:get_active()
+       local n_w = combo:get_active()
 
-        -- Gets the screens dimensions
-        width  = win:get_allocated_width()
-        height = win:get_allocated_height()
+       -- Gets the screens dimensions
+       width  = win:get_allocated_width()
+       height = win:get_allocated_height()
+       
+       -- Sets some variables needed
+       word = n
+       lang = n_w
 
-       configReplace =  {
-           word_set = n,
-           lang_set = n_w,
-           default_width = width,
-           default_height = height
-           }
+       local configReplace = setconfigReplace(word,lang,width,height)
 
-        -- Replace the cacheFile with the new values
-        config = configReplace
+       -- Replace the cacheFile with the new values
+       config = configReplace
 
-        -- Write the updated config back to the file
-        local file = io.open(cacheFile, "w")
-        if file then
-           file:write("config = {\n")
-           for key, value in pairs(config) do
-              file:write("   " .. key .. " = " .. tostring(value) .. ",\n")
-           end
-           file:write("}\n")
-           file:close()
-           print("Config file updated successfully.")
-        else
-           print("Failed to open config file.")
-        end
+       writeTo_config(cacheFile,config)
 
-        -- Destroys the window
+       -- Destroys the window
        win:destroy()
     end
 
     -- Create the function when you press on start
     function buttonStart:on_clicked()
-        local active = combo:get_active()
         local activeWord = comboWord:get_active()
-        local activeWord = activeWord + 1
-        local getwordList = (luaFiles[activeWord])
-        local getwordList = string.gsub(getwordList, ".lua" , "")
-        local wordlistModule = require(getwordList)
-        
-        local wordlist = wordlistModule.wordlist
+
+        local choice = modelWord[activeWord][1]
+
+        wordlist = require(luaWordsModule .. "." .. choice)
         
         width  = win:get_allocated_width()
         height = win:get_allocated_height()
@@ -525,8 +500,19 @@ function getWindowWidth()
     return width
 end
 
+function getWordList()
+    return wordlist
+end
+
+function getSettingList()
+    return settings
+end
+
+
 -- Export the necessary functions and variables
 return {
     app1 = app1,
     getLanguageChoice = getLanguageChoice,
+    getWordList = getWordList,
+    getSettingList = getSettingList,
 }

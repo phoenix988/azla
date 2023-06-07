@@ -1,7 +1,5 @@
 local io = require("io")
 
-
-
 function setconfigReplace(word,lang,width,height)
        
        configReplace =  {

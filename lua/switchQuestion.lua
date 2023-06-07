@@ -11,7 +11,7 @@ local GObject           = lgi.require("GObject", "2.0")
 local gio               = require("lgi").Gio
 local lfs               = require("lfs")
 local os                = require("os")
-
+local theme             = require("lua.theme.default")
 
 -- Sets the import table
 local import = {}
@@ -41,12 +41,12 @@ function import.switchQuestion(correct_answers, incorrect_answers,
      currentQuestion = currentQuestion + 1
      if currentQuestion > #wordlist then
         labelEnd.label = "You reached the last question"
-        labelEnd:set_markup("<span foreground='green'>" .. labelEnd.label .. "</span>")
+        labelEnd:set_markup("<span foreground='" .. theme.label_fg .. "'>" .. labelEnd.label .. "</span>")
         restartButton:set_visible(true)
         labelEndCorrect.label = "correct: " .. correct_answers
-        labelEndCorrect:set_markup("<span foreground='green'>" .. labelEndCorrect.label .. "</span>")
+        labelEndCorrect:set_markup("<span foreground='" .. theme.label_correct .. "'>" .. labelEndCorrect.label .. "</span>")
         labelEndIncorrect.label = "Incorrect: " .. incorrect_answers
-        labelEndIncorrect:set_markup("<span foreground='red'>" .. labelEndIncorrect.label .. "</span>")
+        labelEndIncorrect:set_markup("<span foreground='" .. theme.label_incorrect .. "'>" .. labelEndIncorrect.label .. "</span>")
         summaryButton:set_visible(true)
         backButton:set_margin_top(30)
 

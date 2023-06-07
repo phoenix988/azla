@@ -6,6 +6,9 @@ local GdkPixbuf         = lgi.require('GdkPixbuf')
 local lfs               = require("lfs")
 local os                = require("os")
 
+-- Import theme
+local theme             = require("lua.theme.default")
+
 -- Other imports and global variables
 -- Imports function to create images
 local imageModule       = require("lua.createImage")
@@ -22,7 +25,7 @@ local app1              = Gtk.Application({ application_id = appID1 })
 
 -- Gets users home directory
 local home              = os.getenv("HOME")
-local imagePath         = "/opt/azla/images/flag.jpg"
+local imagePath         = theme.main_image 
 
 -- Imports Config function
 local loadConfigModule  = require("lua.loadConfig")
@@ -30,8 +33,8 @@ local loadConfig        = loadConfigModule.load_config
 local loadConfigCustom  = loadConfigModule.load_config_custom
 
 -- Imports fileexist module
-local fileExistModule = require("lua.fileExist")
-local fileExist       = fileExistModule.fileExists
+local fileExistModule   = require("lua.fileExist")
+local fileExist         = fileExistModule.fileExists
 
 -- Import function to write to cache file
 local writeToConfigModule   = require("lua.settings")
@@ -39,15 +42,15 @@ local writeTo_config        = writeToConfigModule.writeTo_config
 local configReplace         = writeToConfigModule.setconfigReplace
 
 -- Gets current directory
-local currentDir = debug.getinfo(1, "S").source:sub(2)
-currentDir       = currentDir:match("(.*/)") or ""
+local currentDir        = debug.getinfo(1, "S").source:sub(2)
+currentDir              = currentDir:match("(.*/)") or ""
 
 -- Variable to store word arrays
 local luaWordsPath      = currentDir .. "words"
 local luaWordsModule    = "lua.words"
 
 -- Sets variable that will determine language choice
-local exportLanguageChoice    = "azerbajani"
+local exportLanguageChoice = "azerbajani"
 
 -- Sets window width and height empty variable
 local width
@@ -66,7 +69,7 @@ if config == nil then
 end
 
 -- Sets path of customConfig
-local customConfig       = home .. "/.config/azla.lua"
+local customConfig = home .. "/.config/azla.lua"
 
 -- Creates the config array if the custom file exist
 if fileExist(customConfig) then
@@ -75,6 +78,10 @@ else
    local custom = ({}) --Custom config file doesn't exist
 end
 
+-- import widgets 
+local widget = require("lua.widgets.box")
+local button = require("lua.widgets.button")
+local label  = require("lua.widgets.label")
 
 -- Creates the window where you input answers in azerbajani
 -- Makes the main startup window
@@ -125,64 +132,6 @@ function app1:on_startup()
         deletable = true,
      })
     
-    -- Makes the main box widget to be used 
-    local boxMain = Gtk.Box({
-        orientation = Gtk.Orientation.VERTICAL,
-        spacing = 10,
-    })
-     
-    -- Makes some other boxes
-    local box = Gtk.Box({
-        orientation = Gtk.Orientation.VERTICAL,
-        spacing = 10,
-        width_request  = 200,
-        height_request = 400,
-        halign = Gtk.Align.FILL,
-        valign = Gtk.Align.CENTER,
-        hexpand = true,
-        vexpand = true,
-        margin_top    = 40,
-        margin_bottom = 40,
-        margin_start  = 40,
-        margin_end    = 40
-    })
- 
-    -- Makes secondary box
-    local boxAlt = Gtk.Box({
-        orientation = Gtk.Orientation.VERTICAL,
-        spacing = 0,
-        width_request  = 50,
-        height_request = 50,
-        halign = Gtk.Align.FILL,
-        valign = Gtk.Align.BOTTOM,
-        hexpand = true,
-        vexpand = true,
-        margin_start  = 40,
-        margin_end    = 40
-    })
-
-
-    -- Some labels used on the startup window --START
-    -- Language Label
-    local labelLanguage = Gtk.Label({ label = "Choose Language you want to write answers in:" })
-
-         -- Word list label
-    local labelWordList = Gtk.Label({ label = "Choose your wordlist",  height_request = 50, })
-
-    -- Welcome label for welcome message
-    local labelWelcome =  Gtk.Label({ 
-                          label = "Welcome to AZLA",
-                          width_request = 200,  -- Set the desired width
-                          height_request = 100,
-                          wrap = true })
-    local labelSept = Gtk.Label({label = ""})
- 
-    -- Sets size of the labels
-    labelWelcome:set_markup("<span size='20000'>" .. labelWelcome.label .. "</span>"  )
-    labelSept:set_markup("<span size='40000'>" .. labelSept.label .. "</span>"  )
-
-    -- Label --END
-
     -- Combo box --START
     -- Here I am configuiring the combo box widgets for Azla 
     -- Where you make some choice
@@ -233,7 +182,7 @@ function app1:on_startup()
     end
 
     -- Makes the combobox widgets
-    local combo = Gtk.ComboBox({
+    local comboLang = Gtk.ComboBox({
         model = model,
         active = 0,
         cells = {
@@ -260,7 +209,7 @@ function app1:on_startup()
     
     --If config file doesn't exist then it will set default value here
     if config == nil then
-       combo:set_active(0)
+       comboLang:set_active(0)
     else
        -- Use custom config if it exist
        -- Otherwise it use defaults
@@ -276,7 +225,7 @@ function app1:on_startup()
           else
              defaultLang = custom.lang_set
           end
-          combo:set_active(defaultLang)
+          comboLang:set_active(defaultLang)
           
           if defaultLang == 0 then
               exportLanguageChoice = "azerbajani"
@@ -285,12 +234,12 @@ function app1:on_startup()
           end
        else
           if config.lang_set == nil then 
-            combo:set_active(0)
+            comboLang:set_active(0)
           
           else
              
              local defaultLang = config.lang_set
-             combo:set_active(defaultLang)
+             comboLang:set_active(defaultLang)
              if defaultLang == 0 then
                  exportLanguageChoice = "azerbajani"
              else
@@ -306,11 +255,16 @@ function app1:on_startup()
     local last = string.match(labelWordStringStart, "[^/]+$")
     local last = string.match(last, "([^.]+).")
 
-    labelWordList.label = "WordList "..wordActive.." selected (".. last ..")"
+    label.word_list.label = "WordList "..wordActive.." selected (".. last ..")"
+    label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
+    
+    settings = {}
+    settings.word = comboWord:get_active()
+    settings.lang = comboLang:get_active()
 
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app
-    function combo:on_changed()
+    function comboLang:on_changed()
         -- Gets the current active combo number
         local n = self:get_active()
         local n_w = comboWord:get_active()
@@ -321,7 +275,9 @@ function app1:on_startup()
         word   = n_w
         lang   = n
         
-        labelLanguage.label = "Option "..n.." selected ("..items[n + 1]..")"
+        label.language.label = "Option "..n.." selected ("..items[n + 1]..")"
+        label.language:set_markup("<span size='" .. theme.label_lang_size .. "' foreground='" .. theme.label_lang .. "'>" .. label.language.label .. "</span>"  )
+        
         if n == 0 then
            -- Determines which languages to use
            -- Will use azerbajani
@@ -341,15 +297,12 @@ function app1:on_startup()
         
     end
     
-        settings = {}
-        settings.word = comboWord:get_active()
-        settings.lang = combo:get_active()
     
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app
     function comboWord:on_changed()
         local n = self:get_active()
-        local n_w = combo:get_active()
+        local n_w = comboLang:get_active()
 
         settings.word = n
         settings.lang = n_w
@@ -368,7 +321,8 @@ function app1:on_startup()
         last = string.match(last, "([^.]+).")
 
         -- Updates label when you change option
-        labelWordList.label = "WordList "..n.." selected (".. last ..")"
+        label.word_list.label = "WordList "..n.." selected (".. last ..")"
+        label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
         
         local configReplace = setconfigReplace(word,lang,width,height)
        
@@ -406,18 +360,11 @@ function app1:on_startup()
     end
 
     --Combo --END
-
-    -- Create Buttons --START    
-    -- Create the start button
-    local buttonStart = Gtk.Button({label = "Start", width_request = 100})
-  
-    -- Create the Exit button
-    local buttonExit = Gtk.Button({label = "Exit", width_request = 30, })
     
     -- Sets function to run when you click the exit button
-    function buttonExit:on_clicked()
+    function button.exit:on_clicked()
        local n = comboWord:get_active()
-       local n_w = combo:get_active()
+       local n_w = comboLang:get_active()
 
        -- Gets the screens dimensions
        width  = win:get_allocated_width()
@@ -439,7 +386,7 @@ function app1:on_startup()
     end
 
     -- Create the function when you press on start
-    function buttonStart:on_clicked()
+    function button.start:on_clicked()
         local activeWord = comboWord:get_active()
 
         local choice = modelWord[activeWord][1]
@@ -462,29 +409,30 @@ function app1:on_startup()
 
     -- Sets the size of the image
     image:set_size_request(200, 150)
-    
+
     -- Adds the widgets to the Main Box
-    box:append(image)
-    box:append(labelWelcome)
-    box:append(labelLanguage)
-    box:append(combo)
-    box:append(labelWordList)
-    box:append(comboWord)
-    box:append(buttonStart)
-    box:append(labelSept)
-    
+    widget.box_first:append(image)
+    widget.box_first:append(label.welcome)
+    widget.box_first:append(label.language)
+    widget.box_first:append(comboLang)
+    widget.box_first:append(label.word_list)
+    widget.box_first:append(comboWord)
+    widget.box_first:append(button.start)
+    widget.box_first:append(label.sept)
+
     -- Add widgets to secondary box
-    boxAlt:append(buttonExit)
+    widget.box_second:append(button.exit)
 
     -- Appends both boxes to the main one
-    boxMain:append(box)
-    boxMain:append(boxAlt)
+    widget.box_main:append(widget.box_first)
+    widget.box_main:append(widget.box_second)
 
     -- Appends box to the main window
-    win.child = boxMain
+    win.child = widget.box_main
 end -- End of the app function
 
 
+-- Returns some variables
 -- Creates the function to import the language variable
 function getLanguageChoice()
     return exportLanguageChoice

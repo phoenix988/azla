@@ -1,3 +1,25 @@
+-- Module to control the theming of the app
+local os        = require("os")
+
+local fileExistModule = require("lua.fileExist")
+local fileExist = fileExistModule.fileExists
+
+local loadConfigModule = require("lua.loadConfig")
+local loadConfig = loadConfigModule.load_config_theme
+
+local home      = os.getenv("HOME")
+local customConfig = home .. "/.config/azla.lua"
+
+-- check if custom file exist
+if fileExist(customConfig) then
+
+  themeCustom = loadConfig(customConfig)
+   
+end
+
+if theme ~= nil then
+   themeCompare = theme 
+end
 
 
 local theme = {
@@ -14,5 +36,14 @@ local theme = {
    label_question_size  = '20000',
    main_image           = "/opt/azla/images/flag.jpg"
 }
+
+-- Overwrites config if you have a custom one
+if themeCompare ~= nil then
+  for key, value in pairs(theme) do
+    if themeCompare[key] ~= nil then
+        theme[key] = themeCompare[key]
+     end
+  end
+end
 
 return theme

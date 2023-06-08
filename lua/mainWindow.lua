@@ -134,7 +134,7 @@ function app1:on_startup()
     
     -- Combo box --START
     -- Here I am configuiring the combo box widgets for Azla 
-    -- Where you make some choice
+    -- Where you make some choices in the app like choosing wordlist and language
 
     -- Model for the combo box
     local model = Gtk.ListStore.new({ GObject.Type.STRING })

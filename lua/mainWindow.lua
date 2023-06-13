@@ -1,64 +1,76 @@
 -- Imports libaries we need
-local lgi               = require("lgi")
-local Gtk               = lgi.require("Gtk", "4.0")
-local GObject           = lgi.require("GObject", "2.0")
-local GdkPixbuf         = lgi.require('GdkPixbuf')
-local lfs               = require("lfs")
-local os                = require("os")
+local lgi                 = require("lgi")
+local Gtk                 = lgi.require("Gtk", "4.0")
+local GObject             = lgi.require("GObject", "2.0")
+local GdkPixbuf           = lgi.require('GdkPixbuf')
+local lfs                 = require("lfs")
+local os                  = require("os")
 
 -- Import theme
-local theme             = require("lua.theme.default")
+local theme               = require("lua.theme.default")
+local setting_default     = require("lua.theme.setting")
 
 -- Other imports and global variables
 -- Imports function to create images
-local imageModule       = require("lua.createImage")
-local create_image      = imageModule.create_image
+local imageModule         = require("lua.createImage")
+local create_image        = imageModule.create_image
 
 -- Imports window 2
-local appModule         = require("lua.questionMain")
-local create_app2       = appModule.create_app2
+local appModule           = require("lua.questionMain")
+local create_app2         = appModule.create_app2
 
 -- Variables to make the application id
-local appID1            = "io.github.Phoenix988.azla.main.lua"
-local appTitle          = "Azla"
-local app1              = Gtk.Application({ application_id = appID1 })
+local appID1               = "io.github.Phoenix988.azla.main.lua"
+local appTitle             = "Azla"
+local app1                 = Gtk.Application({ application_id = appID1 })
 
 -- Gets users home directory
-local home              = os.getenv("HOME")
-local imagePath         = theme.main_image 
+local home                 = os.getenv("HOME")
+local imagePath            = theme.main_image 
+
+-- import widgets 
+local widget               = require("lua.widgets.box")
+local button               = require("lua.widgets.button")
+local label                = require("lua.widgets.label")
+local notebook             = require("lua.widgets.notebook")
+local array                = require("lua.widgets.setting")
+local combo                = require("lua.widgets.combo")
 
 -- Imports Config function
-local loadConfigModule  = require("lua.loadConfig")
-local loadConfig        = loadConfigModule.load_config
-local loadConfigCustom  = loadConfigModule.load_config_custom
+local loadConfigModule     = require("lua.loadConfig")
+local loadConfig           = loadConfigModule.load_config
+local loadConfigCustom     = loadConfigModule.load_config_custom
 
 -- Imports fileexist module
-local fileExistModule   = require("lua.fileExist")
-local fileExist         = fileExistModule.fileExists
+local fileExistModule      = require("lua.fileExist")
+local fileExist            = fileExistModule.fileExists
 
 -- Import function to write to cache file
-local writeToConfigModule   = require("lua.settings")
-local writeTo_config        = writeToConfigModule.writeTo_config
-local configReplace         = writeToConfigModule.setconfigReplace
+local writeToConfigModule  = require("lua.settings")
+local writeTo_config       = writeToConfigModule.writeTo_config
+local write_theme          = writeToConfigModule.write_theme
+local write_setting        = writeToConfigModule.write_setting
+local configReplace        = writeToConfigModule.setconfigReplace
+local write                = writeToConfigModule.write
 
 -- Gets current directory
-local currentDir        = debug.getinfo(1, "S").source:sub(2)
-currentDir              = currentDir:match("(.*/)") or ""
+local currentDir           = debug.getinfo(1, "S").source:sub(2)
+currentDir                 = currentDir:match("(.*/)") or ""
 
 -- Variable to store word arrays
-local luaWordsPath      = currentDir .. "words"
-local luaWordsModule    = "lua.words"
+local luaWordsPath         = currentDir .. "words"
+local luaWordsModule       = "lua.words"
 
--- Sets variable that will determine language choice
+-- Sets default variable that will determine language choice
 local exportLanguageChoice = "azerbajani"
 
--- Sets window width and height empty variable
+-- Sets window width and height variable
+-- Empty
 local width
 local height 
+local replace = {}
 
-local wordlist
-
--- load cachefile config
+-- load cachefile config and set the path
 local cacheFile          = home .. "/.cache/azla.lua"
 local configPath         = loadConfig(cacheFile)
 
@@ -68,20 +80,27 @@ if config == nil then
    config = ({})
 end
 
--- Sets path of customConfig
+-- Sets path to customConfig
 local customConfig = home .. "/.config/azla.lua"
 
 -- Creates the config array if the custom file exist
 if fileExist(customConfig) then
    local customPath = loadConfigCustom(customConfig) --Custom config exist
 else
-   local custom = ({}) --Custom config file doesn't exist
+   -- sets empty array 
+   local setting = ({}) --Custom config file doesn't exist
 end
 
--- import widgets 
-local widget = require("lua.widgets.box")
-local button = require("lua.widgets.button")
-local label  = require("lua.widgets.label")
+-- Sets some empty arrays to be used later
+local setting_labels         = {}
+local setting_labels_setting = {}
+local grid_widgets_setting   = {}
+local theme_labels           = {}
+local theme_labels_setting   = {}
+local grid_widgets           = {}
+local grid_widgets_2         = {}
+
+
 
 -- Creates the window where you input answers in azerbajani
 -- Makes the main startup window
@@ -91,21 +110,21 @@ function app1:on_startup()
     -- You can configure this in a config file
     if fileExist(customConfig) then
        -- Prints error if you dont name the variable custom inside the setting file
-       if custom == nil then
+       if setting == nil then
            print("Error in config")
            os.exit()
        end
        
-       if custom.default_height == nil then
+       if setting.default_height == nil then
            config.default_height = 800
        else
-           config.default_height = custom.default_height
+           config.default_height = setting.default_height
        end
 
-       if custom.default_width == nil then
+       if setting.default_width == nil then
            config.default_width = 800
        else 
-           config.default_width = custom.default_width
+           config.default_width = setting.default_width
        end
 
     else
@@ -137,17 +156,11 @@ function app1:on_startup()
     -- Where you make some choices in the app like choosing wordlist and language
 
     -- Model for the combo box
-    local model = Gtk.ListStore.new({ GObject.Type.STRING })
+    combo.lang_create()
 
     -- Model for the second combo box
     local modelWord = Gtk.ListStore.new({ GObject.Type.STRING })
   
-    -- Define language options for language combo box
-    local items = {
-      "Azerbaijan",
-      "English"
-    }
-
     -- Function to list all word files inside lua_words
     local function getLuaFilesInDirectory(directory)
        local luaFiles = {}
@@ -159,6 +172,9 @@ function app1:on_startup()
                 table.insert(luaFiles, filePath)
             end
        end
+
+       -- Sorts all the files
+       table.sort(luaFiles)
     
        return luaFiles --Returns luaFiles variable to be used later
     end
@@ -167,12 +183,7 @@ function app1:on_startup()
     local directoryPath = luaWordsPath
     local luaFiles = getLuaFilesInDirectory(directoryPath)
 
-    -- Add the items to the language model
-    for _, name in ipairs(items) do
-        model:append({ name })
-    end
-  
-    -- Add items to the wordfile combo box
+      -- Add items to the wordfile combo box
     for _, luafiles in ipairs(luaFiles) do
         local luafilesFormatFirst = string.gsub(luafiles, "lua", "")
         local luafilesFormatSecond = string.gsub(luafilesFormatFirst, ".lua", "")
@@ -180,19 +191,6 @@ function app1:on_startup()
         local last = string.match(last, "([^.]+).")
         modelWord:append({ last })
     end
-
-    -- Makes the combobox widgets
-    local comboLang = Gtk.ComboBox({
-        model = model,
-        active = 0,
-        cells = {
-          {
-            Gtk.CellRendererText(),
-            { text = 1 },
-            align = Gtk.Align.START
-          }
-        }
-    })
     
     -- Makes the combobox widget for wordlists
     local comboWord = Gtk.ComboBox({
@@ -207,75 +205,69 @@ function app1:on_startup()
         }
     })
     
-    --If config file doesn't exist then it will set default value here
-    if config == nil then
-       comboLang:set_active(0)
-    else
-       -- Use custom config if it exist
-       -- Otherwise it use defaults
-       -- Can probably make this better, right now it's just 
-       -- a bunch of nested if statements
-       if fileExist(customConfig) then
-          if custom.lang_set == nil then
-             if config.lang_set == nil then
-                defaultLang = 0
-             else
-                defaultLang = config.lang_set
-             end
-          else
-             defaultLang = custom.lang_set
-          end
-          comboLang:set_active(defaultLang)
-          
-          if defaultLang == 0 then
-              exportLanguageChoice = "azerbajani"
-          else
-              exportLanguageChoice = "english"
-          end
-       else
-          if config.lang_set == nil then 
-            comboLang:set_active(0)
-          
-          else
-             
-             local defaultLang = config.lang_set
-             comboLang:set_active(defaultLang)
-             if defaultLang == 0 then
-                 exportLanguageChoice = "azerbajani"
-             else
-                 exportLanguageChoice = "english"
-             end
-          end   
-       end 
-    end
+
+    local combo_set = combo.lang
+    combo.set_value(config,customConfig,combo_set,fileExist,config.lang_set)
  
     -- set default label of labelWordList
     local wordActive = comboWord:get_active()
     local labelWordStringStart = luaFiles[wordActive + 1]
     local last = string.match(labelWordStringStart, "[^/]+$")
     local last = string.match(last, "([^.]+).")
-
+    
+    -- Updates the label of word_list
     label.word_list.label = "WordList "..wordActive.." selected (".. last ..")"
     label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
     
+    -- Gets the active items in the combo boxes
+    -- And stores it in settings just so we dont get errors
+    -- Sometimes I got some errors when Launching the app
+    -- If I didn't set these
     settings = {}
-    settings.word = comboWord:get_active()
-    settings.lang = comboLang:get_active()
+    settings.word       = comboWord:get_active()
+    settings.lang       = combo.lang:get_active()
+    settings.comboWord  = comboWord
+
+    -- Creates combo word count box
+    combo.word_count_create()
+
+    -- adds the active word_count and stores it in settings
+    settings.word_count = combo.word_count:get_active()
+
+    -- Gets the length of the wordlist
+    local activeWord           = comboWord:get_active()
+    local choice               = modelWord[activeWord][1]
+    local wordlist_first       = require(luaWordsModule .. "." .. choice)
+    local wordlist_count_f     = #wordlist_first
+    local wordlist_count_f_new = {}
+    
+    -- Gets the length of the wordlist file on startup
+    for i = 1, wordlist_count_f do
+            if i % 2 == 0 then -- Check if the index is even (every second number)
+              table.insert(wordlist_count_f_new, i)
+            end
+    end
+    
+    -- Clears the model if it doesn't exist
+    combo.word_model:clear()
+    combo.word_count_items = {}
+    for i = 1, #wordlist_count_f_new do
+      combo.word_count_items[i] = wordlist_count_f_new[i]
+      combo.word_model:append({ combo.word_count_items[i] })
+    end
+       
+    local combo_set = combo.word_count
+    combo.set_value(config,customConfig,combo_set,fileExist,config.word_count_set)
 
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app
-    function comboLang:on_changed()
+    function combo.lang:on_changed()
         -- Gets the current active combo number
         local n = self:get_active()
-        local n_w = comboWord:get_active()
         
-        -- Gets the dimensions of the screen
-        width  = win:get_allocated_width()
-        height = win:get_allocated_height()
-        word   = n_w
-        lang   = n
+       write.config_settings(replace,comboWord,combo)
         
-        label.language.label = "Option "..n.." selected ("..items[n + 1]..")"
+        label.language.label = "Option "..n.." selected ("..combo.lang_items[n + 1]..")"
         label.language:set_markup("<span size='" .. theme.label_lang_size .. "' foreground='" .. theme.label_lang .. "'>" .. label.language.label .. "</span>"  )
         
         if n == 0 then
@@ -288,7 +280,7 @@ function app1:on_startup()
            exportLanguageChoice = "english"
         end
 
-        local configReplace = setconfigReplace(word,lang,width,height)
+        local configReplace = setconfigReplace(replace)
 
         -- Replace the cacheFile with the new values
         config = configReplace
@@ -298,23 +290,14 @@ function app1:on_startup()
     end
     
     
+    local isFirstStart = true
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app
     function comboWord:on_changed()
-        local n = self:get_active()
-        local n_w = comboLang:get_active()
+       local n = self:get_active()
 
-        settings.word = n
-        settings.lang = n_w
-
-        -- Gets the screens dimensions
-        width  = win:get_allocated_width()
-        height = win:get_allocated_height()
-        
-        -- Sets variables
-        word = n
-        lang = n_w
-        
+       write.config_settings(replace,comboWord,combo)
+ 
         -- Only get the list name
         newStr = luaFiles[n + 1]
         last = string.match(newStr, "[^/]+$")
@@ -324,57 +307,84 @@ function app1:on_startup()
         label.word_list.label = "WordList "..n.." selected (".. last ..")"
         label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
         
-        local configReplace = setconfigReplace(word,lang,width,height)
+        local configReplace = setconfigReplace(replace)
        
         -- Replace the cacheFile with the new values
         config = configReplace
 
         writeTo_config(cacheFile,config)
+
+        -- Gets the length of the wordlist
+        local activeWord   = comboWord:get_active()
+        local choice       = modelWord[activeWord][1]
+        wordlist = require(luaWordsModule .. "." .. choice)
+        local wordlist_count = #wordlist
+        local wordlist_count_new = {}
+        
+        -- Counts the length of the wordlist
+        -- And appends the number to the combo word count widget
+        if combo.word_model ~= nil then
+          combo.word_model:clear()
+          combo.word_count_items = {}
+          if #wordlist >= 5 then
+            for i = 1, wordlist_count do
+              if i % 2 == 0 then -- Check if the index is even (every second number)
+                table.insert(wordlist_count_new, i)
+              end
+            end
+            for i = 1, #wordlist_count_new do
+              combo.word_count_items[i] = wordlist_count_new[i]
+              combo.word_model:append({ combo.word_count_items[i] })
+            end
+          else
+           for i = 1, wordlist_count do
+              combo.word_count_items[i] = i
+              combo.word_model:append({ combo.word_count_items[i] })
+            end
+          end  
+
+        if isFirstStart == true then         
+            isFirstStart = false
+            combo.word_count:set_active(config.word_count_set)
+        else
+            combo.word_count:set_active(3)
+        end
+
+        end
+
         
     end
+   
+    local combo_set = comboWord
+    combo.set_value(config,customConfig,combo_set,fileExist,config.word_set)
 
-    --If config file doesn't exist then it will set default value here
-    if config == nil then
-       comboWord:set_active(1)
-    else
-       if fileExist(customConfig) then
-          if custom.word_set == nil then
-             if config.word_set == nil then
-               defaultWord = 0
-             else
-               defaultWord = config.word_set
-             end
+    function combo.word_count:on_changed()
+        local n = self:get_active()
 
-          else
-             defaultWord = custom.word_set
-          end
-          comboWord:set_active(defaultWord)
-       else 
-          if config.word_set == nil then 
-             comboWord:set_active(1)
-          else  
-             local defaultWord = config.word_set
-             comboWord:set_active(defaultWord)
-          end
-       end
+        local success, result = pcall(function()
+          -- Code that uses the variable
+          label.word_count.label = "Selected "..combo.word_count_items[n + 1].." Words"
+          label.word_count:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_count.label .. "</span>"  )
+        end)
+
+        write.config_settings(replace,comboWord,combo)
+
+        local configReplace = setconfigReplace(replace)
+       
+        -- Replace the cacheFile with the new values
+        config = configReplace
+
+        writeTo_config(cacheFile,config)
+
     end
-
+        
     --Combo --END
     
     -- Sets function to run when you click the exit button
     function button.exit:on_clicked()
-       local n = comboWord:get_active()
-       local n_w = comboLang:get_active()
+       write.config_settings(replace,comboWord,combo)
 
-       -- Gets the screens dimensions
-       width  = win:get_allocated_width()
-       height = win:get_allocated_height()
-       
-       -- Sets some variables needed
-       word = n
-       lang = n_w
-
-       local configReplace = setconfigReplace(word,lang,width,height)
+       local configReplace = setconfigReplace(replace)
 
        -- Replace the cacheFile with the new values
        config = configReplace
@@ -387,11 +397,14 @@ function app1:on_startup()
 
     -- Create the function when you press on start
     function button.start:on_clicked()
-        local activeWord = comboWord:get_active()
+        local activeWord      = comboWord:get_active()
+        local activeWordCount = combo.word_count:get_active()
 
-        local choice = modelWord[activeWord][1]
+        local choice       = modelWord[activeWord][1]
+        local choice_count = combo.word_model[activeWordCount][1]
 
         wordlist = require(luaWordsModule .. "." .. choice)
+        wordlist.count = choice_count
         
         width  = win:get_allocated_width()
         height = win:get_allocated_height()
@@ -402,29 +415,74 @@ function app1:on_startup()
         app2:run()
 
       end
-    -- Create Buttons --END    
 
-    -- Creates the image
-    local image = create_image(imagePath)
+      -- Creates the images
+      local image = create_image(imagePath)
+      local image2 = create_image(imagePath)
+      
+       -- Hide Image 2
+      image2:set_visible(false)
 
-    -- Sets the size of the image
-    image:set_size_request(200, 150)
+      -- Sets the size of the image
+      image:set_size_request(200, 150)
+      image2:set_size_request(200, 150)
+
+      -- apend widgets to box theme  
+      widget.box_theme_main:append(image2)
+      widget.box_theme_main:append(label.theme)
+      
+      -- Create theme entry boxes
+      array.theme_table(theme,grid_widgets,theme_labels,theme_labels_setting,grid_widgets_2)
+
+      -- Create default setting empty boxes
+      array.setting_table(theme,grid_widgets_setting,setting_labels,setting_labels_setting,setting_default)
+               
+      -- appends the back button
+      widget.box_theme_main:append(notebook.theme)
+      widget.box_theme_main:append(notebook.setting)
+      widget.box_theme_main:append(label.theme_apply)
+      widget.box_theme_button:append(button.setting_submit)
+      widget.box_theme_button:append(button.setting_back)
+ 
+
+      -- Call some click actions
+      button.click_action(widget, image2, label, theme, setting_default, theme_labels, write_theme, write_setting,setting_labels)
+      -- Create Buttons --END    
 
     -- Adds the widgets to the Main Box
     widget.box_first:append(image)
     widget.box_first:append(label.welcome)
     widget.box_first:append(label.language)
-    widget.box_first:append(comboLang)
+    widget.box_first:append(combo.lang)
     widget.box_first:append(label.word_list)
     widget.box_first:append(comboWord)
+    widget.box_first:append(label.word_count)
+    widget.box_first:append(combo.word_count)
     widget.box_first:append(button.start)
     widget.box_first:append(label.sept)
 
     -- Add widgets to secondary box
+    widget.box_second:append(button.setting)
     widget.box_second:append(button.exit)
+
+    
+    -- Initally hide the theme box
+    widget.box_theme:set_visible(false)
+    widget.box_setting:set_visible(false)
+    widget.box_theme_alt:set_visible(false)
+    widget.box_theme_main:set_visible(false)
+    widget.box_theme_button:set_visible(false)
+    widget.box_theme_label:set_visible(false)
 
     -- Appends both boxes to the main one
     widget.box_main:append(widget.box_first)
+    widget.box_main:append(widget.box_theme_main)
+    widget.box_third:append(widget.box_theme_label)
+    widget.box_third:append(widget.box_theme_alt)
+    widget.box_third:append(widget.box_setting)
+    widget.box_main:append(widget.box_third)
+    widget.box_main:append(widget.box_theme)
+    widget.box_main:append(widget.box_theme_button)
     widget.box_main:append(widget.box_second)
 
     -- Appends box to the main window
@@ -448,10 +506,12 @@ function getWindowWidth()
     return width
 end
 
+-- Returns wordlist 
 function getWordList()
     return wordlist
 end
 
+-- Returns some settings to be used
 function getSettingList()
     return settings
 end

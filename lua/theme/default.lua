@@ -32,9 +32,15 @@ local theme = {
    label_fg             = '#d8dee9',
    label_word_size      = '12000',
    label_lang_size      = '14000',
+   label_fg_size        = '14000',
    label_welcome_size   = '20000',
    label_question_size  = '20000',
    main_image           = "/opt/azla/images/flag.jpg"
+}
+
+local setting = {
+     default_width = 600,
+     default_height = 800,
 }
 
 -- Overwrites config if you have a custom one

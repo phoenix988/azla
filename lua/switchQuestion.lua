@@ -37,9 +37,18 @@ function import.switchQuestion(correct_answers, incorrect_answers,
      local mainWindowModule = require("lua.mainWindow")
      local getWordList = mainWindowModule.getWordList
      local wordlist = getWordList()
+     local count = tonumber(wordlist.count)
 
      currentQuestion = currentQuestion + 1
-     if currentQuestion > #wordlist then
+     local chosen_wordlist = #wordlist 
+     
+     -- Checks if the wordlist has less words than the count choice
+     -- If true then it will change the value of count
+     if chosen_wordlist < count then
+         count = chosen_wordlist
+     end
+
+     if currentQuestion > count then
         labelEnd.label = "You reached the last question"
         labelEnd:set_markup("<span foreground='" .. theme.label_fg .. "'>" .. labelEnd.label .. "</span>")
         restartButton:set_visible(true)
@@ -53,7 +62,8 @@ function import.switchQuestion(correct_answers, incorrect_answers,
      end
 
      -- Hide all question elements
-     for i = 1, #wordlist do
+     --for i = 1, #wordlist do
+     for i = 1, math.min(#wordlist, count) do
         question_labels[i]:set_visible(false)
         entry_fields[i]:set_visible(false)
         submit_buttons[i]:set_visible(false)
@@ -62,38 +72,27 @@ function import.switchQuestion(correct_answers, incorrect_answers,
      end
 
      -- Show the active question elements
-     if question_labels[currentQuestion] == nil then 
-       local trash 
-     else
+     if question_labels[currentQuestion] ~= nil then 
        question_labels[currentQuestion]:set_visible(true)
      end
      
-     if entry_fields[currentQuestion] == nil then 
-       local trash 
-     else
+     if entry_fields[currentQuestion] ~= nil then 
        entry_fields[currentQuestion]:set_visible(true)
      end
 
-     if submit_buttons[currentQuestion] == nil then 
-       local trash 
-     else
+     if submit_buttons[currentQuestion] ~= nil then 
        submit_buttons[currentQuestion]:set_visible(true)
      end
 
-     if result_labels[currentQuestion] == nil then 
-       local trash 
-     else
+     if result_labels[currentQuestion] ~= nil then 
        result_labels[currentQuestion]:set_visible(true)
      end
 
-     if next_buttons[currentQuestion] == nil then 
-       local trash 
-     else
+     if next_buttons[currentQuestion] ~= nil then 
        next_buttons[currentQuestion]:set_visible(false)
      end
 
-     
-     -- Retunr currentquestion variable
+     -- Return currentquestion variable
      return currentQuestion
 end
 

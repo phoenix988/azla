@@ -6,7 +6,10 @@ local GdkPixbuf         = lgi.require('GdkPixbuf')
 local gio               = require("lgi").Gio
 local lfs               = require("lfs")
 local os                = require("os")
+
+-- Import theme
 local theme             = require("lua.theme.default")
+local replace           = {}
 
 -- Other imports and global variables
 -- Imports function to create images
@@ -15,6 +18,8 @@ local create_image      = imageModule.create_image
 
 -- Define home variable
 local home              = os.getenv("HOME")
+
+-- Define image path
 local imagePath         = theme.main_image
 
 -- Cache file path
@@ -24,6 +29,30 @@ local cacheFile          = home .. "/.cache/azla.lua"
 local writeToConfigModule   = require("lua.settings")
 local writeTo_config        = writeToConfigModule.writeTo_config
 local configReplace         = writeToConfigModule.setconfigReplace
+local write                 = writeToConfigModule.write
+
+
+-- Import the show_result function from resultModule.lua
+local resultModule   = require("lua.showResult")
+local show_result    = resultModule.show_result
+
+-- Import SwitchQuestion function
+local import         = require("lua.switchQuestion")
+local switchQuestion = import.switchQuestion
+
+-- Import the question Module
+local question     = require("lua.questionFunction")
+local questionMain = question.main
+
+-- Import shuffle
+local shuffle        = require("lua.shuffle")
+
+-- Sets app attributes
+local appID2            = "io.github.Phoenix988.azla.az.lua"
+local appTitle          = "Azla Question"
+local app2              = Gtk.Application({ application_id = appID2 })
+
+local combo             = require("lua.widgets.combo")
 
 -- Define other variables used later in the application
 local question_labels    = {}
@@ -36,25 +65,6 @@ local show_result_labels = {}
 -- Counts correct answers
 local correct_answers   = 0
 local incorrect_answers = 0
-
--- Sets app attributes
-local appID2            = "io.github.Phoenix988.azla.az.lua"
-local appTitle          = "Azla Question"
-local app2              = Gtk.Application({ application_id = appID2 })
-
--- Import the show_result function from resultModule.lua
-local resultModule   = require("lua.showResult")
-local show_result    = resultModule.show_result
-
--- Import switchquestion function
-local import         = require("lua.switchQuestion")
-local switchQuestion = import.switchQuestion
-
--- Import the question Module
-local questionMain   = require("lua.questionFunction")
-
--- Import shuffle
-local shuffle        = require("lua.shuffle")
 
 -- Calculates current question
 local currentQuestion = 1
@@ -74,6 +84,7 @@ local function create_app2()
       local getHeight = mainWindowModule.getWindowHeight
       local width = getWindowWidth()
       local height = getWindowHeight()
+
 
       local win = Gtk.ApplicationWindow({
          title = appTitle,
@@ -101,11 +112,11 @@ local function create_app2()
       })
 
       -- Creates image for the app
-      local image_2 = create_image(imagePath)
-      image_2:set_size_request(200, 150)
+      local image = create_image(imagePath)
+      image:set_size_request(200, 150)
        
       -- Appends the image on the top
-      box:append(image_2)
+      box:append(image)
 
       local getWordList = mainWindowModule.getWordList
       local wordlist = getWordList()
@@ -137,6 +148,10 @@ local function create_app2()
       restartButton = Gtk.Button({label = "Restart"})
       -- Initially you wont see the restartbutton
       restartButton:set_visible(false)
+
+      -- Makes grid
+      local grid = Gtk.Grid()
+      local grid2 = Gtk.Grid()
       
       -- Function called when clicking the restartbutton
       function restartButton:on_clicked() 
@@ -145,6 +160,9 @@ local function create_app2()
           correct_answers = 0
           incorrect_answers = 0
           currentQuestion = 1  -- Start from the first question if reached the end
+
+          question.label_correct = {}
+          question.label_incorrect = {}
 
           import.setQuestion(currentQuestion)
           
@@ -157,39 +175,48 @@ local function create_app2()
       local resultButton = Gtk.Button({label = "Show Result"})
 
       summaryButton = Gtk.Button({label = "Summary"})
+      continueButton = Gtk.Button({label = "Continue", visible = false})
       hidesummaryButton = Gtk.Button({label = "Hide", margin_top = 75})
  
       summaryButton:set_visible(false)
       hidesummaryButton:set_visible(false)
-
+      
       function summaryButton:on_clicked()
+         -- Imports some modules
+         local clear = require("lua.clear_grid")
+         local show  = require("lua.summary.show")
 
-         show_result_labels[1]:set_margin_top(50)
-         for i = 1, #wordlist do
-            show_result_labels[i]:set_visible(true)
-         end
+         -- clears the grid
+         clear.grid(grid)
+         clear.grid(grid2)
+         
+         -- shows the summary
+         show.summary(question,grid,theme)
 
-          labelEnd:set_visible(false)
-          labelEndCorrect:set_visible(false)
-          labelEndIncorrect:set_visible(false)
-          resultButton:set_visible(false)
-          summaryButton:set_visible(false)
-          hidesummaryButton:set_visible(true)
-
+         grid:set_visible(true)
+         grid2:set_visible(true)
+         labelEnd:set_visible(false)
+         labelEndCorrect:set_visible(false)
+         labelEndIncorrect:set_visible(false)
+         resultButton:set_visible(false)
+         summaryButton:set_visible(false)
+         hidesummaryButton:set_visible(true)
+         
+         
       end
 
       function hidesummaryButton:on_clicked()
-
-         for i = 1, #wordlist do
-            show_result_labels[i]:set_visible(false)
-         end
-
+          
           labelEnd:set_visible(true)
           labelEndCorrect:set_visible(true)
           labelEndIncorrect:set_visible(true)
           resultButton:set_visible(true)
           summaryButton:set_visible(true)
           hidesummaryButton:set_visible(false)
+
+          -- Hides the grids
+          grid:set_visible(false)
+          grid2:set_visible(false)
 
       end
       
@@ -201,7 +228,10 @@ local function create_app2()
       
       -- Defines the function of Resultbutton
       function resultButton:on_clicked()
-          show_result(correct_answers, incorrect_answers)
+          -- Import correct answers
+          local question = require("lua.questionFunction") 
+          -- Runs the function show_result
+          show_result(question.correct, question.incorrect)
       end
       
       -- Imports window variable from mainWindow
@@ -215,6 +245,10 @@ local function create_app2()
           correct_answers = 0
           incorrect_answers = 0
           currentQuestion = 1  -- Start from the first question if reached the end
+          
+          -- Make these variables empty to avoid stacking
+          question.label_correct = {}
+          question.label_incorrect = {}
 
           import.setQuestion(currentQuestion)
           
@@ -224,17 +258,16 @@ local function create_app2()
 
       function exitButton:on_clicked()
 
-          local mainWindowModule = require("lua.mainWindow")
+         local mainWindowModule = require("lua.mainWindow")
 
-          local getSettingList = mainWindowModule.getSettingList
-          local settingList = getSettingList()
-          
-          width  = win:get_allocated_width()
-          height = win:get_allocated_height()
-          word = settingList.word
-          lang = settingList.lang
+         local getSettingList = mainWindowModule.getSettingList
+         local settingList = getSettingList()
 
-          local configReplace = setconfigReplace(word,lang,width,height)
+         local comboWord = settingList.comboWord
+
+         write.config_settings(replace,comboWord,combo)
+
+          local configReplace = setconfigReplace(replace)
           -- Replace the cacheFile with the new values
           config = configReplace
           
@@ -254,6 +287,8 @@ local function create_app2()
       end
   
       -- Appends these widgets to box
+      box:append(grid)
+      box:append(grid2)
       box:append(labelEnd)
       box:append(labelEndCorrect)
       box:append(labelEndIncorrect)
@@ -264,7 +299,6 @@ local function create_app2()
       box:append(backButton)
       box:append(exitButton)
       box:append(checkBox)
-
   
       -- Appends box to the main window
       win.child = box

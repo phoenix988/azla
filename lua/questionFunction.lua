@@ -9,20 +9,33 @@ local lfs               = require("lfs")
 local os                = require("os")
 local theme             = require("lua.theme.default")
 
+local count = 0
+
+question = {}
 
 -- Runs the function
-local function question_main(wordlist,
-                             question_labels,
-                             entry_fields,
-                             result_labels,
-                             show_result_labels,
-                             submit_buttons,
-                             next_buttons,
-                             box,
-                             correct_answers,
-                             incorrect_answers,
-                             currentQuestion)
+function question.main(wordlist,
+                       question_labels,
+                       entry_fields,
+                       result_labels,
+                       show_result_labels,
+                       submit_buttons,
+                       next_buttons,
+                       box,
+                       correct_answers,
+                       incorrect_answers,
+                       currentQuestion)
+
+     -- Imports main window module
+     local mainWindowModule  = require("lua.mainWindow").getWordList
+     
+     -- Gets the word count choice 
+     local wordlistCount = getWordList()
       
+      -- Counts correct answer to export
+      question.correct = 0
+      question.incorrect = 0
+
       -- Import switchquestion function
       local import = require("lua.switchQuestion")
       local switchQuestion = import.switchQuestion
@@ -42,10 +55,13 @@ local function question_main(wordlist,
          languageNumber_2 = 1
          languageString = "in English"
       end
-     
-      -- Iterate over the wordlist using a for loop
-      for i = 1, #wordlist do
+      
+     local count = tonumber(wordlist.count)
 
+     -- Iterate over the wordlist using a for loop
+     -- for i = 1, #wordlist do
+      for i = 1, math.min(#wordlist, count) do
+          
           -- Gets the correct answer and stores it in a variable
           local correct = string.lower(wordlist[i][languageNumber_1])
           local word = wordlist[i][languageNumber_2]
@@ -105,6 +121,7 @@ local function question_main(wordlist,
           -- Evaluates if answer is correct
           if choice == correct then
                correct_answers = correct_answers + 1
+               question.correct = question.correct + 1
                result_labels[i].label = "Congratulations, your answer is correct!"
                show_result_labels[i].label = "Correct: " .. correct .. " Answer: " .. choice
                show_result_labels[i]:set_markup("<span foreground='" .. theme.label_correct .. "'>" .. show_result_labels[i].label .. "</span>")
@@ -113,10 +130,16 @@ local function question_main(wordlist,
                result_labels[i]:set_markup("<span size='18000'>" .. result_labels[i].label .. "</span>"  )
                submit_buttons[i]:set_visible(false)
                next_buttons[i]:set_visible(true)
+               
+               if question.label_correct == nil then
+                   question.label_correct = {}
+               end
+               question.label_correct[i] = "Correct: " .. correct .. ":" .. "Answer: " .. choice
   
           else
                 
                incorrect_answers = incorrect_answers + 1
+               question.incorrect = question.incorrect + 1
                result_labels[i].label = "Sorry, your answer is incorrect. Correct answer: " .. correct
                show_result_labels[i].label = "Correct: " .. correct .. " Answer: " .. choice
                show_result_labels[i]:set_markup("<span foreground='" .. theme.label_incorrect .. "'>" .. show_result_labels[i].label .. "</span>")
@@ -125,6 +148,11 @@ local function question_main(wordlist,
                result_labels[i]:set_markup("<span size='18000'>" .. result_labels[i].label .. "</span>"  )
                submit_buttons[i]:set_visible(false)
                next_buttons[i]:set_visible(true)
+
+               if question.label_incorrect == nil then
+                   question.label_incorrect = {}
+               end
+               question.label_incorrect[i] = "Correct: " .. correct .. ":" .. "Answer: " .. choice
   
           end  -- End of if Statement
   
@@ -150,9 +178,12 @@ local function question_main(wordlist,
          box:append(submit_buttons[i])
          box:append(next_buttons[i])
          box:append(show_result_labels[i])
-  
+      
+      count = count + 1
+
+
       end -- End for loop
 
 end
 
-return question_main
+return question

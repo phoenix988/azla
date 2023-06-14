@@ -148,6 +148,34 @@ local widget = {}
         margin_end    = 20
     })
 
+function widget.box_question_create()
+      -- Makes the main box widget to be used 
+      box = Gtk.Box({
+          orientation = Gtk.Orientation.VERTICAL,
+          spacing = 10,
+          halign = Gtk.Align.FILL,
+          valign = Gtk.Align.CENTER,
+          hexpand = true,
+          vexpand = true,
+          margin_top    = 30,
+          margin_bottom = 30,
+          margin_start  = 200,
+          margin_end    = 200
+      })
+
+end
+
+function widget.checkbox_create()
+
+      widget.checkbox_1 = Gtk.CheckButton({label = "Save", valign = Gtk.Align.Center , margin_top = 50})
+
+      function widget.checkbox_1:on_toggled()
+         if widget.checkbox_1.active then
+            print("button activated")
+         end
+      end
+end 
+
 
 return widget
 

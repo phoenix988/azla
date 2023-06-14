@@ -5,7 +5,7 @@ local theme   = require("lua.theme.default")
 local label = {}
 
     
--- Some labels used on the startup window --START
+-- Some labels used on the startup window 
 -- Language Label
 label.language = Gtk.Label({ label = "Choose Language you want to write answers in:" })
 
@@ -35,10 +35,22 @@ label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foregro
 label.word_count:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_count.label .. "</span>"  )
 label.language:set_markup("<span size='" .. theme.label_lang_size .. "' foreground='" .. theme.label_lang .. "'>" .. label.language.label .. "</span>"  )
 label.theme:set_markup("<span size='" .. theme.label_welcome_size .. "' foreground='" .. theme.label_fg .. "'>" .. label.theme.label .. "</span>"  )
+label.setting:set_markup("<span size='" .. theme.label_welcome_size .. "' foreground='" .. theme.label_fg .. "'>" .. label.setting.label .. "</span>"  )
 label.theme_nochange:set_markup("<span size='" .. theme.label_welcome_size .. "' foreground='" .. theme.label_incorrect .. "'>" .. label.theme_nochange.label .. "</span>"  )
 label.theme_apply:set_markup("<span size='" .. theme.label_welcome_size .. "' foreground='" .. theme.label_correct .. "'>" .. label.theme_apply.label .. "</span>"  )
 label.sept:set_markup("<span size='40000'>" .. label.sept.label .. "</span>"  )
 
--- Label --END
+function label.end_create()
+-- Creates some labels to show at the end
+wg = {}
+-- Make end Label
+wg.labelEnd = Gtk.Label()
+-- Counts correct answers
+wg.labelEndCorrect = Gtk.Label()
+-- Counts incorrect answers
+wg.labelEndIncorrect = Gtk.Label()
+
+end
+
 
 return label

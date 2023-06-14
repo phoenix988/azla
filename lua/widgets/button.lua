@@ -97,8 +97,150 @@ function button.click_action(widget, image2, label, theme, setting_default,theme
 
 end
 
+function button.result_create(show_result)
 
+button.result = Gtk.Button({label = "Show Result"})
 
+-- Defines the function of Resultbutton
+function button.result:on_clicked()
+    -- Import correct answers
+    local question = require("lua.question.main") 
+    -- Runs the function show_result
+    show_result(question.correct, question.incorrect)
+end
+
+end
+
+function button.restart_create(win,app2,currentQuestion,import)
+
+-- Creates the restart button if you want to restart the list
+      restartButton = Gtk.Button({label = "Restart"})
+      -- Initially you wont see the restartbutton
+      restartButton:set_visible(false)
+
+      -- Function called when clicking the restartbutton
+      function restartButton:on_clicked() 
+          -- Resets the variables that keep tracks of current 
+          -- question and correct answers
+          correct_answers = 0
+          incorrect_answers = 0
+          currentQuestion = 1  -- Start from the first question if reached the end
+
+          question.label_correct = {}
+          question.label_incorrect = {}
+
+          import.setQuestion(currentQuestion)
+          
+          -- Relaunch the app
+          win:destroy()
+          app2:activate()
+      end
+end
+
+-- Create summary and hidden buttons
+function button.summary_create(grid,grid2,wg)
+ 
+      -- Creates summary button and hide button
+      summaryButton = Gtk.Button({label = "Summary"})
+      hidesummaryButton = Gtk.Button({label = "Hide", margin_top = 75})
+
+      -- Create continue button
+      continueButton = Gtk.Button({label = "Continue", visible = false})
+      
+      -- Hides summary and hidesummary button initally
+      summaryButton:set_visible(false)
+      hidesummaryButton:set_visible(false)
+
+      -- Create click action on summaryButton
+      function summaryButton:on_clicked()
+         -- Imports some modules
+         local clear = require("lua.clear_grid")
+         local show  = require("lua.summary.show")
+
+         -- clears the grid
+         clear.grid(grid)
+         clear.grid(grid2)
+         
+         -- shows the summary
+         show.summary(question,grid,theme)
+
+         grid:set_visible(true)
+         grid2:set_visible(true)
+         wg.labelEnd:set_visible(false)
+         wg.labelEndCorrect:set_visible(false)
+         wg.labelEndIncorrect:set_visible(false)
+         button.result:set_visible(false)
+         summaryButton:set_visible(false)
+         hidesummaryButton:set_visible(true)
+         
+      end
+
+      -- Create click action on hidesummaryButton
+      function hidesummaryButton:on_clicked()
+          
+          wg.labelEnd:set_visible(true)
+          wg.labelEndCorrect:set_visible(true)
+          wg.labelEndIncorrect:set_visible(true)
+          button.result:set_visible(true)
+          summaryButton:set_visible(true)
+          hidesummaryButton:set_visible(false)
+
+          -- Hides the grids
+          grid:set_visible(false)
+          grid2:set_visible(false)
+
+      end
+      
+
+end
+
+function button.back_exit_create(correct_answers,incorrect_answers,
+                                       currentQuestion,question,import,win,mainWindow,
+                                       replace,cacheFile,combo)
+      
+      
+      backButton = Gtk.Button({label = "Go Back"})
+      
+       -- Makes exit button to exit
+      exitButton = Gtk.Button({label = "Exit", margin_top = 50})
+            
+      
+       -- Defines the function of Exitbutton
+      function backButton:on_clicked()
+                -- Resets the variables that keep tracks of current 
+                -- question and correct answers
+                correct_answers = 0
+                incorrect_answers = 0
+                currentQuestion = 1  -- Start from the first question if reached the end
+                
+                -- Make these variables empty to avoid stacking
+                question.label_correct = {}
+                question.label_incorrect = {}
+      
+                import.setQuestion(currentQuestion)
+                
+                win:destroy()
+                mainWindow:activate()
+            end
+      
+            function exitButton:on_clicked()
+      
+               local mainWindowModule = require("lua.main")
+               local writeModule      = require("lua.settings")
+               local write            = writeModule.write
+      
+               local getSettingList = mainWindowModule.getSettingList
+               local settingList = getSettingList()
+      
+               local comboWord = settingList.comboWord
+      
+               write.config_main(replace,cacheFile,combo,comboWord)
+      
+               win:destroy()
+               mainWindow:quit()
+      end
+      
+end
 return button
     
 

@@ -66,28 +66,6 @@ function combo.lang_create()
 
 end
 
--- Makes combo word widget
-function combo.word_create()
-
--- Model for the second combo box
-  combo.word_model = Gtk.ListStore.new({ GObject.Type.STRING })
-
-   -- Makes the combobox widget for wordlists
-      combo.word = Gtk.ComboBox({
-        model = combo.word_model,
-        active = 0,
-        cells = {
-          {
-            Gtk.CellRendererText(),
-            { text = 1 },
-            align = Gtk.Align.START
-          }
-        }
-    })
-
-
-end
-
 -- Function to set value of combo boxes on startup
 function combo.set_value(config,customConfig,combo_set,fileExist,value)
 

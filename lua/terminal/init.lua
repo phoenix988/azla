@@ -2,6 +2,8 @@ local io              = require("io")
 local os              = require("os")
 local colors          = require("lua.terminal.colors")
 local luaWordsModule  = "lua.words"
+local p               = require("lua.terminal.processSwitch")
+local language        = {}
 
 local function terminal_init()
   -- Sets fzf variable
@@ -55,12 +57,12 @@ local function terminal_init()
      end
 
      -- Function that asks you which language root you want to take
-     function language()
+     function language_choice()
        -- Keeps running if you make incorrect choice
-       local language = "empty"
+       local language_check = "empty"
      
        -- Keeps running if you make invalid choice
-       while language == "empty" do
+       while language_check == "empty" do
          local question = "Choose which Language you want your questions to be in ((A)zerbajan/(E)nglish/): "
          io.write(colors.blue .. question)
          print(colors.reset)
@@ -69,10 +71,12 @@ local function terminal_init()
          -- Statement that sets the language variable depending on choice
          if choice == "A" or choice == "a" then
              -- Perform action for choice A
-             language="azerbajan"
+             language.opt = "azerbajan"
+             break
          elseif choice == "E" or choice == "e" then
              -- Perform action for choice E
-             language="english"
+             language.opt = "english"
+             break
          else
              -- Invalid choice
              print("Invalid choice, Try again")
@@ -131,42 +135,39 @@ local function terminal_init()
      os.exit(0)
   end
   
-  -- Process the switches
-  processSwitches()
-  
   -- Welcome message
   welcome()
-  
-  -- Asks if you want to write in english or azerbajani
-  language()
   
   -- Loops that keeps running unless you exit
   while run == "yes" do 
     
     session = session + 1
+
+    -- Asks if you want to write in english or azerbajani
+    language_choice()
   
     word_list()
-     
+
     -- Language choice 
     -- If you choose azerbajani this runs 
-    if language == "azerbajan" then 
+    if language.opt == "azerbajan" then 
 
        local questionMainModule = require("lua.terminal.mainQuestion")
        local questionMain       = questionMainModule.question_main
-       getCorrect         = questionMainModule.getCorrect
-       getIncorrect       = questionMainModule.getIncorrect
-       questionMain(wordlist,colors)
+       getCorrect               = questionMainModule.getCorrect
+       getIncorrect             = questionMainModule.getIncorrect
+       questionMain(wordlist,colors,language.opt)
 
        wordlist = nil
     
     -- If you choose english this runs 
-    elseif language == "english" then
+    elseif language.opt == "english" then
 
-       local questionMainModule = require("lua.terminal.altQuestion")
-       local questionAlt       = questionMainModule.question_alt
-       getCorrect         = questionMainModule.getCorrect
-       getIncorrect       = questionMainModule.getIncorrect
-       questionAlt(wordlist,colors)
+       local questionMainModule = require("lua.terminal.mainQuestion")
+       local questionMain        = questionMainModule.question_main
+       getCorrect               = questionMainModule.getCorrect
+       getIncorrect             = questionMainModule.getIncorrect
+       questionMain(wordlist,colors,language.opt)
 
        wordlist = nil
     

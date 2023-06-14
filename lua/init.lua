@@ -1,7 +1,7 @@
 local import = {}
 
 -- Imports window 1
-import.appModule      = require("lua.mainWindow")
+import.appModule      = require("lua.main")
 import.app1           = import.appModule.app1
 
 -- Import file exist module

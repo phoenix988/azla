@@ -25,6 +25,7 @@ end
 local setting = {
      default_width = 600,
      default_height = 800,
+     default_word_count = 5,
 }
 
 -- Overwrites config if you have a custom one

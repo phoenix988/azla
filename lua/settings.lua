@@ -3,7 +3,7 @@ local load_config_module = require("lua.loadConfig")
 local load_config_custom = load_config_module.load_config_custom
 local write = {}
 
-function setconfigReplace(replace)
+function write.set_config_Replace(replace)
        
        configReplace =  {
          word_set       = replace.word,
@@ -18,7 +18,7 @@ return configReplace
 end
 
 -- Write the updated config back to the file
-local function writeTo_config(cacheFile, config)
+function write.to_config(cacheFile, config)
         local file = io.open(cacheFile, "w")
         if file then
            file:write("config = {\n")
@@ -109,7 +109,7 @@ end
 
 function write.config_settings(replace,comboWord,combo)
 
-        local mainWindowModule = require("lua.mainWindow")
+        local mainWindowModule = require("lua.main")
         local getWidth = mainWindowModule.getWindowWidth
         local getHeight = mainWindowModule.getWindowHeight
         local width = getWindowWidth()
@@ -126,7 +126,23 @@ function write.config_settings(replace,comboWord,combo)
 
 end
 
+-- Main function that runs all config replacements at once
+function write.config_main(replace,cacheFile,combo,comboWord)
+       
+       -- gets all values we need
+       write.config_settings(replace,comboWord,combo)
+       
+       -- makes the settings array
+       local configReplace = write.set_config_Replace(replace)
+
+       -- Change the name 
+       local config = configReplace
+    
+       -- Replace the cacheFile with the new values
+       write.to_config(cacheFile,config)
+
+end
+
 
 -- Returns all variables
-return {writeTo_config = writeTo_config, setconfigReplace = setconfigReplace, 
-        write_theme = write_theme, write_setting = write_setting, write = write}
+return {write_theme = write_theme, write_setting = write_setting, write = write}

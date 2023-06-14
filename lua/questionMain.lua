@@ -23,14 +23,11 @@ local home              = os.getenv("HOME")
 local imagePath         = theme.main_image
 
 -- Cache file path
-local cacheFile          = home .. "/.cache/azla.lua"
+local cacheFile         = home .. "/.cache/azla.lua"
 
 -- Import function to write to cache file
 local writeToConfigModule   = require("lua.settings")
-local writeTo_config        = writeToConfigModule.writeTo_config
-local configReplace         = writeToConfigModule.setconfigReplace
 local write                 = writeToConfigModule.write
-
 
 -- Import the show_result function from resultModule.lua
 local resultModule   = require("lua.showResult")
@@ -41,33 +38,42 @@ local import         = require("lua.switchQuestion")
 local switchQuestion = import.switchQuestion
 
 -- Import the question Module
-local question     = require("lua.questionFunction")
-local questionMain = question.main
+local question       = require("lua.question.main")
+local questionMain   = question.main
 
 -- Import shuffle
-local shuffle        = require("lua.shuffle")
+local shuffle           = require("lua.shuffle")
 
 -- Sets app attributes
 local appID2            = "io.github.Phoenix988.azla.az.lua"
 local appTitle          = "Azla Question"
 local app2              = Gtk.Application({ application_id = appID2 })
 
-local combo             = require("lua.widgets.combo")
+-- Imports combo widgets
+local wc                = require("lua.widgets.init")
 
--- Define other variables used later in the application
-local question_labels    = {}
-local entry_fields       = {}
-local submit_buttons     = {}
-local result_labels      = {}
-local next_buttons       = {}
-local show_result_labels = {}
+-- import widgets 
+local wc                   = require("lua.widgets.init")
+local widget_list          = {}
+
+for key, _  in pairs(wc) do
+     table.insert(widget_list, key)
+end
+
+-- Loops through them
+ for _, value in ipairs(widget_list) do
+      _G[value] = wc[value]
+ end
+
+-- Creates empty table to make some widgets 
+local w                 = {}
 
 -- Counts correct answers
 local correct_answers   = 0
 local incorrect_answers = 0
 
 -- Calculates current question
-local currentQuestion = 1
+local currentQuestion   = 1
 
 local function create_app2()
   -- Create the application object
@@ -79,7 +85,7 @@ local function create_app2()
   -- Create the main window function
   function app2:on_activate()
       
-      local mainWindowModule = require("lua.mainWindow")
+      local mainWindowModule = require("lua.main")
       local getWidth = mainWindowModule.getWindowWidth
       local getHeight = mainWindowModule.getWindowHeight
       local width = getWindowWidth()
@@ -97,20 +103,12 @@ local function create_app2()
          deletable = true,
       })
 
-      -- Makes the main box widget to be used 
-      local box = Gtk.Box({
-          orientation = Gtk.Orientation.VERTICAL,
-          spacing = 10,
-          halign = Gtk.Align.FILL,
-          valign = Gtk.Align.CENTER,
-          hexpand = true,
-          vexpand = true,
-          margin_top    = 30,
-          margin_bottom = 30,
-          margin_start  = 200,
-          margin_end    = 200
-      })
+      wc.grid.grid_create()
+      wc.grid.grid_1 = grid.grid_1
+      wc.grid.grid_2 = grid.grid_2
 
+      widget.box_question_create()
+ 
       -- Creates image for the app
       local image = create_image(imagePath)
       image:set_size_request(200, 150)
@@ -118,6 +116,7 @@ local function create_app2()
       -- Appends the image on the top
       box:append(image)
 
+      -- Gets chosen wordlist value
       local getWordList = mainWindowModule.getWordList
       local wordlist = getWordList()
   
@@ -126,179 +125,43 @@ local function create_app2()
       
       -- Runs the question Function
       questionMain(wordlist,
-                   question_labels,
-                   entry_fields,
-                   result_labels,
-                   show_result_labels,
-                   submit_buttons,
-                   next_buttons,
+                   w,
                    box,
                    correct_answers,
                    incorrect_answers,
                    currentQuestion)
- 
-      -- Make end Label
-      labelEnd = Gtk.Label()
-      -- Counts correct answers
-      labelEndCorrect = Gtk.Label()
-      -- Counts incorrect answers
-      labelEndIncorrect = Gtk.Label()
-  
-      -- Creates the restart button if you want to restart the list
-      restartButton = Gtk.Button({label = "Restart"})
-      -- Initially you wont see the restartbutton
-      restartButton:set_visible(false)
-
-      -- Makes grid
-      local grid = Gtk.Grid()
-      local grid2 = Gtk.Grid()
       
-      -- Function called when clicking the restartbutton
-      function restartButton:on_clicked() 
-          -- Resets the variables that keep tracks of current 
-          -- question and correct answers
-          correct_answers = 0
-          incorrect_answers = 0
-          currentQuestion = 1  -- Start from the first question if reached the end
-
-          question.label_correct = {}
-          question.label_incorrect = {}
-
-          import.setQuestion(currentQuestion)
-          
-          -- Relaunch the app
-          win:destroy()
-          app2:activate()
-      end
+      -- Create end labels
+      label.end_create()
+      
+      -- Create restart button and function
+      wc.button.restart_create(win,app2,currentQuestion,import)
+      
+      -- Create summary buttons
+      wc.button.summary_create(wc.grid.grid_1,wc.grid.grid_2,wg)
       
       -- Makes result button to show your result
-      local resultButton = Gtk.Button({label = "Show Result"})
+      wc.button.result_create(show_result)
+     
+      wc.button.back_exit_create(correct_answers,incorrect_answers,
+                              currentQuestion,question,import,win,mainWindowModule.app1,
+                              replace,cacheFile,combo)
 
-      summaryButton = Gtk.Button({label = "Summary"})
-      continueButton = Gtk.Button({label = "Continue", visible = false})
-      hidesummaryButton = Gtk.Button({label = "Hide", margin_top = 75})
- 
-      summaryButton:set_visible(false)
-      hidesummaryButton:set_visible(false)
+      widget.checkbox_create()
       
-      function summaryButton:on_clicked()
-         -- Imports some modules
-         local clear = require("lua.clear_grid")
-         local show  = require("lua.summary.show")
-
-         -- clears the grid
-         clear.grid(grid)
-         clear.grid(grid2)
-         
-         -- shows the summary
-         show.summary(question,grid,theme)
-
-         grid:set_visible(true)
-         grid2:set_visible(true)
-         labelEnd:set_visible(false)
-         labelEndCorrect:set_visible(false)
-         labelEndIncorrect:set_visible(false)
-         resultButton:set_visible(false)
-         summaryButton:set_visible(false)
-         hidesummaryButton:set_visible(true)
-         
-         
-      end
-
-      function hidesummaryButton:on_clicked()
-          
-          labelEnd:set_visible(true)
-          labelEndCorrect:set_visible(true)
-          labelEndIncorrect:set_visible(true)
-          resultButton:set_visible(true)
-          summaryButton:set_visible(true)
-          hidesummaryButton:set_visible(false)
-
-          -- Hides the grids
-          grid:set_visible(false)
-          grid2:set_visible(false)
-
-      end
-      
-      -- Create back button to go back to main
-      backButton = Gtk.Button({label = "Go Back"})
-      
-      -- Makes exit button to exit
-      local exitButton = Gtk.Button({label = "Exit", margin_top = 50})
-      
-      -- Defines the function of Resultbutton
-      function resultButton:on_clicked()
-          -- Import correct answers
-          local question = require("lua.questionFunction") 
-          -- Runs the function show_result
-          show_result(question.correct, question.incorrect)
-      end
-      
-      -- Imports window variable from mainWindow
-      local mainWindowModule = require("lua.mainWindow")
-      local mainWindow = mainWindowModule.app1
-      
-      -- Defines the function of Exitbutton
-      function backButton:on_clicked()
-          -- Resets the variables that keep tracks of current 
-          -- question and correct answers
-          correct_answers = 0
-          incorrect_answers = 0
-          currentQuestion = 1  -- Start from the first question if reached the end
-          
-          -- Make these variables empty to avoid stacking
-          question.label_correct = {}
-          question.label_incorrect = {}
-
-          import.setQuestion(currentQuestion)
-          
-          win:destroy()
-          mainWindow:activate()
-      end
-
-      function exitButton:on_clicked()
-
-         local mainWindowModule = require("lua.mainWindow")
-
-         local getSettingList = mainWindowModule.getSettingList
-         local settingList = getSettingList()
-
-         local comboWord = settingList.comboWord
-
-         write.config_settings(replace,comboWord,combo)
-
-          local configReplace = setconfigReplace(replace)
-          -- Replace the cacheFile with the new values
-          config = configReplace
-          
-          -- Runs function to replace
-          writeTo_config(cacheFile,config)
-            
-          win:destroy()
-          mainWindow:quit()
-      end
-
-      checkBox = Gtk.CheckButton({label = "Save", valign = Gtk.Align.Center , margin_top = 50})
-
-      function checkBox:on_toggled()
-         if checkBox.active then
-            print("button activated")
-         end
-      end
-  
       -- Appends these widgets to box
-      box:append(grid)
-      box:append(grid2)
-      box:append(labelEnd)
-      box:append(labelEndCorrect)
-      box:append(labelEndIncorrect)
-      box:append(resultButton)
+      box:append(wc.grid.grid_1)
+      box:append(wc.grid.grid_2)
+      box:append(wg.labelEnd)
+      box:append(wg.labelEndCorrect)
+      box:append(wg.labelEndIncorrect)
+      box:append(wc.button.result)
       box:append(summaryButton)
       box:append(hidesummaryButton)
       box:append(restartButton)
       box:append(backButton)
       box:append(exitButton)
-      box:append(checkBox)
+      box:append(widget.checkbox_1)
   
       -- Appends box to the main window
       win.child = box

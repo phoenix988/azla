@@ -27,14 +27,11 @@ end
 
 -- Function so it switch question after you submit your answer
 function import.switchQuestion(correct_answers, incorrect_answers, 
-                               question_labels,entry_fields,submit_buttons,
-                               result_labels,next_buttons,
-                               labelEnd,labelEndCorrect,
-                               labelEndIncorrect,restartButton,
+                               w,wg,restartButton,
                                summaryButton,backButton)
 
      -- Imports active wordlist
-     local mainWindowModule = require("lua.mainWindow")
+     local mainWindowModule = require("lua.main")
      local getWordList = mainWindowModule.getWordList
      local wordlist = getWordList()
      local count = tonumber(wordlist.count)
@@ -49,13 +46,13 @@ function import.switchQuestion(correct_answers, incorrect_answers,
      end
 
      if currentQuestion > count then
-        labelEnd.label = "You reached the last question"
-        labelEnd:set_markup("<span foreground='" .. theme.label_fg .. "'>" .. labelEnd.label .. "</span>")
+        wg.labelEnd.label = "You reached the last question"
+        wg.labelEnd:set_markup("<span foreground='" .. theme.label_fg .. "'>" .. wg.labelEnd.label .. "</span>")
         restartButton:set_visible(true)
-        labelEndCorrect.label = "correct: " .. correct_answers
-        labelEndCorrect:set_markup("<span foreground='" .. theme.label_correct .. "'>" .. labelEndCorrect.label .. "</span>")
-        labelEndIncorrect.label = "Incorrect: " .. incorrect_answers
-        labelEndIncorrect:set_markup("<span foreground='" .. theme.label_incorrect .. "'>" .. labelEndIncorrect.label .. "</span>")
+        wg.labelEndCorrect.label = "correct: " .. correct_answers
+        wg.labelEndCorrect:set_markup("<span foreground='" .. theme.label_correct .. "'>" .. wg.labelEndCorrect.label .. "</span>")
+        wg.labelEndIncorrect.label = "Incorrect: " .. incorrect_answers
+        wg.labelEndIncorrect:set_markup("<span foreground='" .. theme.label_incorrect .. "'>" .. wg.labelEndIncorrect.label .. "</span>")
         summaryButton:set_visible(true)
         backButton:set_margin_top(30)
 
@@ -64,32 +61,32 @@ function import.switchQuestion(correct_answers, incorrect_answers,
      -- Hide all question elements
      --for i = 1, #wordlist do
      for i = 1, math.min(#wordlist, count) do
-        question_labels[i]:set_visible(false)
-        entry_fields[i]:set_visible(false)
-        submit_buttons[i]:set_visible(false)
-        result_labels[i]:set_visible(false)
-        next_buttons[i]:set_visible(false)
+        w.question_labels[i]:set_visible(false)
+        w.entry_fields[i]:set_visible(false)
+        w.submit_buttons[i]:set_visible(false)
+        w.result_labels[i]:set_visible(false)
+        w.next_buttons[i]:set_visible(false)
      end
 
      -- Show the active question elements
-     if question_labels[currentQuestion] ~= nil then 
-       question_labels[currentQuestion]:set_visible(true)
+     if w.question_labels[currentQuestion] ~= nil then 
+       w.question_labels[currentQuestion]:set_visible(true)
      end
      
-     if entry_fields[currentQuestion] ~= nil then 
-       entry_fields[currentQuestion]:set_visible(true)
+     if w.entry_fields[currentQuestion] ~= nil then 
+       w.entry_fields[currentQuestion]:set_visible(true)
      end
 
-     if submit_buttons[currentQuestion] ~= nil then 
-       submit_buttons[currentQuestion]:set_visible(true)
+     if w.submit_buttons[currentQuestion] ~= nil then 
+       w.submit_buttons[currentQuestion]:set_visible(true)
      end
 
-     if result_labels[currentQuestion] ~= nil then 
-       result_labels[currentQuestion]:set_visible(true)
+     if w.result_labels[currentQuestion] ~= nil then 
+       w.result_labels[currentQuestion]:set_visible(true)
      end
 
-     if next_buttons[currentQuestion] ~= nil then 
-       next_buttons[currentQuestion]:set_visible(false)
+     if w.next_buttons[currentQuestion] ~= nil then 
+       w.next_buttons[currentQuestion]:set_visible(false)
      end
 
      -- Return currentquestion variable

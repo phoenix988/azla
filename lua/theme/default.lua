@@ -1,14 +1,14 @@
 -- Module to control the theming of the app
-local os        = require("os")
+local os               = require("os")
 
-local fileExistModule = require("lua.fileExist")
-local fileExist = fileExistModule.fileExists
+local fileExistModule  = require("lua.fileExist")
+local fileExist        = fileExistModule.fileExists
 
 local loadConfigModule = require("lua.loadConfig")
-local loadConfig = loadConfigModule.load_config_theme
+local loadConfig       = loadConfigModule.load_config_theme
 
-local home      = os.getenv("HOME")
-local customConfig = home .. "/.config/azla.lua"
+local home             = os.getenv("HOME")
+local customConfig     = home .. "/.config/azla.lua"
 
 -- check if custom file exist
 if fileExist(customConfig) then

@@ -18,17 +18,17 @@ local import         = require("lua.init")
 -- Sets home variable
 local home           = os.getenv("HOME")
 
-local luaWordsPath      = currentDir .. "lua/words/"
-local luaWordsModule    = "lua.words"
-
 -- File exist function
-local fileExist       = import.fileExists
+local fileExist      = import.fileExists
 
 -- Main window
-local app1            = import.app1
+local app1           = import.app1
 
 -- Sets terminal variable
-local terminal       = false
+
+local p              = require("lua.terminal.processSwitch")
+
+p.terminal           = false
 
 -- Sets cachefile path
 local cacheFile      = home .. "/.cache/azla.lua"
@@ -47,56 +47,12 @@ if not fileExists(cacheFile) then
 
 end
 
--- Define a function to process the switches
-function processSwitches()
-  local i = 1
-  while i <= #arg do
-    local switch = arg[i]
-
-    if switch == "--help" or switch == "-h" then
-      -- Handle help switch
-      print("--help -h Print this help Message")
-      print("--term -t Open the terminal version of the app")
-      print("-t $ARG use a wordlist thats located in lua_words")
-      os.exit(0)
-
-    elseif switch == "--term" or switch == "-t" then  
-      -- handle terminal switch
-      terminal = true
-
-      -- Check if input value is provided
-      -- will leave if no output is provided
-      local input = arg[i + 1]
-      if not input then
-         -- Wont do anything if you dont provide any argument
-         local no = ""
-      else
- 
-         -- Will leave if the file doesn't exist
-         local filename = luaWordsPath .. input .. ".lua"
-         if not fileExists(filename) then
-           print("File does not exist:", filename)
-           os.exit(1)
-         end
-
-         -- Process the input file
-         wordlist = require(luaWordsModule .. "." .. input)
-         i = i + 1
-          
-      end
-
-    else
-      -- Handle unrecognized switches or arguments
-      print("Unrecognized switch or argument:", switch)
-      os.exit(1)
-    end
-
-    i = i + 1
-  end
-end
+-- set luawords path
+local luaWordsPath   = currentDir .. "lua/words/"
+local luaWordsModule = "lua.words"
 
 -- Process the switches 
-processSwitches()
+p.processSwitches(luaWordsPath,luaWordsModule)
 
 -- Activate app1
 function app1:on_activate()
@@ -104,13 +60,13 @@ function app1:on_activate()
 end
 
 -- Runs the GUI app if you dont specify --term (-t)
-if terminal == false then 
+if p.terminal == false then 
   
   -- Runs the app
   app1:run()
 
--- Runs the terminal app
-elseif terminal == true then
+elseif p.terminal == true then
+
   -- runs terminal app
   terminal_init()
 

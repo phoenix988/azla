@@ -49,8 +49,6 @@ local appID2            = "io.github.Phoenix988.azla.az.lua"
 local appTitle          = "Azla Question"
 local app2              = Gtk.Application({ application_id = appID2 })
 
--- Imports combo widgets
-local wc                = require("lua.widgets.init")
 
 -- import widgets 
 local wc                   = require("lua.widgets.init")
@@ -142,10 +140,13 @@ local function create_app2()
       
       -- Makes result button to show your result
       wc.button.result_create(show_result)
-     
-      wc.button.back_exit_create(correct_answers,incorrect_answers,
-                              currentQuestion,question,import,win,mainWindowModule.app1,
-                              replace,cacheFile,combo)
+      
+      -- Create exit and back button
+      local bt = wc.button.back_exit_create(
+                           correct_answers,incorrect_answers,
+                           currentQuestion,question,import,win,mainWindowModule.app1,
+                           replace,cacheFile,combo)
+
 
       widget.checkbox_create()
       
@@ -159,8 +160,8 @@ local function create_app2()
       box:append(summaryButton)
       box:append(hidesummaryButton)
       box:append(restartButton)
-      box:append(backButton)
-      box:append(exitButton)
+      box:append(bt.back)
+      box:append(bt.exit)
       box:append(widget.checkbox_1)
   
       -- Appends box to the main window

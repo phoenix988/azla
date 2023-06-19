@@ -195,10 +195,8 @@ function button.summary_create(grid,grid2,wg)
 end
 
 function button.back_exit_create(correct_answers,incorrect_answers,
-                                       currentQuestion,question,import,win,mainWindow,
-                                       replace,cacheFile,combo)
-      
-      
+                                 currentQuestion,question,import,win,mainWindow,
+                                 replace,cacheFile,combo)
       backButton = Gtk.Button({label = "Go Back"})
       
        -- Makes exit button to exit
@@ -229,16 +227,15 @@ function button.back_exit_create(correct_answers,incorrect_answers,
                local writeModule      = require("lua.settings")
                local write            = writeModule.write
       
-               local getSettingList = mainWindowModule.getSettingList
-               local settingList = getSettingList()
-      
-               local comboWord = settingList.comboWord
-      
-               write.config_main(replace,cacheFile,combo,comboWord)
+               write.config_main(replace,cacheFile,combo)
       
                win:destroy()
                mainWindow:quit()
+
+      
       end
+
+    return { exit = exitButton, back = backButton }
       
 end
 return button

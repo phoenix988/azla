@@ -60,6 +60,7 @@ function question.main(wordlist,
          languageString = "in English"
       end
       
+     -- Gets the wordlist count value of the combo count box
      local count = tonumber(wordlist.count)
 
      -- Iterate over the wordlist using a for loop

@@ -1,11 +1,47 @@
 local io                = require("io")
 local os                = require("os")
 
-local correct_answers   = 0
-local incorrect_answers = 0
+local result           = {}
+result.correct         = 0
+result.incorrect       = 0
+
+local function select_count(wordlist,colors)
+      local last_number = #wordlist 
+      local choice      = last_number + 1
+      local first       = true
+      
+      for i = 1, #wordlist do
+          print(colors.blue .. i .. colors.reset)
+      end
+      
+        while choice > last_number do   
+            if not first then
+               os.execute("clear")
+               for i = 1, #wordlist do
+                   print(colors.blue .. i .. colors.reset)
+               end
+               print(colors.red .. "Invalid options" .. colors.reset)
+            end
+            
+            io.write("Choose the amount of words you want: ")
+            choice = io.read()
+            
+            choice = tonumber(choice)
+            
+            if choice == nil then 
+               choice = last_number + 1
+            end
+            first  = false
+
+        end
+      
+      return choice
+end
 
 -- Main function that creates the questions
-function question_main(wordlist,colors,language)
+function question_main(wordlist,colors,language,word_count)
+
+    os.execute("clear")
     
     -- Creates neceseary values to use depending on language choice
     if language == "azerbajan" then
@@ -18,7 +54,7 @@ function question_main(wordlist,colors,language)
     end
 
   -- Starts the for loop
-  for i = 1, #wordlist do
+  for i = 1, math.min(#wordlist, word_count) do
        -- Sets the correct answer
        local correct = wordlist[i][n_1]
        local correct = string.lower(correct)
@@ -44,7 +80,7 @@ function question_main(wordlist,colors,language)
           io.write(colors.green .. "Congratulations answer is correct!")
           io.read()
           os.execute("clear")
-          correct_answers = correct_answers + 1
+          result.correct   = result.correct + 1
   
           print(colors.reset)
   
@@ -61,7 +97,7 @@ function question_main(wordlist,colors,language)
           io.write("Your answer was: " .. choice .. ": ")
           io.read()
           os.execute("clear")
-          incorrect_answers = incorrect_answers + 1
+          result.incorrect = result.incorrect + 1
   
           print(colors.reset)
         
@@ -70,12 +106,11 @@ function question_main(wordlist,colors,language)
 
 end -- End of question_main
 
-function getCorrect()
-    return correct_answers
-end
-    
-function getIncorrect()
-    return incorrect_answers
+
+function getResult()
+   return result
 end
   
-return {question_main = question_main, getCorrect = getCorrect, getIncorrect = getIncorrect}
+return {question_main = question_main, 
+        getResult     = getResult,
+        select_count = select_count}

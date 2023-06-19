@@ -107,7 +107,7 @@ local function write_setting(config, apply, apply_theme)
 
 end
 
-function write.config_settings(replace,comboWord,combo)
+function write.config_settings(replace,combo)
 
         local mainWindowModule = require("lua.main")
         local getWidth = mainWindowModule.getWindowWidth
@@ -118,7 +118,7 @@ function write.config_settings(replace,comboWord,combo)
         -- Gets the dimensions of the screen
         replace.width  = height
         replace.height = width
-        replace.word   = comboWord:get_active()
+        replace.word   = combo.word:get_active()
         replace.lang   = combo.lang:get_active()
         replace.word_count = combo.word_count:get_active()
 
@@ -127,10 +127,10 @@ function write.config_settings(replace,comboWord,combo)
 end
 
 -- Main function that runs all config replacements at once
-function write.config_main(replace,cacheFile,combo,comboWord)
+function write.config_main(replace,cacheFile,combo)
        
        -- gets all values we need
-       write.config_settings(replace,comboWord,combo)
+       write.config_settings(replace,combo)
        
        -- makes the settings array
        local configReplace = write.set_config_Replace(replace)

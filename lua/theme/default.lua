@@ -38,11 +38,6 @@ local theme = {
    main_image           = "/opt/azla/images/flag.jpg"
 }
 
-local setting = {
-     default_width = 600,
-     default_height = 800,
-}
-
 -- Overwrites config if you have a custom one
 if themeCompare ~= nil then
   for key, value in pairs(theme) do

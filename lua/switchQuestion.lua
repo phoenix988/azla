@@ -24,7 +24,6 @@ function import.setQuestion()
    currentQuestion = 1
 end
 
-
 -- Function so it switch question after you submit your answer
 function import.switchQuestion(correct_answers, incorrect_answers, 
                                w,wg,restartButton,

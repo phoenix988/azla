@@ -1,11 +1,22 @@
 local lgi               = require("lgi")
 local Gtk               = lgi.require("Gtk", "4.0")
 local widget            = require("lua.widgets.box")
+local setting_default   = require("lua.theme.setting")
 
 local count = 0
 local array = {}
 
-function array.theme_table(theme,grid_widgets,theme_labels,theme_labels_setting,grid_widgets_2)
+-- Creates some empty widget tables
+array.theme_labels           = {}
+array.theme_labels_setting   = {}
+array.grid_widgets_1         = {}
+array.grid_widgets_2         = {}
+array.grid_widgets_setting   = {}
+array.setting_labels         = {}
+array.setting_labels_setting = {}
+
+-- Function to create grid layout of theme settings
+function array.theme_table(theme)
       
       local theme_table = {}
       for key in pairs(theme) do
@@ -19,35 +30,35 @@ function array.theme_table(theme,grid_widgets,theme_labels,theme_labels_setting,
          
             if count <= 6 then
 
-            grid_widgets[key] = Gtk.Grid({margin_top = 0})
+            array.grid_widgets_1[key] = Gtk.Grid({margin_top = 0})
             -- Makes entry widgets
-            theme_labels[key] = Gtk.Entry({margin_top = 10, margin_bottom = 20,text = value})
+            array.theme_labels[key] = Gtk.Entry({margin_top = 10, margin_bottom = 20,text = value})
 
             -- Make label widgets
-            theme_labels_setting[key] = Gtk.Label({margin_top = 10,label = key})
+            array.theme_labels_setting[key] = Gtk.Label({margin_top = 10,label = key})
 
-            theme_labels_setting[key]:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. theme.label_fg_size .. "'>" .. theme_labels_setting[key].label .. "</span>")
-            grid_widgets[key]:attach(theme_labels[key], 1,1,1,1,  0, 0, 0)
-            grid_widgets[key]:attach(theme_labels_setting[key], 1,-10,1,1)
-            widget.box_theme:append(grid_widgets[key])
+            array.theme_labels_setting[key]:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. theme.label_fg_size .. "'>" .. array.theme_labels_setting[key].label .. "</span>")
+            array.grid_widgets_1[key]:attach(array.theme_labels[key], 1,1,1,1,  0, 0, 0)
+            array.grid_widgets_1[key]:attach(array.theme_labels_setting[key], 1,-10,1,1)
+            widget.box_theme:append(array.grid_widgets_1[key])
 
          end
 
 
          if count >= 6 then
 
-            grid_widgets_2[key] = Gtk.Grid({margin_top = 0})
+            array.grid_widgets_2[key] = Gtk.Grid({margin_top = 0})
             -- Makes entry widgets
-            theme_labels[key] = Gtk.Entry({margin_top = 10, margin_bottom = 20,text = value})
+            array.theme_labels[key] = Gtk.Entry({margin_top = 10, margin_bottom = 20,text = value})
 
             -- Make label widgets
-            theme_labels_setting[key] = Gtk.Label({margin_top = 10,label = key})
+            array.theme_labels_setting[key] = Gtk.Label({margin_top = 10,label = key})
 
-            theme_labels_setting[key]:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. theme.label_fg_size .. "'>" .. theme_labels_setting[key].label .. "</span>")
-            grid_widgets_2[key]:attach(theme_labels[key], 1,1,1,1,  0, 0, 0)
-            grid_widgets_2[key]:attach(theme_labels_setting[key], 1,-10,1,1)
+            array.theme_labels_setting[key]:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. theme.label_fg_size .. "'>" .. array.theme_labels_setting[key].label .. "</span>")
+            array.grid_widgets_2[key]:attach(array.theme_labels[key], 1,1,1,1,  0, 0, 0)
+            array.grid_widgets_2[key]:attach(array.theme_labels_setting[key], 1,-10,1,1)
 
-            widget.box_theme_alt:append(grid_widgets_2[key])
+            widget.box_theme_alt:append(array.grid_widgets_2[key])
 
          end
 
@@ -55,10 +66,13 @@ function array.theme_table(theme,grid_widgets,theme_labels,theme_labels_setting,
 
       end -- end of for loop
 
+      return widget
+
 
 end
 
-function array.setting_table(theme,grid_widgets_setting,setting_labels,setting_labels_setting,setting_default)
+-- Function to create grid layout of regular settings
+function array.setting_table(theme)
       local setting_table = {}
       for key in pairs(setting_default) do
         table.insert(setting_table, key)
@@ -69,19 +83,21 @@ function array.setting_table(theme,grid_widgets_setting,setting_labels,setting_l
       for _, key in ipairs(setting_table) do
             local value = setting_default[key]
 
-            grid_widgets_setting[key] = Gtk.Grid({margin_top = 0})
+            array.grid_widgets_setting[key] = Gtk.Grid({margin_top = 0})
             -- Makes entry widgets
-            setting_labels[key] = Gtk.Entry({margin_top = 10, margin_bottom = 20,text = value})
+            array.setting_labels[key] = Gtk.Entry({margin_top = 10, margin_bottom = 20,text = value})
 
             -- Make label widgets
-            setting_labels_setting[key] = Gtk.Label({margin_top = 10,label = key})
+            array.setting_labels_setting[key] = Gtk.Label({margin_top = 10,label = key})
 
-            setting_labels_setting[key]:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. theme.label_fg_size .. "'>" .. setting_labels_setting[key].label .. "</span>")
-            grid_widgets_setting[key]:attach(setting_labels[key], 1,1,1,1,  0, 0, 0)
-            grid_widgets_setting[key]:attach(setting_labels_setting[key], 1,-10,1,1)
-            widget.box_setting:append(grid_widgets_setting[key])
+            array.setting_labels_setting[key]:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. theme.label_fg_size .. "'>" .. array.setting_labels_setting[key].label .. "</span>")
+            array.grid_widgets_setting[key]:attach(array.setting_labels[key], 1,1,1,1,  0, 0, 0)
+            array.grid_widgets_setting[key]:attach(array.setting_labels_setting[key], 1,-10,1,1)
+            widget.box_setting:append(array.grid_widgets_setting[key])
 
        end
+
+       return widget
 end
 
 

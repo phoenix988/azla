@@ -3,7 +3,7 @@
 #+AUTHOR: Karl Fredin
 
 
-[[file:./images/wp2106881.jpg]]
+[[file:./images/flag.jpg]]
 
 
 * TABLE OF CONTENTS

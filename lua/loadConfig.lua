@@ -26,9 +26,23 @@ function load_config_custom(filename)
     return custom
 end
 
+function load_config_theme(filename)
+    local theme = {}
+    local file = io.open(filename, "r")
+
+    if file then
+        local content = file:read("*all")
+        file:close()
+        theme = assert(load(content))() or {}
+    end
+
+    return theme
+end
+
 
 
 return {
         load_config = load_config,
-        load_config_custom = load_config_custom
+        load_config_custom = load_config_custom,
+        load_config_theme  = load_config_theme
         }

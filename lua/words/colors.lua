@@ -1,3 +1,4 @@
+local wordlist = {}
 
 wordlist = {
 { "Rənglər", "Colors" },  
@@ -15,8 +16,7 @@ wordlist = {
 }
 
 
-return {
-wordlist = wordlist
-}
+return wordlist
+
 
 

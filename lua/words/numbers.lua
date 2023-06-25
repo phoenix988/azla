@@ -1,4 +1,5 @@
 -- Some numbers in azerbajani
+local wordlist = {}
 
 wordlist = {
  {"bir", "One"},
@@ -25,4 +26,4 @@ wordlist = {
 
  }
 
- return { wordlist = wordlist }
+ return wordlist 

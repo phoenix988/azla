@@ -4,8 +4,8 @@ local Gtk               = lgi.require("Gtk", "4.0")
 local show = {}
 
 function show.summary(question,grid,theme)
+      local label_correct   = {}
       local label_incorrect = {}
-      local label_correct = {}
       
       if question.label_correct ~= nil then
         for key , value in pairs(question.label_correct) do

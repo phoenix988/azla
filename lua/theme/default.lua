@@ -8,7 +8,7 @@ local loadConfigModule = require("lua.loadConfig")
 local loadConfig       = loadConfigModule.load_config_theme
 
 local home             = os.getenv("HOME")
-local customConfig     = home .. "/.config/azla.lua"
+local customConfig     = home .. "/.config/azla/conf.lua"
 
 -- check if custom file exist
 if fileExist(customConfig) then

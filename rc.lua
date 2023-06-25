@@ -13,39 +13,43 @@ local currentDir = currentDir:match("(.*/)") or ""
 package.path = currentDir .. "?.lua;" .. package.path
 
 -- Imports init file
-local import         = require("lua.init")
 local terminal_init  = require("lua.terminal.init")
 
 -- Import some switches variables
 local p              = require("lua.terminal.processSwitch")
 
+-- Import Variables
+local var            = require("lua.config.init")
+
 -- Sets home variable
 local home           = os.getenv("HOME")
 
 -- File exist function
-local fileExist      = import.fileExists
-
--- Main window
-local app1           = import.app1
+local fileExist      = require("lua.fileExist")
 
 -- Sets terminal variable
 p.terminal           = false
 
 -- Sets cachefile path
-local cacheFile      = home .. "/.cache/azla.lua"
+local cacheDir       = var.cacheDir
+local cacheFile      = var.cacheFile
 
-local azla           = {}
-azla.dir             = currentDir
+local mkdir          = require("lua.terminal.mkdir").mkdir
 
 -- Create the cache file if it doesn't exist
+
+if not fileExists(cacheDir) then
+      mkdir(cacheDir)
+end
+
 if not fileExists(cacheFile) then
       local file = io.open(cacheFile, "w")
       
       file:write("config = {\n")
       file:write("}")
    
-       -- Close the file
-       file:close()
+      -- Close the file
+      file:close()
 
 end
 
@@ -56,13 +60,18 @@ local luaWordsModule = "lua.words"
 -- Process the switches 
 p.processSwitches(luaWordsPath,luaWordsModule)
 
--- Activate app1
-function app1:on_activate()
-  self.active_window:present()
-end
-
 -- Runs the GUI app if you dont specify --term (-t)
 if p.terminal == false then 
+
+  local import         = require("lua.init")
+  
+  -- Main window
+  local app1           = import.app1
+
+  -- Activate app1
+  function app1:on_activate()
+    self.active_window:present()
+  end
   
   -- Runs the app
   app1:run()
@@ -74,6 +83,5 @@ elseif p.terminal == true then
 
 end -- End of if statement
 
-return {azla = azla}
 
 

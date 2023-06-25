@@ -1,9 +1,12 @@
 local lfs                  = require("lfs")
+local io                   = require("io")
 
 local list = {}
 
 -- Modify a string to print the last column in a path
-function list.modify(luaFiles)
+function list.modify(luaFiles, type)
+
+    local file_type = type or "dir"
     -- Add items to the wordfile combo box
     local luafilesFormatFirst = string.gsub(luaFiles, "lua", "")
     local luafilesFormatSecond = string.gsub(luafilesFormatFirst, ".lua", "")
@@ -17,15 +20,36 @@ function list.modify(luaFiles)
 end
 
 
+function list.modify_dir(luaFiles)
+    -- Add items to the wordfile combo box
+    local luafilesFormatFirst = string.gsub(luaFiles, "lua", "")
+    local luafilesFormatSecond = string.gsub(luafilesFormatFirst, ".lua", "")
+    local last = string.match(luafilesFormatSecond, "[^/]+$")
+        
+    local luaFiles = last
+    
+    return luaFiles 
+
+end
+
+
 -- Function to list all word files inside lua_words
- function list.dir(directory)
+ function list.dir(directory, type)
        local luaFiles = {}
+
+       local file_type = type or "lua"
  
        -- Loops through the directory
        for file in lfs.dir(directory) do
             local filePath = directory .. "/" .. file
-            if lfs.attributes(filePath, "mode") == "file" and file:match("%.lua$") then
-                table.insert(luaFiles, filePath)
+            if file_type == "lua" then
+               if lfs.attributes(filePath, "mode") == "file" and file:match("%.lua$") then
+                   table.insert(luaFiles, filePath)
+               end
+            elseif file_type == "dir" then
+               if file ~= "." and file ~= ".." and lfs.attributes(filePath, "mode") == "directory" then
+                   table.insert(luaFiles, filePath)
+               end
             end
        end
 
@@ -34,6 +58,8 @@ end
 
        return luaFiles --Returns luaFiles variable to be used later
 end
+
+
 
 -- Gets the active diretory
 function list.current_dir(sub)

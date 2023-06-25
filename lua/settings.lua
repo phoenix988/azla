@@ -1,7 +1,7 @@
-local io = require("io")
+local io                 = require("io")
 local load_config_module = require("lua.loadConfig")
 local load_config_custom = load_config_module.load_config_custom
-local write = {}
+local write              = {}
 
 function write.set_config_Replace(replace)
        
@@ -14,6 +14,40 @@ function write.set_config_Replace(replace)
          }
 
 return configReplace
+
+end
+
+
+function write.window_size(customConfig,setting,config,fileExist)
+
+    -- Gets the width and height to set on the window
+    -- You can configure this in a config file
+    if fileExist(customConfig) then
+       -- Prints error if you dont name the variable custom inside the setting file
+       if setting == nil then
+           print("Error in config")
+           os.exit()
+       end
+    end
+       
+       if setting.default_height ~= nil then
+           config.default_height = setting.default_height
+       elseif config.default_height ~= nil then 
+           config.default_height = config.default_height
+       else
+           config.default_height = 800 
+       end
+
+       if setting.default_width ~= nil then
+           config.default_width = setting.default_width
+       elseif config.default_width ~= nil then 
+           config.default_width = config.default_width
+       else
+           config.default_width = 600 
+       end
+
+    
+    return config
 
 end
 
@@ -35,7 +69,7 @@ end
 
 -- Function to update config file
 -- Theme array
-local function write_theme(config, apply, theme)
+function write.theme(config, apply, theme, setting)
         local file = io.open(config, "w")
 
         local fileExist          = require("lua.fileExist")
@@ -72,9 +106,9 @@ end
 
 -- Function to update config file
 -- Settings array
-local function write_setting(config, apply, apply_theme)
+function write.setting(config, apply, apply_theme)
 
-    local file = io.open(config, "w")
+        local file = io.open(config, "w")
 
         local fileExist          = require("lua.fileExist")
         local fileExist          = fileExist.fileExists
@@ -108,18 +142,17 @@ local function write_setting(config, apply, apply_theme)
 end
 
 function write.config_settings(replace,combo)
+        local replace = {}
 
         local mainWindowModule = require("lua.main")
-        local getWidth = mainWindowModule.getWindowWidth
-        local getHeight = mainWindowModule.getWindowHeight
-        local width = getWindowWidth()
-        local height = getWindowHeight()
+        local getDim = mainWindowModule.getWindowDim
+        local window = getDim()
 
         -- Gets the dimensions of the screen
-        replace.width  = height
-        replace.height = width
-        replace.word   = combo.word:get_active()
-        replace.lang   = combo.lang:get_active()
+        replace.width      = window.width
+        replace.height     = window.height
+        replace.word       = combo.word:get_active()
+        replace.lang       = combo.lang:get_active()
         replace.word_count = combo.word_count:get_active()
 
         return replace
@@ -127,10 +160,11 @@ function write.config_settings(replace,combo)
 end
 
 -- Main function that runs all config replacements at once
-function write.config_main(replace,cacheFile,combo)
+function write.config_main(cacheFile,combo)
+
        
        -- gets all values we need
-       write.config_settings(replace,combo)
+       local replace = write.config_settings(replace,combo)
        
        -- makes the settings array
        local configReplace = write.set_config_Replace(replace)
@@ -141,8 +175,9 @@ function write.config_main(replace,cacheFile,combo)
        -- Replace the cacheFile with the new values
        write.to_config(cacheFile,config)
 
+
 end
 
 
 -- Returns all variables
-return {write_theme = write_theme, write_setting = write_setting, write = write}
+return {write = write}

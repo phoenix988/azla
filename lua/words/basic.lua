@@ -1,22 +1,16 @@
-local wordlist = {}
+local shuffle  = require("lua.shuffle")
 
-wordlist = {
-   {"minnoş","cute" },
-   {"balam","my baby" },
-   {"yaxşıyam","I am fine" },
-   {"bəli","yes" },
-   {"çox sağol","Thank you" },
-   {"hələlik","goodbye" },
-   {"tualet hardadır","where is the toilet" },
-   {"düz gedin","go straight" },
-   {"sola dön","turn left" },
-   {"sağa dön","turn right" },
-   {"avtobus və qatar"," bus and train" },
-   {"öpürəm səni","I kiss you" },
-   {"Bütün","Whole" },
-   {"Qürur","Proud" },
- }
+local random   = {}
 
+random.list_1  = require("lua.words.basic.words_2")
+random.list_2  = require("lua.words.basic.words_1")
 
- return wordlist
+shuffle(random)
+
+-- choose a rnaodm list from basic
+for key,value in pairs(random) do
+    wordlist = random[key]
+end
+
+return wordlist
 

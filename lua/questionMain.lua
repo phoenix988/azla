@@ -16,6 +16,9 @@ local replace           = {}
 local imageModule       = require("lua.createImage")
 local create_image      = imageModule.create_image
 
+-- Import Variables
+local var            = require("lua.config.init")
+
 -- Define home variable
 local home              = os.getenv("HOME")
 
@@ -23,23 +26,23 @@ local home              = os.getenv("HOME")
 local imagePath         = theme.main_image
 
 -- Cache file path
-local cacheFile         = home .. "/.cache/azla.lua"
+local cacheFile         = var.cacheFile
 
 -- Import function to write to cache file
-local writeToConfigModule   = require("lua.settings")
-local write                 = writeToConfigModule.write
+local writeModule       = require("lua.settings")
+local write             = writeModule.write
 
 -- Import the show_result function from resultModule.lua
-local resultModule   = require("lua.showResult")
-local show_result    = resultModule.show_result
+local resultModule      = require("lua.showResult")
+local show_result       = resultModule.show_result
 
 -- Import SwitchQuestion function
-local import         = require("lua.switchQuestion")
-local switchQuestion = import.switchQuestion
+local import            = require("lua.switchQuestion")
+local switchQuestion    = import.switchQuestion
 
 -- Import the question Module
-local question       = require("lua.question.main")
-local questionMain   = question.main
+local question          = require("lua.question.main")
+local questionMain      = question.main
 
 -- Import shuffle
 local shuffle           = require("lua.shuffle")
@@ -49,10 +52,9 @@ local appID2            = "io.github.Phoenix988.azla.az.lua"
 local appTitle          = "Azla Question"
 local app2              = Gtk.Application({ application_id = appID2 })
 
-
 -- import widgets 
-local wc                   = require("lua.widgets.init")
-local widget_list          = {}
+local wc                = require("lua.widgets.init")
+local widget_list       = {}
 
 for key, _  in pairs(wc) do
      table.insert(widget_list, key)
@@ -83,19 +85,19 @@ local function create_app2()
   -- Create the main window function
   function app2:on_activate()
       
+      -- Imports some modules from main
       local mainWindowModule = require("lua.main")
-      local getWidth = mainWindowModule.getWindowWidth
-      local getHeight = mainWindowModule.getWindowHeight
-      local width = getWindowWidth()
-      local height = getWindowHeight()
-
-
+      local getWordList      = mainWindowModule.getWordList
+      local getDim           = mainWindowModule.getWindowDim
+      local window           = getDim()
+      
+      -- Creates main window
       local win = Gtk.ApplicationWindow({
          title = appTitle,
          application = self,
          class = "Azla",
-         default_width = width,
-         default_height = height,
+         default_width = window.width,
+         default_height = window.height,
          on_destroy = Gtk.main_quit,
          decorated = true,
          deletable = true,
@@ -104,7 +106,8 @@ local function create_app2()
       wc.grid.grid_create()
       wc.grid.grid_1 = grid.grid_1
       wc.grid.grid_2 = grid.grid_2
-
+      
+      -- Create boxes
       widget.box_question_create()
  
       -- Creates image for the app
@@ -115,12 +118,11 @@ local function create_app2()
       box:append(image)
 
       -- Gets chosen wordlist value
-      local getWordList = mainWindowModule.getWordList
       local wordlist = getWordList()
   
       -- Calls the shuffle function
       shuffle(wordlist)
-      
+
       -- Runs the question Function
       questionMain(wordlist,
                    w,
@@ -136,7 +138,7 @@ local function create_app2()
       wc.button.restart_create(win,app2,currentQuestion,import)
       
       -- Create summary buttons
-      wc.button.summary_create(wc.grid.grid_1,wc.grid.grid_2,wg)
+      wc.button.summary_create(grid.grid_1,grid.grid_2,wg)
       
       -- Makes result button to show your result
       wc.button.result_create(show_result)

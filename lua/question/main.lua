@@ -8,6 +8,8 @@ local GdkPixbuf         = lgi.require('GdkPixbuf')
 local lfs               = require("lfs")
 local os                = require("os")
 local theme             = require("lua.theme.default")
+local replace           = require("lua.question.replace")
+local response          = require("lua.question.response")
 
 local count = 0
 
@@ -112,49 +114,60 @@ function question.main(wordlist,
           -- Create result label for each question
           w.result_labels[i] = Gtk.Label()
 
-          w.show_result_labels[i]   = Gtk.Label({visible = false})
+          w.show_result_labels[i] = Gtk.Label({visible = false})
   
           -- Define the callback function for the submit button
           w.submit_buttons[i].on_clicked = function()
           local choice = w.entry_fields[i].text:lower()
-  
+          
+          -- Alternative correct answer
+          local altCorrect = replace.replace_main(correct)
+
+          -- sets dont run variable
+          local dontRun    = false
+
+          -- create all the labels imported from respones.lua in this dir
+          response.labels(correct, choice)
+          local correctString =  response.correctString
+          local correctStringAlt = response.correctStringAlt  
+          local correctLabel = response.correctLabel
+          local incorrectString = response.incorrectString
+          local incorrectLabel = response.incorrectLabel
+          
           -- Evaluates if answer is correct
           if choice == correct then
-               correct_answers = correct_answers + 1
-               question.correct = question.correct + 1
-               w.result_labels[i].label = "Congratulations, your answer is correct!"
-               w.show_result_labels[i].label = "Correct: " .. correct .. " Answer: " .. choice
-               w.show_result_labels[i]:set_markup("<span foreground='" .. theme.label_correct .. "'>" .. w.show_result_labels[i].label .. "</span>")
-               w.show_result_labels[i]:set_markup("<span size='15000'>".. w.show_result_labels[i].label .. "</span>"  )
-               w.result_labels[i]:set_markup("<span foreground='" .. theme.label_correct .. "'>" .. w.result_labels[i].label .. "</span>")
-               w.result_labels[i]:set_markup("<span size='18000'>" .. w.result_labels[i].label .. "</span>"  )
-               w.submit_buttons[i]:set_visible(false)
-               w.next_buttons[i]:set_visible(true)
                
-               if question.label_correct == nil then
-                   question.label_correct = {}
-               end
-               question.label_correct[i] = "Correct: " .. correct .. ":" .. "Answer: " .. choice
+               -- runs the function
+               local opt = "correct"
+               correct_answers = response.main(opt,correct_answers, correctString,
+                             w,i, correctLabel,choice, theme)
   
           else
-                
-               incorrect_answers = incorrect_answers + 1
-               question.incorrect = question.incorrect + 1
-               w.result_labels[i].label = "Sorry, your answer is incorrect. Correct answer: " .. correct
-               w.show_result_labels[i].label = "Correct: " .. correct .. " Answer: " .. choice
-               w.show_result_labels[i]:set_markup("<span foreground='" .. theme.label_incorrect .. "'>" .. w.show_result_labels[i].label .. "</span>")
-               w.show_result_labels[i]:set_markup("<span size='15000'>" .. w.show_result_labels[i].label .. "</span>"  )
-               w.result_labels[i]:set_markup("<span foreground='" .. theme.label_incorrect .. "'>" .. w.result_labels[i].label .. "</span>")
-               w.result_labels[i]:set_markup("<span size='18000'>" .. w.result_labels[i].label .. "</span>"  )
-               w.submit_buttons[i]:set_visible(false)
-               w.next_buttons[i]:set_visible(true)
+               for key,value in pairs(altCorrect) do
+                   if value == choice then
 
-               if question.label_incorrect == nil then
-                   question.label_incorrect = {}
+                       -- runs the function
+                       local opt = "correct"
+                       correct_answers = response.main(opt,correct_answers, correctStringAlt,
+                             w,i, correctLabel,choice, theme)
+                                               
+                        -- Wont run next statement if this runs
+                        dontRun = true
+                      
+                   end
                end
-               question.label_incorrect[i] = "Correct: " .. correct .. ":" .. "Answer: " .. choice
-  
-          end  -- End of if Statement
+                
+            end  -- End of if Statement
+            
+            -- Runs if answer is incorrect
+            if choice ~= correct and not dontRun then
+               
+                 -- runs the function
+                 local opt = "incorrect"
+                 incorrect_answers = response.main(opt,incorrect_answers, incorrectString,
+                             w,i, incorrectLabel,choice, theme)
+            end
+
   
        end
   

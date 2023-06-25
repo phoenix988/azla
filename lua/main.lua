@@ -149,7 +149,7 @@ function app1:on_startup()
     combo.set:create_word_list()
     
     -- Creates combo box for wordlist dir 
-    combo.set:create_word_dir()
+    --combo.set:create_word_dir()
 
     -- Creates combo word count box
     combo:create_word_count()
@@ -213,9 +213,9 @@ function app1:on_startup()
     end
     
     -- Function that runs when you change wordlist directory in the box 
-    function combo.word_dir:on_changed()
-        local combo_wordlist = combo.word_dir_change()
-    end
+    --function combo.word_dir:on_changed()
+    --    local combo_wordlist = combo.word_dir_change()
+    --end
 
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app

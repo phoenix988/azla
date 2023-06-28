@@ -10,22 +10,27 @@ local os                = require("os")
 local theme             = require("lua.theme.default")
 local replace           = require("lua.question.replace")
 local response          = require("lua.question.response")
+local list              = require("lua.terminal.listFiles")
 
 local count = 0
 
 question = {}
+-- Counts correct answer to export
+question.correct = 0
+question.incorrect = 0
+question.current = 0
+
 
 -- Runs the function
 function question.main(wordlist,
                        w,
                        box,
-                       correct_answers,
-                       incorrect_answers,
                        currentQuestion)
 
      -- Making empty widgets
      w.question_labels    = {}
      w.submit_buttons     = {}
+     w.current_labels     = {}
      w.next_buttons       = {}
      w.entry_fields       = {}
      w.result_labels      = {}
@@ -38,9 +43,6 @@ function question.main(wordlist,
      -- Gets the word count choice 
      local wordlistCount = getWordList()
       
-      -- Counts correct answer to export
-      question.correct = 0
-      question.incorrect = 0
 
       -- Import switchquestion function
       local import = require("lua.switchQuestion")
@@ -68,17 +70,43 @@ function question.main(wordlist,
      -- Iterate over the wordlist using a for loop
      -- for i = 1, #wordlist do
       for i = 1, math.min(#wordlist, count) do
+ 
+          question.current = question.current + 1
           
           -- Gets the correct answer and stores it in a variable
           local correct = string.lower(wordlist[i][languageNumber_1])
           local word = wordlist[i][languageNumber_2]
+          local word = list.to_upper(word)
+
+
+           -- Function to create a label with multiple span sections
+           function question.create_label(spans)
+             local label = Gtk.Label()
+             local markup = ""
            
-          -- Create question label for each word in the list
-          w.question_labels[i] = Gtk.Label {
-               label = "<span weight='bold'>What is</span> <span size='" .. theme.label_question_size .. "".. 
-               "' foreground='" .. theme.label_question .. "'>" .. word .. "</span>"..
-               "<span weight='bold'> ".. languageString .. "</span>"
-          }
+             for i, span in ipairs(spans) do
+                 markup = markup .. string.format("<span %s>%s</span>", span.attributes, span.text)
+             end
+
+             label:set_markup(markup)
+           
+             return label
+           end
+
+
+           w.question_labels[i] = question.create_label(
+              {
+                { attributes = "weight='bold' foreground='" .. theme.label_question .. "'", text = question.current },
+                { attributes = "weight='bold'", text = " What is " },
+                { attributes = "size='" .. theme.label_question_size .. "' foreground='" .. theme.label_question .. "'", text = word },
+                { attributes = "weight='bold'", text = " " .. languageString }
+              }
+          )
+           
+          -- Create labels that displays current question
+          w.current_labels[i] = Gtk.Label {label = "Current: " .. question.current }
+          w.current_labels[i]:set_markup("<span size='" .. theme.label_fg_size .. "" .. 
+          "' foreground='" .. theme.label_question .. "'>" .. w.current_labels[i].label .. "</span>"  )
 
           -- sets size of question label
           w.question_labels[i]:set_markup("<span size='" .. theme.label_question_size .. "" .. 
@@ -102,13 +130,13 @@ function question.main(wordlist,
               w.question_labels[currentQuestion]:set_visible(false)
 
               -- Move to the next question
-              switchQuestion(correct_answers, 
-              incorrect_answers, 
+              currentQuestion = switchQuestion(question, 
               w,
               wg,
               restartButton,
               summaryButton,
               backButton)
+
           end
   
           -- Create result label for each question
@@ -138,8 +166,9 @@ function question.main(wordlist,
           if choice == correct then
                
                -- runs the function
+               question.correct = question.correct + 1
                local opt = "correct"
-               correct_answers = response.main(opt,correct_answers, correctString,
+               correct_answers = response.main(opt, correctString,
                              w,i, correctLabel,choice, theme)
   
           else
@@ -148,7 +177,7 @@ function question.main(wordlist,
 
                        -- runs the function
                        local opt = "correct"
-                       correct_answers = response.main(opt,correct_answers, correctStringAlt,
+                       response.main(opt, correctStringAlt,
                              w,i, correctLabel,choice, theme)
                                                
                         -- Wont run next statement if this runs
@@ -157,43 +186,45 @@ function question.main(wordlist,
                    end
                end
                 
-            end  -- End of if Statement
+          end  -- End of if Statement
             
-            -- Runs if answer is incorrect
-            if choice ~= correct and not dontRun then
-               
-                 -- runs the function
-                 local opt = "incorrect"
-                 incorrect_answers = response.main(opt,incorrect_answers, incorrectString,
-                             w,i, incorrectLabel,choice, theme)
-            end
+          -- Runs if answer is incorrect
+          if choice ~= correct and not dontRun then
+             
+               question.incorrect = question.incorrect + 1
+               -- runs the function
+               local opt = "incorrect"
+               response.main(opt,incorrectString,
+                           w,i, incorrectLabel,choice, theme)
+          elseif dontRun then
+                question.correct = question.correct + 1
+          end
 
   
-       end
-  
-         if i == 1 then
-            w.question_labels[i]:set_visible(true)
-            w.entry_fields[i]:set_visible(true)
-            w.result_labels[i]:set_visible(true)
-            w.submit_buttons[i]:set_visible(true)
-            w.next_buttons[i]:set_visible(false)
-         else
-            w.question_labels[i]:set_visible(false)
-            w.entry_fields[i]:set_visible(false)
-            w.result_labels[i]:set_visible(false)
-            w.submit_buttons[i]:set_visible(false)
-            w.next_buttons[i]:set_visible(false)
-         end
-  
-         box:append(w.question_labels[i])
-         box:append(w.entry_fields[i])
-         box:append(w.result_labels[i])
-         box:append(w.submit_buttons[i])
-         box:append(w.next_buttons[i])
-         box:append(w.show_result_labels[i])
+        end
+ 
+        -- Sets default visibility of all widgets
+        for widget, _ in pairs(w) do
+               if i == 1 then
+                  w[widget][i]:set_visible(true)
+               else
+                  w[widget][i]:set_visible(false)
+               end
+        end
+
+        if i == 1 then
+               w.next_buttons[i]:set_visible(false)
+        end
+        
+        -- Appends them all to the main box
+        box:append(w.question_labels[i])
+        box:append(w.entry_fields[i])
+        box:append(w.result_labels[i])
+        box:append(w.submit_buttons[i])
+        box:append(w.next_buttons[i])
+        box:append(w.show_result_labels[i])
       
-      count = count + 1
-
+        count = count + 1
 
       end -- End for loop
 

@@ -68,10 +68,6 @@ end
 -- Creates empty table to make some widgets 
 local w                 = {}
 
--- Counts correct answers
-local correct_answers   = 0
-local incorrect_answers = 0
-
 -- Calculates current question
 local currentQuestion   = 1
 
@@ -103,6 +99,8 @@ local function create_app2()
          deletable = true,
       })
 
+      --win:fullscreen()
+
       wc.grid.grid_create()
       wc.grid.grid_1 = grid.grid_1
       wc.grid.grid_2 = grid.grid_2
@@ -113,6 +111,7 @@ local function create_app2()
       -- Creates image for the app
       local image = create_image(imagePath)
       image:set_size_request(200, 150)
+      image:set_margin_bottom(50)
        
       -- Appends the image on the top
       box:append(image)
@@ -127,8 +126,6 @@ local function create_app2()
       questionMain(wordlist,
                    w,
                    box,
-                   correct_answers,
-                   incorrect_answers,
                    currentQuestion)
       
       -- Create end labels
@@ -145,7 +142,6 @@ local function create_app2()
       
       -- Create exit and back button
       local bt = wc.button.back_exit_create(
-                           correct_answers,incorrect_answers,
                            currentQuestion,question,import,win,mainWindowModule.app1,
                            replace,cacheFile,combo)
 

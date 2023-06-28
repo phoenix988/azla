@@ -2,6 +2,8 @@
 
 -- Import modules
 local list = require("lua.terminal.listFiles")
+-- Import Variables
+local var  = require("lua.config.init")
 
 -- Gets currentDirectory
 local currentDir = debug.getinfo(1, "S").source:sub(2)
@@ -12,9 +14,10 @@ local wc = {}
 
 -- path to widgets modules
 local widget_mod = "lua.widgets"
+local widget_path = var.widget_dir
 
 -- list all the files
-local files = list.dir(currentDir)
+local files = list.dir(widget_path)
 
 -- Loops throught them and imports them
 for _, luafiles in ipairs(files) do

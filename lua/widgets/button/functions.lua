@@ -9,6 +9,7 @@ local theme       = require("lua.theme.default")
 local array       = require("lua.widgets.setting")
 local fileExists  = require("lua.fileExist").fileExists
 local mkdir       = require("lua.terminal.mkdir").mkdir
+local question    = require("lua.question.main")
 
 -- Import Variables
 local var         = require("lua.config.init")
@@ -18,10 +19,11 @@ local button      = {}
 local confPath    = var.customConfig
 local confDir     = var.confDir
 
-function button.back_exit_create(correct_answers ,incorrect_answers,
-                                 currentQuestion,question,import,
+-- Function for the question window
+function button.back_exit_create(currentQuestion,question,import,
                                  win,mainWin,
                                  replace,cacheFile,combo)
+
       backButton = Gtk.Button({label = "Go Back"})
       
        -- Makes exit button to exit
@@ -32,8 +34,11 @@ function button.back_exit_create(correct_answers ,incorrect_answers,
       function backButton:on_clicked()
                 -- Resets the variables that keep tracks of current 
                 -- question and correct answers
-                correct_answers = 0
-                incorrect_answers = 0
+                question.correct = 0
+                question.incorrect = 0
+
+                -- resets current question
+                question.current = 0
                 currentQuestion = 1  -- Start from the first question if reached the end
                 
                 -- Make these variables empty to avoid stacking
@@ -50,8 +55,8 @@ function button.back_exit_create(correct_answers ,incorrect_answers,
       
                local mainWindowModule = require("lua.main")
                local writeModule      = require("lua.settings")
-               local getDim = mainWindowModule.getWindowDim
-               local window = getDim()
+               local getDim           = mainWindowModule.getWindowDim
+               local window           = getDim()
                local write            = writeModule.write
 
                window.width  = win:get_allocated_width()
@@ -68,6 +73,8 @@ function button.back_exit_create(correct_answers ,incorrect_answers,
       
 end
 
+
+-- click actions for the main window
 function button.click_action(widget, image, label, theme, setting, write)
   -- Creates the setting button click event
   function button.setting:on_clicked()

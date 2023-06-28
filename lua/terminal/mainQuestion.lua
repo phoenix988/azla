@@ -1,11 +1,14 @@
 local io                = require("io")
 local os                = require("os")
 local replace           = require("lua.question.replace")
+local list              = require("lua.terminal.listFiles")
 
-local result           = {}
-result.correct         = 0
-result.incorrect       = 0
+-- Sets questions table
+local questions           = {}
+questions.correct         = 0
+questions.incorrect       = 0
 
+-- Function that lest you choose the amount of words you want
 local function select_count(wordlist,colors)
       local last_number = #wordlist 
       local choice      = last_number + 1
@@ -14,7 +17,7 @@ local function select_count(wordlist,colors)
 
       if words > 40 then
           words = 40
-          last_number = 8
+          last_number = 40
       end
       
       for i = 1, words do
@@ -68,16 +71,20 @@ function question_main(wordlist,colors,language,word_count)
   
        -- Sets the first letter to uppercase for the value inside of word
        local word = wordlist[i][n_2]
-       local word_firstLetter = word:sub(1, 1):upper()
-       local word_restofword = word:sub(2)
-       local word = word_firstLetter .. word_restofword
+       local word = list.to_upper(word)
   
        -- asks you the questions
        io.write(colors.blue .. "What is " .. colors.green .. word .. colors.blue ..  " in " .. language .. ": " )
        local choice = io.read()
+       
        -- Sets your answer to all lowercase
        local choice = choice:lower()
+
+       -- Sets alternative correct answer
        local altCorrect = replace.replace_main(correct)
+
+       -- Sets variable that will be set to true if your anser matches
+       -- altCorrect
        local dontRun = false
        
        -- Reset colors
@@ -89,7 +96,7 @@ function question_main(wordlist,colors,language,word_count)
            io.write(colors.green .. "Congratulations answer is correct!")
            io.read()
            os.execute("clear")
-           result.correct   = result.correct + 1
+           questions.correct   = questions.correct + 1
   
            print(colors.reset)
   
@@ -101,7 +108,7 @@ function question_main(wordlist,colors,language,word_count)
                     io.write("Correct answer is: " .. correct)
                     io.read()
                     os.execute("clear")
-                    result.correct   = result.correct + 1
+                    questions.correct   = questions.correct + 1
                     dontRun = true
                 end
            end
@@ -119,7 +126,7 @@ function question_main(wordlist,colors,language,word_count)
            io.write("Your answer was: " .. choice .. ": ")
            io.read()
            os.execute("clear")
-           result.incorrect = result.incorrect + 1
+           questions.incorrect = questions.incorrect + 1
   
            print(colors.reset)
        end
@@ -127,11 +134,12 @@ function question_main(wordlist,colors,language,word_count)
 
 end -- End of question_main
 
-
+-- function to return questions
 function getResult()
-   return result
+   return questions
 end
   
+-- Returns functions to be used
 return {question_main = question_main, 
         getResult     = getResult,
-        select_count = select_count}
+        select_count  = select_count}

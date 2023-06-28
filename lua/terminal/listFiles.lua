@@ -81,6 +81,15 @@ function list.program_installed(program_name)
    return result:match("yes") ~= nil
 end
 
+-- function that makes the first letter of a word uppercase
+function list.to_upper(word)
+     local wordFirstLetter = word:sub(1, 1):upper()
+     local wordRestofWord = word:sub(2)
+     local word = wordFirstLetter .. wordRestofWord
+
+     return word
+end
+
    
 return list   
     

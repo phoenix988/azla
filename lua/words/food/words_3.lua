@@ -1,23 +1,23 @@
 local wordlist = {}
 
 wordlist = {
-{ "Armud", "pear"}, 
-{ "Portağal", "orange"},
-{ "Limon", "Lemon"}, 
+{ "armud", "pear"}, 
+{ "portağal", "orange"},
+{ "limon", "Lemon"}, 
 { "Banan", "banana"},
 { "Qarpız", "watermelon"}, 
-{ "Üzüm", "grape"},
-{ "Çiyələk", "strawberry"}, 
-{ "Gilas", "cherry"},
-{ "Gilənar", "small cherry"},
-{ "Şaftalı", "peach"},
-{ "Mango", "mango"}, 
-{ "Kakos", "coconut"}, 
-{ "Kivi", "kiwi"}, 
-{ "Qarğidali", "corn"}, 
-{ "Düyü", "rice"}, 
-{ "Makaron", "pasta"},
-{ "Balıq", "fish"}, 
+{ "üzüm", "grape"},
+{ "çiyələk", "strawberry"}, 
+{ "gilas", "cherry"},
+{ "gilənar", "small cherry"},
+{ "saftalı", "peach"},
+{ "mango", "mango"}, 
+{ "kakos", "coconut"}, 
+{ "kivi", "kiwi"}, 
+{ "qarğidali", "corn"}, 
+{ "düyü", "rice"}, 
+{ "makaron", "pasta"},
+{ "balıq", "fish"}, 
 
 }
 

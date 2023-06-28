@@ -9,6 +9,7 @@ local theme       = require("lua.theme.default")
 local array       = require("lua.widgets.setting")
 local fileExists  = require("lua.fileExist").fileExists
 local mkdir       = require("lua.terminal.mkdir").mkdir
+local question    = require("lua.question.main")
 
 -- Import Variables
 local var         = require("lua.config.init")
@@ -51,6 +52,7 @@ function button.result_create(result)
 
 end
 
+-- Function to create restart button for the question window
 function button.restart_create(win,app2,currentQuestion,import)
 
       -- Creates the restart button if you want to restart the list
@@ -62,8 +64,11 @@ function button.restart_create(win,app2,currentQuestion,import)
       function restartButton:on_clicked() 
           -- Resets the variables that keep tracks of current 
           -- question and correct answers
-          correct_answers = 0
-          incorrect_answers = 0
+          question.correct = 0
+          question.incorrect = 0
+          
+          -- resets current question
+          question.current = 0
           currentQuestion = 1  -- Start from the first question if reached the end
 
           question.label_correct = {}

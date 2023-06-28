@@ -47,7 +47,7 @@ local currentDir           = debug.getinfo(1, "S").source:sub(2)
 local currentDir           = currentDir:match("(.*/)") or ""
 
 -- Variable to store word arrays
-local luaWordsPath         = currentDir .. "words"
+local luaWordsPath         = var.word_dir
 local luaWordsModule       = "lua.words"
 
 -- adds some variables to the wordItems table
@@ -134,6 +134,9 @@ function app1:on_startup()
         decorated = true,
         deletable = true,
      })
+     
+     -- returns the window to be used later
+     window.main       = win
 
     -- Combo box --START
     -- Here I am configuiring the combo box widgets for Azla 

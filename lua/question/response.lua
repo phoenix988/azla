@@ -1,3 +1,6 @@
+local themeModule = require("lua.theme.default")
+local font        = themeModule.font.load()
+
 -- Function that create all labels we need for azla
 local response = {}
 
@@ -21,7 +24,7 @@ function response.main(opt, labels, w, i, answer_result, choice, theme)
       
       w.result_labels[i].label = labels
       w.result_labels[i]:set_markup("<span foreground='" .. color .. "'>" .. w.result_labels[i].label .. "</span>")
-      w.result_labels[i]:set_markup("<span size='18000'>" .. w.result_labels[i].label .. "</span>"  )
+      w.result_labels[i]:set_markup("<span size='" .. font.fg_size .. "'>" .. w.result_labels[i].label .. "</span>"  )
       w.submit_buttons[i]:set_visible(false)
       w.next_buttons[i]:set_visible(true)
       

@@ -4,8 +4,12 @@ local Gtk               = lgi.require("Gtk", "4.0")
 local show = {}
 
 function show.summary(question,grid,theme)
+
+      local theme = theme.load()
+      local font  = require("lua.theme.font").load()
       local label_correct   = {}
       local label_incorrect = {}
+
       
       if question.label_correct ~= nil then
         for key , value in pairs(question.label_correct) do
@@ -17,7 +21,8 @@ function show.summary(question,grid,theme)
                   local numCols = 4
                   if value ~= nil then
                     label_correct[key] = Gtk.Label({ label = question.label_correct[key] .. "    "})
-                    label_correct[key]:set_markup("<span foreground='".. theme.label_correct .. "' size='" .. theme.label_fg_size .. "'>" .. label_correct[key].label .. "</span>")
+                    label_correct[key]:set_markup("<span foreground='".. theme.label_correct .. "' size='" .. font.fg_size .. "'>" 
+                    .. label_correct[key].label .. "</span>")
                  
                      -- Calculate the row and column indices
                      local row = math.floor((key - 1) / numCols)
@@ -44,7 +49,8 @@ function show.summary(question,grid,theme)
                   local numCols = 4
                   if value ~= nil then
                     label_incorrect[key] = Gtk.Label({ label = question.label_incorrect[key] .. "    "})
-                    label_incorrect[key]:set_markup("<span foreground='".. theme.label_incorrect .. "' size='" .. theme.label_fg_size .. "'>" .. label_incorrect[key].label .. "</span>")
+                    label_incorrect[key]:set_markup("<span foreground='".. theme.label_incorrect .. "' size='" .. font.fg_size .. "'>" 
+                    .. label_incorrect[key].label .. "</span>")
                  
                      -- Calculate the row and column indices
                      local row = math.floor((key - 1) / numCols)

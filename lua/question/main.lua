@@ -11,21 +11,43 @@ local theme             = require("lua.theme.default")
 local replace           = require("lua.question.replace")
 local response          = require("lua.question.response")
 local list              = require("lua.terminal.listFiles")
+local style             = require("lua.widgets.setting")
 
 local count = 0
 
 question = {}
+
 -- Counts correct answer to export
 question.correct = 0
 question.incorrect = 0
 question.current = 0
 
 
+-- Function to create a label with multiple span sections
+function question.create_label(spans)
+    local label = Gtk.Label()
+    local markup = ""
+  
+    for i, span in ipairs(spans) do
+        markup = markup .. string.format("<span %s>%s</span>", span.attributes, span.text)
+    end
+  
+    label:set_markup(markup)
+  
+    return label
+end
+
+
 -- Runs the function
 function question.main(wordlist,
                        w,
-                       box,
-                       currentQuestion)
+                       mainGrid,
+                       currentQuestion,
+                       bt)
+
+     local theme = require("lua.theme.default")
+     local font  = theme.font.load()
+     local theme = theme.load()
 
      -- Making empty widgets
      w.question_labels    = {}
@@ -78,44 +100,33 @@ function question.main(wordlist,
           local word = wordlist[i][languageNumber_2]
           local word = list.to_upper(word)
 
-
-           -- Function to create a label with multiple span sections
-           function question.create_label(spans)
-             local label = Gtk.Label()
-             local markup = ""
-           
-             for i, span in ipairs(spans) do
-                 markup = markup .. string.format("<span %s>%s</span>", span.attributes, span.text)
-             end
-
-             label:set_markup(markup)
-           
-             return label
-           end
-
-
            w.question_labels[i] = question.create_label(
               {
                 { attributes = "weight='bold' foreground='" .. theme.label_question .. "'", text = question.current },
                 { attributes = "weight='bold'", text = " What is " },
-                { attributes = "size='" .. theme.label_question_size .. "' foreground='" .. theme.label_question .. "'", text = word },
+                { attributes = "size='" .. font.question_size .. "' foreground='" .. theme.label_question .. "'", text = word },
                 { attributes = "weight='bold'", text = " " .. languageString }
               }
           )
            
           -- Create labels that displays current question
           w.current_labels[i] = Gtk.Label {label = "Current: " .. question.current }
-          w.current_labels[i]:set_markup("<span size='" .. theme.label_fg_size .. "" .. 
+          w.current_labels[i]:set_markup("<span size='" .. font.fg_size .. "" .. 
           "' foreground='" .. theme.label_question .. "'>" .. w.current_labels[i].label .. "</span>"  )
 
           -- sets size of question label
-          w.question_labels[i]:set_markup("<span size='" .. theme.label_question_size .. "" .. 
+          w.question_labels[i]:set_markup("<span size='" .. font.question_size .. "" .. 
           "' foreground='" .. theme.label_fg .. "'>" .. w.question_labels[i].label .. "</span>"  )
   
           -- Create entry field for each question
           w.entry_fields[i] = Gtk.Entry()
 
           w.entry_fields[i]:set_size_request(200, 50) -- Set width = 200, height = 100
+
+          -- Set style of entry box
+          w.entry_fields[i] = style.set_theme(w.entry_fields[i], {
+          {size = 26, color = theme.label_question, border_color = theme.label_fg}
+          })
   
           -- Create submit button for each question
           w.submit_buttons[i] = Gtk.Button {
@@ -124,6 +135,9 @@ function question.main(wordlist,
   
           -- Create next button for each question
           w.next_buttons[i] = Gtk.Button({label = "Next"})
+
+          style.set_theme(w.next_buttons[i])
+          style.set_theme(w.submit_buttons[i])
   
           -- Create next button action and in this case it will call switchQuestion
           w.next_buttons[i].on_clicked = function ()
@@ -135,7 +149,7 @@ function question.main(wordlist,
               wg,
               restartButton,
               summaryButton,
-              backButton)
+              bt)
 
           end
   
@@ -156,11 +170,11 @@ function question.main(wordlist,
 
           -- create all the labels imported from respones.lua in this dir
           response.labels(correct, choice)
-          local correctString =  response.correctString
+          local correctString    =  response.correctString
           local correctStringAlt = response.correctStringAlt  
-          local correctLabel = response.correctLabel
-          local incorrectString = response.incorrectString
-          local incorrectLabel = response.incorrectLabel
+          local correctLabel     = response.correctLabel
+          local incorrectString  = response.incorrectString
+          local incorrectLabel   = response.incorrectLabel
           
           -- Evaluates if answer is correct
           if choice == correct then
@@ -215,14 +229,15 @@ function question.main(wordlist,
         if i == 1 then
                w.next_buttons[i]:set_visible(false)
         end
+
         
         -- Appends them all to the main box
-        box:append(w.question_labels[i])
-        box:append(w.entry_fields[i])
-        box:append(w.result_labels[i])
-        box:append(w.submit_buttons[i])
-        box:append(w.next_buttons[i])
-        box:append(w.show_result_labels[i])
+        mainGrid:attach(w.question_labels[i],0,0,1,1)
+        mainGrid:attach(w.entry_fields[i],0,1,1,1)
+        mainGrid:attach(w.result_labels[i],0,2,1,1)
+        mainGrid:attach(w.submit_buttons[i],0,3,1,1)
+        mainGrid:attach(w.next_buttons[i],0,4,1,1)
+        mainGrid:attach(w.show_result_labels[i],0,5,1,1)
       
         count = count + 1
 

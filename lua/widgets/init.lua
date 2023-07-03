@@ -1,4 +1,4 @@
--- export widget
+-- export widgets 
 
 -- Import modules
 local list = require("lua.terminal.listFiles")
@@ -9,8 +9,9 @@ local var  = require("lua.config.init")
 local currentDir = debug.getinfo(1, "S").source:sub(2)
 local currentDir = currentDir:match("(.*/)") or ""
 
--- Create empty table
+-- Create empty table to store all the widgets
 local wc = {}
+
 
 -- path to widgets modules
 local widget_mod = "lua.widgets"
@@ -36,6 +37,10 @@ end
 ---- export widgets to be used 
 wc.widget = wc.box
 wc.array  = wc.setting
+
+-- Import listBox widget
+wc.listBox = require("lua.widgets.button.treeView")
+wc.menu    = require("lua.widgets.menu.init")
 
 return wc
 

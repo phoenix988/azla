@@ -1,40 +1,45 @@
--- Module to control the theming of the app
-local os        = require("os")
+-- Import function to check if file exist
+local fileExist       = require("lua.fileExist").fileExists
 
-local fileExistModule = require("lua.fileExist")
-local fileExist = fileExistModule.fileExists
+-- Import Variables
+local file            = require("lua.config.init")
 
-local loadConfigModule = require("lua.loadConfig")
-local loadConfig = loadConfigModule.load_config_theme
+local loadConfig      = require("lua.loadConfig").load_config_theme
 
-local home      = os.getenv("HOME")
-local customConfig = home .. "/.config/azla/conf.lua"
+-- Sets custom config path
+local customConfig    = file.customConfig
 
--- check if custom file exist
-if fileExist(customConfig) then
 
-  themeCustom = loadConfig(customConfig)
+local M = {}
+
+function M.load()
+   -- check if custom file exist
+   if fileExist(customConfig) then
+     themeCustom = loadConfig(customConfig)
+   end
    
-end
-
-if setting ~= nil then
-   settingCompare = setting 
-end
-
-
-local setting = {
-     default_width = 600,
-     default_height = 800,
-     default_word_count = 5,
-}
-
--- Overwrites config if you have a custom one
-if settingCompare ~= nil then
-  for key, value in pairs(setting) do
-    if settingCompare[key] ~= nil then
-        setting[key] = settingCompare[key]
+   if setting ~= nil then
+      settingCompare = setting 
+   end
+   
+   -- default values 
+   local setting = {
+        default_width  = 1200,
+        default_height = 1000,
+        image          = "/opt/azla/images/flag.jpg",
+   }
+   
+   -- Overwrites config if you have a custom one
+   if settingCompare ~= nil then
+     for key, value in pairs(setting) do
+       if settingCompare[key] ~= nil then
+           setting[key] = settingCompare[key]
+        end
      end
-  end
+   end
+   
+   return setting
+
 end
 
-return setting
+return M

@@ -3,6 +3,7 @@ local os              = require("os")
 local colors          = require("lua.terminal.colors")
 local p               = require("lua.terminal.processSwitch")
 
+
 -- Import shuffle
 local shuffle         = require("lua.shuffle")
 local list            = require("lua.terminal.listFiles")
@@ -12,9 +13,11 @@ local word_count      = require("lua.terminal.mainQuestion").select_count
 local currentDir      = list.current_dir("/terminal")
 
 local luaWordsModule  = "lua.words"
-local filesWord       = currentDir .. "words" 
+local filesWord       = "/opt/azla/lua/words" 
 
 local language        = {}
+
+local M = {}
 
 -- Function so you can select wordlist
 local function select_word(luaFiles)
@@ -61,8 +64,8 @@ local function select_word(luaFiles)
             choice = io.read()
 
             for index, value in ipairs(luaFiles) do
-                    value = list.modify(value)
-                    choice = tonumber(choice)
+                     value = list.modify(value)
+                     choice = tonumber(choice)
                  if index == choice then
                      choice = value
                      continue = false
@@ -84,7 +87,7 @@ local function select_word(luaFiles)
 end
 
 
-local function terminal_init()
+function M.terminal_init()
   
   -- Sets variable that controls
   -- if you wanna keep running the script
@@ -96,23 +99,25 @@ local function terminal_init()
  
   -- Welcome message function
   function welcome()
-      print("Welcome to my script that will help you practice Azerbaijani words and sentences")
-      print("-Karl")
+      print(colors.blue .. "Welcome to my script that will help you practice Azerbaijani words and sentences" ..
+      "\nTerminal Version, Have fun!!!")
+      print(colors.reset .. "\n~Karl")
+      print("Enter to continue: ")
       io.read()
   end
   
   -- Function that prompts you to choose word list
   function word_list()
      
-     -- Select wordlist
-     local selection = select_word(filesWord)
+      -- Select wordlist
+      local selection = select_word(filesWord)
+       
+      if wordlist == nil then
+         wordlist = require(luaWordsModule .. "." .. selection )
+      end
       
-     if wordlist == nil then
-        wordlist = require(luaWordsModule .. "." .. selection )
-     end
-     
-     -- shuffle the array to make the questions random
-     shuffle(wordlist)
+      -- shuffle the array to make the questions random
+      shuffle(wordlist)
     
   end
 
@@ -251,9 +256,8 @@ local function terminal_init()
   -- Prints the result in the end
   print("Your correct answers over " .. session .. " sessions" )
   print(colors.green .. "Correct: " .. result.correct)
-  print(colors.red ..   "İncorrect: " .. result.incorrect)
+  print(colors.red ..   "Incorrect: " .. result.incorrect)
 
 end -- end of terminal init
 
-
-return terminal_init
+return M.terminal_init

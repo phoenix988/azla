@@ -37,7 +37,6 @@ local cacheFile      = var.cacheFile
 local mkdir          = require("lua.terminal.mkdir").mkdir
 
 -- Create the cache file if it doesn't exist
-
 if not fileExists(cacheDir) then
       mkdir(cacheDir)
 end
@@ -63,10 +62,10 @@ p.processSwitches(luaWordsPath,luaWordsModule)
 -- Runs the GUI app if you dont specify --term (-t)
 if p.terminal == false then 
 
-  local import         = require("lua.init")
+  local import   = require("lua.init")
   
   -- Main window
-  local app1           = import.app1
+  local app1     = import.app1
 
   -- Activate app1
   function app1:on_activate()

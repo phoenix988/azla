@@ -24,6 +24,7 @@ function widget:set_value(combo_set,value)
     local config    = self.app.config
     local custom    = self.app.custom
     local fileExist = self.app.fileExist
+    
 
     if config == nil then
            combo_set:set_active(1)
@@ -108,39 +109,39 @@ end
 
 function widget:set_count_value()
      
-  -- Gets the length of the wordlist
-  self.app.choice             = self.app.modelWord[self.app.activeWord][1]
-  self.app.wordlist           = require(self.app.module .. "." .. self.app.choice)
+    -- Gets the length of the wordlist
+    self.app.choice             = self.app.modelWord[self.app.activeWord][1]
+    self.app.wordlist           = require(self.app.module .. "." .. self.app.choice)
 
-  local wordlist              = self.app.wordlist
-  self.app.list_count         = #wordlist
-  self.app.list_new           = {}
+    local wordlist              = self.app.wordlist
+    self.app.list_count         = #wordlist
+    self.app.list_new           = {}
 
-  local wordlist = self.app.list_count
-  local list_new = self.app.list_new
-  
-  -- If the wordlist contain more than 40 words then this will limit the choice to 40
-  if wordlist >= 40 then
-     wordlist = 40
-  end
+    local wordlist = self.app.list_count
+    local list_new = self.app.list_new
+    
+    -- If the wordlist contain more than 40 words then this will limit the choice to 40
+    if wordlist >= 40 then
+       wordlist = 40
+    end
 
-  -- Gets the length of the wordlist file on startup
-  for i = 1, wordlist do
-        if i % 2 == 0 then -- Check if the index is even (every second number)
-          table.insert(list_new, i)
-        end
-  end
-  
-  -- Clears the model if it doesn't exist
-  combo.word_model:clear()
-  combo.word_count_items = {}
-  for i = 1, #list_new do
-        combo.word_count_items[i] = list_new[i]
-        combo.word_model:append({ combo.word_count_items[i] })
-  end
+    -- Gets the length of the wordlist file on startup
+    for i = 1, wordlist do
+          if i % 2 == 0 then -- Check if the index is even (every second number)
+            table.insert(list_new, i)
+          end
+    end
+    
+    -- Clears the model if it doesn't exist
+    combo.word_model:clear()
+    combo.word_count_items = {}
+    for i = 1, #list_new do
+          combo.word_count_items[i] = list_new[i]
+          combo.word_model:append({ combo.word_count_items[i] })
+    end
 
 
-  return input     
+    return input     
 end
 
 

@@ -1,3 +1,6 @@
+local themeModule = require("lua.theme.default")
+local font        = themeModule.font.load()
+
 -- Function that create all labels we need for azla
 local response = {}
 
@@ -12,18 +15,16 @@ function response.labels(correct, choice)
 end
 
 
-function response.main(opt, result, labels, w, i, answer_result, choice, theme)
+function response.main(opt, labels, w, i, answer_result, choice, theme)
       if opt == "correct" then
           color = theme.label_correct
       elseif opt == "incorrect" then
           color = theme.label_incorrect
       end
       
-      result = result + 1
-      question.correct = question.correct + 1
       w.result_labels[i].label = labels
       w.result_labels[i]:set_markup("<span foreground='" .. color .. "'>" .. w.result_labels[i].label .. "</span>")
-      w.result_labels[i]:set_markup("<span size='18000'>" .. w.result_labels[i].label .. "</span>"  )
+      w.result_labels[i]:set_markup("<span size='" .. font.fg_size .. "'>" .. w.result_labels[i].label .. "</span>"  )
       w.submit_buttons[i]:set_visible(false)
       w.next_buttons[i]:set_visible(true)
       
@@ -39,7 +40,8 @@ function response.main(opt, result, labels, w, i, answer_result, choice, theme)
            question.label_incorrect[i] = answer_result
       end
 
-      return result
+      
+
 end
 
 return response

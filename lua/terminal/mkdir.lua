@@ -1,10 +1,10 @@
 local os = require("os")
 
-local file = {}
+local M = {}
 -- create directory
-function file.mkdir(file)
+function M.mkdir(file)
    os.execute("mkdir " .. file)
 end
 
 
-return file
+return M

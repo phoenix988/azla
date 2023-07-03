@@ -1,4 +1,4 @@
-
+-- some terminal colors defined
 local colors = {
         reset = "\27[0m", -- Reset color
         red = "\27[31m", -- Red

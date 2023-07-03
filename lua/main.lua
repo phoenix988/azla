@@ -1,32 +1,35 @@
 -- Imports libaries we need
 local lgi                  = require("lgi")
 local Gtk                  = lgi.require("Gtk", "4.0")
+local Gdk                  = require("lgi").Gdk
 local GObject              = lgi.require("GObject", "2.0")
 local GdkPixbuf            = lgi.require('GdkPixbuf')
 local lfs                  = require("lfs")
 local os                   = require("os")
 
 -- Import theme
-local theme                = require("lua.theme.default")
-local setting_default      = require("lua.theme.setting")
+local theme                = require("lua.theme.default").load()
+
+-- Import fonts
+local font                = require("lua.theme.default").font.load()
+
+-- Imports some settings
+local setting_default      = require("lua.theme.setting").load()
 
 -- Other imports and global variables
 -- Imports function to create images
-local imageModule          = require("lua.createImage")
-local create_image         = imageModule.create_image
+local create_image         = require("lua.createImage").create_image
 
 -- Imports window 2
-local appModule            = require("lua.questionMain")
-local create_app2          = appModule.create_app2
+local create_app2          = require("lua.questionMain").create_app2
 
--- import widgets 
+-- import widgets and create a table
 local wc                   = require("lua.widgets.init")
 local widget_list          = {}
 
 -- Imports Config function
-local loadConfigModule     = require("lua.loadConfig")
-local loadConfig           = loadConfigModule.load_config
-local loadConfigCustom     = loadConfigModule.load_config_custom
+local loadConfig           = require("lua.loadConfig").load_config
+local loadConfigCustom     = require("lua.loadConfig").load_config_custom
 
 -- Imports fileexist module
 local fileExistModule      = require("lua.fileExist")
@@ -35,9 +38,14 @@ local fileExist            = fileExistModule.fileExists
 -- Import list function
 local list                 = require("lua.terminal.listFiles")
 
+-- Import keybindings
+local lol                  = require("lua.bindings.init").lol
+
+-- Import some functions to run when clicking buttons
+local azla                 = require("lua.question.start")
+
 -- Import function to write to cache file
-local writeToConfigModule  = require("lua.settings")
-local write                = writeToConfigModule.write
+local write                = require("lua.config.init")
 
 -- Import Variables
 local var                  = require("lua.config.init")
@@ -47,7 +55,7 @@ local currentDir           = debug.getinfo(1, "S").source:sub(2)
 local currentDir           = currentDir:match("(.*/)") or ""
 
 -- Variable to store word arrays
-local luaWordsPath         = currentDir .. "words"
+local luaWordsPath         = var.word_dir
 local luaWordsModule       = "lua.words"
 
 -- adds some variables to the wordItems table
@@ -61,7 +69,7 @@ local exportLanguageChoice = "azerbajani"
 
 -- Gets users home directory
 local home                 = os.getenv("HOME")
-local imagePath            = theme.main_image 
+local imagePath            = setting_default.image 
 
 -- set cachefile config path
 local cacheFile            = var.cacheFile
@@ -119,9 +127,9 @@ widget.hideBox = {
 -- Creates the window where you input answers in azerbajani
 -- Makes the main startup window
 function app1:on_startup()
-
-      
-    write.window_size(customConfig,setting,config,fileExist)
+    
+    -- Sets window size
+    write.write.config.window_size(customConfig,setting,config,fileExist)
 
     -- Creates the window
     local win = Gtk.ApplicationWindow({
@@ -134,6 +142,10 @@ function app1:on_startup()
         decorated = true,
         deletable = true,
      })
+
+        
+     -- returns the window to be used later
+     window.main = win
 
     -- Combo box --START
     -- Here I am configuiring the combo box widgets for Azla 
@@ -148,9 +160,6 @@ function app1:on_startup()
     -- Creates the wordlist box
     combo.set:create_word_list()
     
-    -- Creates combo box for wordlist dir 
-    --combo.set:create_word_dir()
-
     -- Creates combo word count box
     combo:create_word_count()
    
@@ -159,7 +168,7 @@ function app1:on_startup()
     
     -- Updates the label of word_list
     label.word_list.label = "WordList "..set.wordActive.." selected (".. set.last_word_label ..")"
-    label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
+    label.word_list:set_markup("<span size='" .. font.word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
     
     -- Creates a table to pass through the combo class
     local input = { 
@@ -185,42 +194,14 @@ function app1:on_startup()
     -- set value of lang combo box
     combo.set:set_value(combo.lang,config.lang_set)
 
-    function combo.word_dir_change()
-        local n   = combo.word_dir:get_active()
-        local num = combo.word:get_active()
-
-        local item = combo.word_dir_files[n + 1]
-
-        combo.word_list_model:clear()
-        local dir = list.dir(item, "lua")
-
-        for _, luafiles in pairs(dir) do
-            local add = list.modify(luafiles)
-            combo.word_list_model:append({ add })
-        end
-
-        combo.word:set_active(0)
-
-        -- Only get the list name
-        local newStr = combo.word_dir_files[n + 1]
-        local newStr = list.modify_dir(newStr)
-
-        -- Updates label when you change option
-        label.word_list.label = "WordList "..num.." selected (".. newStr ..")"
-        label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
-
-        return newStr
-    end
-    
-    -- Function that runs when you change wordlist directory in the box 
-    --function combo.word_dir:on_changed()
-    --    local combo_wordlist = combo.word_dir_change()
-    --end
-
     -- Changes the 'label' text when user change the combo box value
     -- Also updates the cache file so it remembers the last choice when you exit the app
     -- Runs when the lang box changes
     function combo.lang:on_changed()
+        -- Reload theme
+        local theme = require("lua.theme.default")
+        local theme = theme.load()
+        
         -- Gets the current active combo number
         local n = self:get_active()
         
@@ -228,7 +209,7 @@ function app1:on_startup()
         window.height = win:get_allocated_height()
         
         label.language.label = "Option "..n.." selected ("..combo.lang_items[n + 1]..")"
-        label.language:set_markup("<span size='" .. theme.label_lang_size .. "' foreground='" .. theme.label_lang .. "'>" .. label.language.label .. "</span>"  )
+        label.language:set_markup("<span size='" .. font.lang_size .. "' foreground='" .. theme.label_lang .. "'>" .. label.language.label .. "</span>"  )
         
         if n == 0 then
            -- Determines which languages to use
@@ -241,7 +222,7 @@ function app1:on_startup()
         end
         
         -- Updates cachefile
-        write.config_main(cacheFile,combo)
+        write.write.cache.config_main(cacheFile,combo)
 
     end
     
@@ -249,6 +230,9 @@ function app1:on_startup()
     -- Also updates the cache file so it remembers the last choice when you exit the app
     -- Runs when combo word list changes
     function combo.word:on_changed()
+        
+        local theme = require("lua.theme.default")
+        local theme = theme.load()
 
         window.width  = win:get_allocated_width()
         window.height = win:get_allocated_height()
@@ -257,7 +241,7 @@ function app1:on_startup()
         
         local n = self:get_active()
 
-        write.config_main(cacheFile,combo)
+        write.write.cache.config_main(cacheFile,combo)
         
         -- Only get the list name
         newStr = combo.word_files[n + 1]
@@ -269,7 +253,7 @@ function app1:on_startup()
         -- Updates label when you change option
         if last then
            label.word_list.label = "WordList "..n.." selected (".. last ..")"
-           label.word_list:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
+           label.word_list:set_markup("<span size='" .. font.word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_list.label .. "</span>"  )
         end
 
         -- updates the combo boxes    
@@ -295,6 +279,10 @@ function app1:on_startup()
     
     -- Function that runs when combo word count changes
     function combo.word_count:on_changed()
+        -- Reload theme
+        local theme = require("lua.theme.default")
+        local theme = theme.load()
+        
         local n = self:get_active()
 
         window.width  = win:get_allocated_width()
@@ -304,16 +292,17 @@ function app1:on_startup()
         local success, result = pcall(function()
           -- Code that uses the variable
           label.word_count.label = "Selected "..combo.word_count_items[n + 1].." Words"
-          label.word_count:set_markup("<span size='" .. theme.label_word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_count.label .. "</span>"  )
+          label.word_count:set_markup("<span size='" .. font.word_size .. "' foreground='" .. theme.label_word .. "'>" .. label.word_count.label .. "</span>"  )
         end)
 
-        write.config_main(cacheFile,combo)
+        write.write.cache.config_main(cacheFile,combo)
 
     end
 
     -- Exports the default language option on startup
     local lang_value = combo.lang:get_active()
-
+    
+    -- Sets language option
     if lang_value == 0 then
        exportLanguageChoice = "azerbajani"
     elseif lang_value == 1 then
@@ -339,37 +328,27 @@ function app1:on_startup()
     
     -- Sets function to run when you click the exit button
     function button.exit:on_clicked()
+        button.exit_click(window, write, win, cacheFile, combo)
+    end
 
-       window.width  = win:get_allocated_width()
-       window.height = win:get_allocated_height()
-
-       write.config_main(cacheFile,combo)
-       
-       win:destroy()
+    function button.exit_alt:on_clicked()
+        button.exit_click(window, write, win, cacheFile, combo)
     end
 
     -- Create the function when you press on start
     function button.start:on_clicked()
-        local activeWord      = combo.word:get_active()
-        local activeWordCount = combo.word_count:get_active()
-
-        local choice       = combo.word_list_model[activeWord][1]
-        local choice_count = combo.word_model[activeWordCount][1]
-
-        wordlist = require(luaWordsModule .. "." .. choice)
-        wordlist.count = choice_count
-        
-        -- Gets the window dimeonsions to return them later
-        window.width  = win:get_allocated_width()
-        window.height = win:get_allocated_height()
-
-        -- Starts the questions
-        win:hide()
-        
-        local app2 = create_app2()
-        app2:run()
-
+        azla.start_azla(win,window,create_app2,luaWordsModule)
     end
+
+
+    -- Create an accelerator group
+    local keyPress = Gtk.EventControllerKey()
+     
+     -- Connect the 'key-pressed' signal to the callback function
+    keyPress.on_key_pressed = lol
+
+    -- Add the event controller to the window
+    win:add_controller(keyPress)
 
     -- Creates the images
     local image = create_image(imagePath)
@@ -386,27 +365,74 @@ function app1:on_startup()
     widget.box_theme_main:append(image2)
     widget.box_theme_main:append(label.theme)
     
+    -- Create listBox
+    local listBox  = wc.listBox:create()
+    local listTree = wc.listBox:create_tree()
+
+    local schemeGrid  = grid.main_create()
+
+     -- Get active value of the treeview
+    local selection = listTree:get_selection()
+    local model, iter = selection:get_selected()
+    if model and iter then
+       local value = model:get_value(iter, 0) -- Assuming the value is in column 0
+       stringValue = value:get_string() -- Convert value to string
+    end
+    
+    label.current_color_scheme:set_text("Current theme is: " .. stringValue)
+    label.current_color_scheme:set_markup("<span size='" .. font.fg_size .. "' foreground='" .. theme.label_word .. "'>" .. label.current_color_scheme.label .. "</span>")
+
+    widget.box_theme:append(schemeGrid)
+
+    schemeGrid:attach(listTree, 0,0,1,1)
+    schemeGrid:attach(label.current_color_scheme, 1,0,1,1)
+    schemeGrid:attach(button.color_scheme, 0,1,1,1)
+    
     -- Create theme entry boxes
-    local list1 = array.theme_table(theme)
+    local list1 = array.theme_table(theme,font)
 
     -- Create default setting empty boxes
-    local list2 = array.setting_table(theme)
-             
+    local list2 = array.setting_table(theme,font)
+    
+    local list3 = array.font_table(theme,font)
+
+    -- Create a scrolled window
+    local scrolledWindow = Gtk.ScrolledWindow()
+
+    -- Set the text view as the child of the scrolled window
+    scrolledWindow:set_child(widget.box_main)
+
     -- Create notebook widgets
     notebook:create()
     
+    -- Creates some grids
+    local mainGrid    = grid.main_create()
+    local themeGrid   = grid.main_create()
+
+    mainGrid:attach(label.welcome, 0 ,2 ,1,1)
+    mainGrid:attach(label.language, 0 ,3 ,1,1)
+    mainGrid:attach(combo.lang, 0 ,4 ,1,1)
+    mainGrid:attach(label.word_list, 0 ,5 ,1,1)
+    mainGrid:attach(combo.word, 0 ,6 ,1,1)
+    mainGrid:attach(label.word_count, 0 ,7 ,1,1)
+    mainGrid:attach(combo.word_count, 0 ,8 ,1,1)
+    mainGrid:attach(button.start, 0 ,11 ,1,1)
+    mainGrid:attach(button.setting, 0 ,12 ,1,1)
+    mainGrid:attach(button.exit, 0 ,13 ,1,1)
+
+    --themeGrid:attach(button.setting_submit,0,0,1,1)
+    themeGrid:attach(button.setting_back,1,3,1,1)
+    themeGrid:attach(button.setting_submit,1,2,1,1)
+    themeGrid:attach(button.exit_alt,1,4,1,1)
+    themeGrid:attach(label.theme_apply,1,1,1,1)
+
     -- appends all the widgets to make them wisible
     widget.box_theme_main:append(notebook.theme)
-    widget.box_theme_main:append(label.setting)
-    widget.box_theme_main:append(notebook.setting)
-    widget.box_theme_main:append(label.theme_apply)
-    widget.box_theme_button:append(button.setting_submit)
-    widget.box_theme_button:append(button.setting_back)
+    widget.box_theme_button:append(themeGrid)
  
     widget.image =  image2
     widget.label =  label
-
-
+    
     -- Call some click actions
     button.click_action(
     widget,
@@ -422,22 +448,12 @@ function app1:on_startup()
     -- Add widgets to the main box
     -- first section is the widget and second one
     -- is which  box to append it to
+
+
     widget.append = {
          {image,            "main"},
-         {label.welcome,    "main"},
-         {label.language,   "main"},
-         {combo.lang,       "main"},
-         {label.word_list,  "main"},
-       --{combo.word_dir,   "main"},
-         {combo.word,       "main"},
-         {label.word_count, "main"},
-         {combo.word_count, "main"},
-         {button.start,     "main"},
-         {label.sept,       "main"},
-         {button.setting,   "sec" },
-         {button.exit,      "sec" },
+         {mainGrid,         "main"},
     }
-    
     
     -- appends all the widgets
     for i = 1, #widget.append do
@@ -469,7 +485,9 @@ function app1:on_startup()
     end
 
     -- Appends box to the main window
-    win.child = widget.box_main
+    win.child = scrolledWindow
+ 
+
 end -- End of the app function
 
 

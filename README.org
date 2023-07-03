@@ -35,15 +35,17 @@ Libaries needed to run this app is lgi, lfs, G0Object and GdkPixbuf.
 If you just clone this repo and want to run this app you need to have those libaries installed
 
 **** ARCH
-on arch you can run these commands to get all dependencies you need manually
+on arch you can run these commands to install all dependencies to build from source
 #+begin_src sh
 paru -S luarocks gtk4 lua-lgi-git
 
+# install some lua modules
 sudo luarocks install filesystem luautf8
 #+end_src
 *** INSTALL
 All you need to do to install this is to run install.sh.
-Remember that you need to install all dependencies manually
+Remember that you need to install all dependencies manually.
+This script will move all files we need to /opt/azla and build the binary from source
 #+begin_src sh
 git clone https://github.com/phoenix988/azla.git
 

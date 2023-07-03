@@ -25,10 +25,14 @@ function import.setQuestion()
 end
 
 -- Function so it switch question after you submit your answer
-function import.switchQuestion(correct_answers, incorrect_answers, 
+function import.switchQuestion(question, 
                                w,wg,restartButton,
-                               summaryButton,backButton)
+                               summaryButton,bt)
 
+     local theme = require("lua.theme.default")
+     local font  = theme.font.load()
+     local theme = theme.load()
+     
      -- Imports active wordlist
      local mainWindowModule = require("lua.main")
      local getWordList = mainWindowModule.getWordList
@@ -45,15 +49,14 @@ function import.switchQuestion(correct_answers, incorrect_answers,
      end
 
      if currentQuestion > count then
-        wg.labelEnd.label = "You reached the last question"
-        wg.labelEnd:set_markup("<span foreground='" .. theme.label_fg .. "'>" .. wg.labelEnd.label .. "</span>")
-        restartButton:set_visible(true)
-        wg.labelEndCorrect.label = "correct: " .. correct_answers
-        wg.labelEndCorrect:set_markup("<span foreground='" .. theme.label_correct .. "'>" .. wg.labelEndCorrect.label .. "</span>")
-        wg.labelEndIncorrect.label = "Incorrect: " .. incorrect_answers
-        wg.labelEndIncorrect:set_markup("<span foreground='" .. theme.label_incorrect .. "'>" .. wg.labelEndIncorrect.label .. "</span>")
-        summaryButton:set_visible(true)
-        backButton:set_margin_top(30)
+        wg.labelEnd:set_visible(true)
+        wg.labelEnd:set_text("You reached the last question")
+        wg.labelEnd:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. font.welcome_size .. "'>" .. wg.labelEnd.label .. "</span>")
+        bt.again.restart:set_visible(true)
+        wg.labelEndCorrect:set_markup("<span foreground='" .. theme.label_correct .. "'>Correct: " .. question.correct .. "</span>")
+        wg.labelEndIncorrect:set_markup("<span foreground='" .. theme.label_incorrect .. "'>Incorrect: " .. question.incorrect .. "</span>")
+        bt.sum.summary:set_visible(true)
+        bt.last.back:set_margin_top(30)
 
      end
 
@@ -65,7 +68,9 @@ function import.switchQuestion(correct_answers, incorrect_answers,
         w.submit_buttons[i]:set_visible(false)
         w.result_labels[i]:set_visible(false)
         w.next_buttons[i]:set_visible(false)
+        w.current_labels[i]:set_visible(false)
      end
+  
 
      -- Show the active question elements
      if w.question_labels[currentQuestion] ~= nil then 
@@ -86,6 +91,10 @@ function import.switchQuestion(correct_answers, incorrect_answers,
 
      if w.next_buttons[currentQuestion] ~= nil then 
        w.next_buttons[currentQuestion]:set_visible(false)
+     end
+
+     if w.current_labels[currentQuestion] ~= nil then 
+       w.current_labels[currentQuestion]:set_visible(false)
      end
 
      -- Return currentquestion variable

@@ -79,7 +79,7 @@ widget.box_theme_main = Gtk.Box({
 
 -- Makes theme box
 widget.box_theme = Gtk.Box({
-    orientation = Gtk.Orientation.HORIZONTAL,
+    orientation = Gtk.Orientation.VERTICAL,
     spacing = 5,
     halign = Gtk.Align.CENTER,
     valign = Gtk.Align.CENTER,
@@ -93,7 +93,7 @@ widget.box_theme = Gtk.Box({
 
 -- Makes secondary theme box
 widget.box_theme_alt = Gtk.Box({
-    orientation = Gtk.Orientation.HORIZONTAL,
+    orientation = Gtk.Orientation.VERTICAL,
     spacing = 5,
     halign = Gtk.Align.CENTER,
     valign = Gtk.Align.CENTER,
@@ -107,7 +107,7 @@ widget.box_theme_alt = Gtk.Box({
 
 -- Makes theme box
 widget.box_setting = Gtk.Box({
-    orientation = Gtk.Orientation.HORIZONTAL,
+    orientation = Gtk.Orientation.VERTICAL,
     spacing = 5,
     halign = Gtk.Align.CENTER,
     valign = Gtk.Align.CENTER,
@@ -123,8 +123,6 @@ widget.box_setting = Gtk.Box({
 widget.box_theme_button = Gtk.Box({
     orientation = Gtk.Orientation.HORIZONTAL,
     spacing = 5,
-    width_request  = 100,
-    height_request = 50,
     halign = Gtk.Align.CENTER,
     valign = Gtk.Align.FILL,
     hexpand = true,
@@ -148,34 +146,45 @@ widget.box_theme_label = Gtk.Box({
     margin_end    = 20
 })
 
-function widget.box_question_create()
+-- Widget to create a box
+function widget.box_question_create(orientation, fill)
    -- Makes the main box widget to be used 
-   box = Gtk.Box({
-       orientation = Gtk.Orientation.VERTICAL,
+   
+   local orientation = orientation or Gtk.Orientation.VERTICAL
+   local fill = fill or Gtk.Align.FILL
+   local box = Gtk.Box({
+       orientation = orientation,
        spacing = 10,
-       halign = Gtk.Align.FILL,
+       halign = fill,
        valign = Gtk.Align.CENTER,
        hexpand = true,
        vexpand = true,
        margin_top    = 30,
-       margin_bottom = 30,
+       margin_bottom = 0,
        margin_start  = 200,
        margin_end    = 200
    })
 
+   return box
+
 end
 
-function widget.checkbox_create()
-   widget.checkbox_1 = Gtk.CheckButton({label = "Save", 
+-- Function to create checkbox widget
+function widget.checkbox_create(win)
+   widget.checkbox_1 = Gtk.CheckButton({label = "Fullscreen", 
                                         valign = Gtk.Align.Center,
                                         margin_top = 50})
 
    function widget.checkbox_1:on_toggled()
       if widget.checkbox_1.active then
-         print("button activated")
+         win:fullscreen()
+      else
+         win:unfullscreen()
       end
    end
 end 
 
-return widget
+local M = widget
+
+return M
 

@@ -1,15 +1,23 @@
+-- Importing modules we need 
 local lgi     = require("lgi")
 local Gtk     = lgi.require("Gtk", "4.0")
-local os      = require("os")
 local GObject = lgi.require("GObject", "2.0")
-local theme   = require("lua.theme.default")
+
+-- Import labels
 local label   = require("lua.widgets.label")
 
-local combo   = {}
+-- Import style function to set size and color of widgets
+local style   = require("lua.widgets.setting")
 
--- Import some methods
+-- Import theme
+local theme                = require("lua.theme.default").load()
+
+-- Import fonts
+local font                = require("lua.theme.default").font.load()
+
+-- Here we are defining some combo boxes to create
+-- Import some methods and functions for combo boxes
 local combo   = require("lua.widgets.combo.value")
-
 
 -- Creates combo class
 function combo:new(inp)
@@ -20,6 +28,7 @@ function combo:new(inp)
     return obj -- Return the instance
 end
 
+-- Create wordlist box
 function combo:create_word_list()
 
     local list = self.app.list
@@ -52,8 +61,11 @@ function combo:create_word_list()
     })
 
 
+    combo.word = style.set_theme(combo.word,{{size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg}})
+
 end
 
+-- Create word count box
 function combo:create_word_count()
 
     combo.word_model = Gtk.ListStore.new({ GObject.Type.STRING })
@@ -70,6 +82,8 @@ function combo:create_word_count()
           }
         }
     })
+
+    combo.word_count = style.set_theme(combo.word_count,{{size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg}})
 
 end
 
@@ -101,13 +115,16 @@ function combo:create_lang()
         }
     })
     
+    combo.lang = style.set_theme(combo.lang,{{size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg}})
+    
 
 end
 
 
+-- Create word dir combobox (Not used)
 function combo:create_word_dir()
     
-     local list = self.app.list
+    local list = self.app.list
 
     -- Model for the second combo box
     combo.word_dir_model = Gtk.ListStore.new({ GObject.Type.STRING })

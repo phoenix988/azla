@@ -93,6 +93,13 @@ function M:create_tree()
 
     M.tree = treeView
     M.column = column
+
+     selection.on_changed:connect(function()
+        local update  = require("lua.theme.update")
+        local write   = require("lua.config.init")
+        local theme   = require("lua.theme.default")
+        theme.color_scheme(M, write, update)  
+     end)
     
    return treeView
 

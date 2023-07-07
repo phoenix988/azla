@@ -96,10 +96,11 @@ local function create_app2()
       
       -- Imports some modules from main
       local mainWindowModule = require("lua.main")
+      local mode             = require("lua.main").getWordList()
       local getWordList      = mainWindowModule.getWordList
       local getDim           = mainWindowModule.getWindowDim
       local window           = getDim()
-      
+
       -- Load theme everytime you launch this app
       local theme            = require("lua.theme.default")
       local theme            = theme.load()
@@ -115,15 +116,29 @@ local function create_app2()
          decorated = true,
          deletable = true,
       })
+
+      local azlaLabel = Gtk.Label({label = "AZLA", margin_bottom = 30})
+      style.set_theme(azlaLabel,{{color = theme.label_welcome, 
+      border_color = theme.label_welcome, size = font.welcome_size / 1000 * 2}})
       
       -- Checks window state of main window
-      windowState         = window.main:is_fullscreen()
-      window_alt.question = win 
-      
+      windowState            = window.main:is_fullscreen()
+      windowStateMax         = window.main:is_maximized()
+      window_alt.question    = win 
+
       -- If main window is fullscreen then app2 launch in fullscreen
       -- Sets window to fullscreen
-      if windowState then
+
+      if window_alt.windowState then
          win:fullscreen()
+      elseif windowState then
+         win:fullscreen()
+      end
+      
+      if window_alt.windowStateMax then
+         win:maximize()
+      elseif windowStateMax then
+         win:maximize()
       end
       
       -- Creates grid used for the summary of your answers
@@ -140,7 +155,7 @@ local function create_app2()
       -- Create boxes for the window
       local box = widget.box_question_create(Gtk.Orientation.VERTICAL, Gtk.Align.CENTER)
       local boxMain = widget.box_question_create()
-      local box2 = widget.box_question_create(Gtk.Orientation.VERTICAL, Gtk.Align.CENTER)
+      local box2 = widget.box_question_create(Gtk.Orientation.HORIZONTAL, Gtk.Align.CENTER)
       local box3 = widget.box_question_create(Gtk.Orientation.HORIZONTAL, Gtk.Align.CENTER)
       local box4 = widget.box_question_create(Gtk.Orientation.VERTICAL, Gtk.Align.CENTER)
       
@@ -158,7 +173,9 @@ local function create_app2()
       -- Create grid
       local mainGrid = grid.main_create()
       local questionGrid = grid.main_create()
-      
+     
+      -- Set margin of the grid
+      questionGrid:set_margin_end(20)
       
       -- Makes result button to show your result
       wc.button.result_create(show_result)
@@ -166,7 +183,7 @@ local function create_app2()
       local bt = {}
 
       -- Create restart button and function
-      bt.again = wc.button.restart_create(win,app2,currentQuestion,import)
+      bt.again = wc.button.restart_create(win,app2,currentQuestion,import,window_alt)
       
       -- Create summary buttons
       bt.sum = wc.button.summary_create(grid.grid_1,grid.grid_2,wg, box3)
@@ -174,37 +191,70 @@ local function create_app2()
       -- Create exit and back button
       bt.last = wc.button.back_exit_create(
                            currentQuestion,question,import,win,mainWindowModule.app1,
-                           replace,cacheFile,combo)
+                           replace,cacheFile,combo,window_alt)
 
+
+      if mode.mode == true then
+         wc.button.result:set_visible(false)
+      end
       
-     -- Calls the question Function
+      -- Calls the question Function
       questionMain(wordlist,
                    w,
+                   mainGrid,
                    questionGrid,
                    currentQuestion,
                    bt)
 
       -- Create checkbvox widget
       local checkbox = widget.checkbox_create(win)
-
+      
+      local windowState = win:is_fullscreen()
+      if windowState then
+          widget.checkbox_1:set_active(true)
+      end
+      
       -- Creates image for the app and set size
       local image = create_image(imagePath)
       image:set_size_request(200, 150)
-      image:set_margin_bottom(10)
+      image:set_margin_bottom(0)
 
       -- Create a scrolled window
       local scrolledWindow = Gtk.ScrolledWindow()
+      local questionWindow = Gtk.ScrolledWindow({
+            hscrollbar_policy = Gtk.PolicyType.NEVER,
+            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+            margin_end = 30,
+            halign = Gtk.Align.START,
+      })
+      
+      local resultWindow = Gtk.ScrolledWindow({
+            hscrollbar_policy = Gtk.PolicyType.NEVER,
+            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+            margin_end = 30,
+      })
+
+      local resultWindow2 = Gtk.ScrolledWindow({
+            hscrollbar_policy = Gtk.PolicyType.NEVER,
+            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+            margin_end = 30,
+      })
 
       -- Set the text view as the child of the scrolled window
       scrolledWindow:set_child(boxMain)
+      questionWindow:set_child(questionGrid)
 
       -- Attach buttons to the main grid
-      mainGrid:attach(wc.button.result,0, 2 ,1 , 1)
-      mainGrid:attach(bt.sum.summary,0, 3 ,1 , 1)
-      mainGrid:attach(bt.sum.hideSummary,0, 3 ,1 , 1)
-      mainGrid:attach(bt.again.restart,0, 4 ,1 , 1)
-      mainGrid:attach(bt.last.exit,0, 6 ,1 , 1)
-      mainGrid:attach(bt.last.back,0, 5 ,1 , 1)
+      mainGrid:attach(wc.button.result,0, 5 ,1 , 1)
+      mainGrid:attach(bt.sum.summary,0, 6 ,1 , 1)
+      mainGrid:attach(bt.sum.hideSummary,0, 6 ,1 , 1)
+      mainGrid:attach(bt.again.restart,0, 7 ,1 , 1)
+      mainGrid:attach(bt.last.exit,0, 9 ,1 , 1)
+      mainGrid:attach(bt.last.back,0, 8 ,1 , 1)
+      mainGrid:attach(widget.checkbox_1,0, 10 ,1 , 1)
+      
+      -- Set margin of the back button
+      bt.last.back:set_margin_top(40)
 
       style.set_theme(bt.last.back,{{size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_question}})
       style.set_theme(bt.last.exit)
@@ -212,7 +262,10 @@ local function create_app2()
       style.set_theme(bt.sum.hideSummary)
       style.set_theme(bt.again.restart)
       style.set_theme(wc.button.result)
-
+      
+      -- Exports the checkbox
+      window_alt.checkbox = widget.checkbox_1
+      
       -- Create an accelerator group for keybindings
       local keyPress = Gtk.EventControllerKey()
      
@@ -223,21 +276,24 @@ local function create_app2()
       win:add_controller(keyPress)
       
       -- Appends widget to box
-      box:append(questionGrid)
       box:append(wg.labelEnd)
       box:append(wg.labelEndCorrect)
       box:append(wg.labelEndIncorrect)
       
       -- Appends widget to box2
+      box2:append(questionWindow)
       box2:append(mainGrid)
-      box2:append(widget.checkbox_1)
 
       -- Appends these widgets to box3
-      box3:append(wc.grid.grid_1)
-      box3:append(wc.grid.grid_2)
+      resultWindow2:set_child(wc.grid.grid_2)
+      resultWindow:set_child(wc.grid.grid_1)
+      box3:append(resultWindow)
+      box3:append(resultWindow2)
+      box3:set_size_request(200, 200)
 
       -- Appends the image on the top
       box4:append(image)
+      box4:append(azlaLabel)
       box4:append(label.summary)
 
       -- Append widgets to the main Box so they are visible

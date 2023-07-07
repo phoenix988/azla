@@ -1,3 +1,5 @@
+-- Modules that will create multiple box widgtes to be used
+
 -- Imports libaries we need
 local lgi               = require("lgi")
 local Gtk               = lgi.require("Gtk", "4.0")
@@ -6,6 +8,7 @@ local GdkPixbuf         = lgi.require('GdkPixbuf')
 local lfs               = require("lfs")
 local os                = require("os")
 
+-- Declare the table
 local widget = {}
 
 -- Makes the main box widget to be used 
@@ -146,12 +149,13 @@ widget.box_theme_label = Gtk.Box({
     margin_end    = 20
 })
 
--- Widget to create a box
+-- Function to create a box widget
 function widget.box_question_create(orientation, fill)
    -- Makes the main box widget to be used 
    
    local orientation = orientation or Gtk.Orientation.VERTICAL
    local fill = fill or Gtk.Align.FILL
+   
    local box = Gtk.Box({
        orientation = orientation,
        spacing = 10,
@@ -159,10 +163,10 @@ function widget.box_question_create(orientation, fill)
        valign = Gtk.Align.CENTER,
        hexpand = true,
        vexpand = true,
-       margin_top    = 30,
+       margin_top    = 0,
        margin_bottom = 0,
-       margin_start  = 200,
-       margin_end    = 200
+       margin_start  = 0,
+       margin_end    = 0
    })
 
    return box
@@ -182,6 +186,10 @@ function widget.checkbox_create(win)
          win:unfullscreen()
       end
    end
+
+   local checkbox = widget.checkbox_1
+
+   return checkbox
 end 
 
 local M = widget

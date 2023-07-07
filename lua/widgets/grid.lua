@@ -9,6 +9,12 @@ function grid:create()
    grid.grid_1 = Gtk.Grid()
    grid.grid_2 = Gtk.Grid()
 
+   grid.grid_1:set_row_spacing(3)
+   grid.grid_1:set_column_spacing(3)
+   
+   grid.grid_2:set_row_spacing(3)
+   grid.grid_2:set_column_spacing(3)
+
    return grid
 end
 

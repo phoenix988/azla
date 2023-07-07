@@ -337,9 +337,14 @@ function app1:on_startup()
 
     -- Create the function when you press on start
     function button.start:on_clicked()
-        azla.start_azla(win,window,create_app2,luaWordsModule)
+        azla.start_azla(false,win,window,create_app2,luaWordsModule)
     end
-
+    
+    -- Create function for exam mode similar to practice mode
+    -- But you will see your result in the end only
+    function button.exam_mode:on_clicked()
+        azla.start_azla(true,win,window,create_app2,luaWordsModule)
+    end
 
     -- Create an accelerator group
     local keyPress = Gtk.EventControllerKey()
@@ -383,10 +388,13 @@ function app1:on_startup()
     label.current_color_scheme:set_markup("<span size='" .. font.fg_size .. "' foreground='" .. theme.label_word .. "'>" .. label.current_color_scheme.label .. "</span>")
 
     widget.box_theme:append(schemeGrid)
-
+    
+    -- attach widgets to the schemegrid
     schemeGrid:attach(listTree, 0,0,1,1)
     schemeGrid:attach(label.current_color_scheme, 1,0,1,1)
-    schemeGrid:attach(button.color_scheme, 0,1,1,1)
+    --schemeGrid:attach(button.color_scheme, 0,1,1,1)
+
+    schemeGrid:set_margin_bottom(20)
     
     -- Create theme entry boxes
     local list1 = array.theme_table(theme,font)
@@ -398,6 +406,10 @@ function app1:on_startup()
 
     -- Create a scrolled window
     local scrolledWindow = Gtk.ScrolledWindow()
+    local scrolledTheme  = Gtk.ScrolledWindow({
+            hscrollbar_policy = Gtk.PolicyType.NEVER,
+            vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
+    })
 
     -- Set the text view as the child of the scrolled window
     scrolledWindow:set_child(widget.box_main)
@@ -405,10 +417,14 @@ function app1:on_startup()
     -- Create notebook widgets
     notebook:create()
     
+    -- Make the notebook scrollable
+    scrolledTheme:set_child(notebook.theme)
+    
     -- Creates some grids
     local mainGrid    = grid.main_create()
     local themeGrid   = grid.main_create()
-
+    
+    -- Attach all the widgets to the mainGrid
     mainGrid:attach(label.welcome, 0 ,2 ,1,1)
     mainGrid:attach(label.language, 0 ,3 ,1,1)
     mainGrid:attach(combo.lang, 0 ,4 ,1,1)
@@ -417,8 +433,9 @@ function app1:on_startup()
     mainGrid:attach(label.word_count, 0 ,7 ,1,1)
     mainGrid:attach(combo.word_count, 0 ,8 ,1,1)
     mainGrid:attach(button.start, 0 ,11 ,1,1)
-    mainGrid:attach(button.setting, 0 ,12 ,1,1)
-    mainGrid:attach(button.exit, 0 ,13 ,1,1)
+    mainGrid:attach(button.exam_mode, 0 ,12 ,1,1)
+    mainGrid:attach(button.setting, 0 ,13 ,1,1)
+    mainGrid:attach(button.exit, 0 ,14 ,1,1)
 
     --themeGrid:attach(button.setting_submit,0,0,1,1)
     themeGrid:attach(button.setting_back,1,3,1,1)
@@ -427,8 +444,11 @@ function app1:on_startup()
     themeGrid:attach(label.theme_apply,1,1,1,1)
 
     -- appends all the widgets to make them wisible
-    widget.box_theme_main:append(notebook.theme)
+    widget.box_theme_main:append(scrolledTheme)
     widget.box_theme_button:append(themeGrid)
+    
+    -- Sets the size of the main theme box
+    widget.box_theme_main:set_size_request(750, 750)
  
     widget.image =  image2
     widget.label =  label

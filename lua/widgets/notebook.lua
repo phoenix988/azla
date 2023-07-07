@@ -3,7 +3,7 @@ local Gtk               = lgi.require("Gtk", "4.0")
 local widget            = require("lua.widgets.box")
 local button            = require("lua.widgets.button")
 
-
+-- Create notebook widgets
 local notebook = {}
 function notebook:create()
    -- Create the notebook
@@ -19,9 +19,8 @@ function notebook:create()
    notebook.theme:append_page(widget.box_setting, Gtk.Label({ label = "Window" }))
    notebook.theme:append_page(widget.box_theme, Gtk.Label({ label = "Colors" }))
 
-   
    -- Create a stack widget
-  -- notebook.stack = Gtk.Stack()
+   -- notebook.stack = Gtk.Stack()
    
    -- appends widget to stack
    --notebook.stack:add_titled(button.setting_back, "stack", "Back")

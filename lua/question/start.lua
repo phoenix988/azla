@@ -2,7 +2,7 @@ local widget = require("lua.widgets.init")
 
 local M = {}
 
-function M.start_azla(win,window,create_app2,luaWordsModule)
+function M.start_azla(exam,win,window,create_app2,luaWordsModule)
 
         local activeWord      = widget.combo.word:get_active()
         local activeWordCount = widget.combo.word_count:get_active()
@@ -12,6 +12,12 @@ function M.start_azla(win,window,create_app2,luaWordsModule)
 
         wordlist = require(luaWordsModule .. "." .. choice)
         wordlist.count = choice_count
+        
+        if exam == true then
+           wordlist.mode  = true
+        else   
+           wordlist.mode  = false
+        end
         
         -- Gets the window dimeonsions to return them later
         window.width  = win:get_allocated_width()

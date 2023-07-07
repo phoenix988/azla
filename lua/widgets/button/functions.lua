@@ -39,7 +39,7 @@ end
 -- Function for the question window
 function M.back_exit_create(currentQuestion,question,import,
                             win,mainWin,
-                            replace,cacheFile,combo)
+                            replace,cacheFile,combo,window_alt)
 
       local backButton = Gtk.Button({label = "Go Back", width_request = 300,})
       
@@ -63,6 +63,9 @@ function M.back_exit_create(currentQuestion,question,import,
                 question.label_correct = {}
                 question.label_incorrect = {}
       
+                window_alt.windowState    = win:is_fullscreen()
+                window_alt.windowStateMax = win:is_maximized()
+                
                 import.setQuestion(currentQuestion)
                 
                 win:destroy()
@@ -258,7 +261,7 @@ function M.result_create(result)
 end
 
 -- Function to create restart button for the question window
-function M.restart_create(win,app2,currentQuestion,import)
+function M.restart_create(win,app2,currentQuestion,import,window_alt)
 
       -- Creates the restart button if you want to restart the list
       local restartButton = Gtk.Button({label = "Restart"})
@@ -280,6 +283,9 @@ function M.restart_create(win,app2,currentQuestion,import)
           question.label_incorrect = {}
 
           import.setQuestion(currentQuestion)
+
+          window_alt.windowState = win:is_fullscreen()
+          window_alt.windowStateMax = win:is_maximized()
           
           -- Relaunch the app
           win:destroy()
@@ -313,9 +319,10 @@ function M.summary_create(grid1,grid2,wg,box)
           clear.grid(grid1)
           clear.grid(grid2)
           
-          -- shows the summary
-          show.summary(question,grid1,theme)
+          -- shows the summary labels
+          show.summary(question,grid1,grid2,theme)
 
+          -- Hides and shows widgets
           grid1:set_visible(true)
           grid2:set_visible(true)
           box:set_visible(true)
@@ -332,7 +339,8 @@ function M.summary_create(grid1,grid2,wg,box)
       -- Create click action on hidesummaryButton
       function hidesummaryButton:on_clicked()
           
-          box:set_visible(true)
+          -- Hides and shows widgets
+          box:set_visible(false)
           label.summary:set_visible(false)
           wg.labelEnd:set_visible(true)
           wg.labelEndCorrect:set_visible(true)
@@ -347,7 +355,7 @@ function M.summary_create(grid1,grid2,wg,box)
 
       end
 
-
+      -- return the buttons
       return { summary = summaryButton, hideSummary = hidesummaryButton }
 
 end

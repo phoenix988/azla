@@ -25,9 +25,8 @@ function import.setQuestion()
 end
 
 -- Function so it switch question after you submit your answer
-function import.switchQuestion(question, 
-                               w,wg,restartButton,
-                               summaryButton,bt)
+function import.switchQuestion(next,question, 
+                               w,wg,bt)
 
      local theme = require("lua.theme.default")
      local font  = theme.font.load()
@@ -38,8 +37,17 @@ function import.switchQuestion(question,
      local getWordList = mainWindowModule.getWordList
      local wordlist = getWordList()
      local count = tonumber(wordlist.count)
-
-     currentQuestion = currentQuestion + 1
+     
+     if next == true then
+        currentQuestion = currentQuestion + 1
+     elseif next == false then
+        if currentQuestion ~= 1 then
+           currentQuestion = currentQuestion - 1
+        end  
+     else 
+        currentQuestion = next
+     end
+ 
      local chosen_wordlist = #wordlist 
      
      -- Checks if the wordlist has less words than the count choice
@@ -57,6 +65,7 @@ function import.switchQuestion(question,
         wg.labelEndIncorrect:set_markup("<span foreground='" .. theme.label_incorrect .. "'>Incorrect: " .. question.incorrect .. "</span>")
         bt.sum.summary:set_visible(true)
         bt.last.back:set_margin_top(30)
+        wg.tree:set_visible(false)
 
      end
 
@@ -86,11 +95,18 @@ function import.switchQuestion(question,
      end
 
      if w.result_labels[currentQuestion] ~= nil then 
-       w.result_labels[currentQuestion]:set_visible(true)
+       local mode = require("lua.main").getWordList()
+       if mode.mode == false then
+          w.result_labels[currentQuestion]:set_visible(true)
+       end
      end
 
      if w.next_buttons[currentQuestion] ~= nil then 
-       w.next_buttons[currentQuestion]:set_visible(false)
+       if next == false or type(next) == "number" then
+          w.next_buttons[currentQuestion]:set_visible(true)
+       else
+          w.next_buttons[currentQuestion]:set_visible(false)
+       end
      end
 
      if w.current_labels[currentQuestion] ~= nil then 

@@ -1,14 +1,13 @@
 -- Module for all the keybindings for the app
 local azla = require("lua.question.start")
 
-
+-- Function to trigger keybindings
 local function lol(controller, keyval, keycode, state, win)
          local app1 = require("lua.main").app1
          local winDim = require("lua.main").getWindowDim
 
          -- Gets the keybinding
          local value = keyval + keyval
-         print(value)
          if value == 226 then -- CTRL + Q
            app1:quit()
          elseif value == 204 then -- CTRL + F  
@@ -49,20 +48,25 @@ local function lolQuestion(controller, keyval, keycode, state, win)
          
          -- Gets the keybinding
          local value = keyval + keyval
-         print(value)
          if value == 226 then -- CTRL + Q
              window.question:destroy()
              windowMain.main:destroy()
          elseif value == 204 then -- CTRL + F  
+             -- Gets current state and window  
              local window = winDim()
              local getState = window.question:is_fullscreen()
 
              if getState == false then
                 window.question:fullscreen()
+                -- activate the fullscreen checkbox
+                window.checkbox:set_active(true)
              else   
                 window.question:unfullscreen()
+                -- unactivate the fullscreen checkbox
+                window.checkbox:set_active(false)
              end   
          elseif value == 218 then -- CTRL + M  
+             -- Gets current state and window  
              local window = winDim()
              local getState = window.question:is_maximized()
              if getState == false then
@@ -74,7 +78,7 @@ local function lolQuestion(controller, keyval, keycode, state, win)
 end
 
 
-
+-- Returns the variables we need
 return {lol = lol, lolQuestion = lolQuestion}
 
 

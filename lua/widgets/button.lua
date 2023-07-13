@@ -30,8 +30,12 @@ button.start = Gtk.Button({label = "Start", width_request = 100, margin_top = 20
 button.start = style.set_theme(button.start)
 
 -- Button to start exam mode
-button.exam_mode = Gtk.Button({label = "Exam Mode", width_request = 100, margin_bottom = 20})
+button.exam_mode = Gtk.Button({label = "Exam Mode", width_request = 100})
 button.exam_mode = style.set_theme(button.exam_mode)
+
+button.restore_mode = Gtk.Button({label = "Restore Session", width_request = 100, margin_bottom = 20})
+button.restore_mode = style.set_theme(button.restore_mode)
+
 
 -- Create the Exit button
 button.exit = Gtk.Button({label = "Exit" })

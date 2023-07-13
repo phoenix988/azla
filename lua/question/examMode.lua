@@ -1,7 +1,7 @@
 local M = {}
 
 
-function M.exam(widget,last,response,replace,list)
+function M.exam(wordlist,widget,last,response,replace,list)
     
     -- Checks if you completed all questions
     for i = 1, last do
@@ -17,7 +17,7 @@ function M.exam(widget,last,response,replace,list)
         local correct = string.lower(wordlist[i][languageNumber_1])
         local word = wordlist[i][languageNumber_2]
         local word = list.to_upper(word)
-        
+
         local choice = widget.entry_fields[i].text:lower()
 
         -- Alternative correct answer

@@ -5,6 +5,8 @@ local button            = require("lua.widgets.button")
 
 -- Create notebook widgets
 local notebook = {}
+
+-- Create notebook widgets for the settings
 function notebook:create()
    -- Create the notebook
    notebook.theme = Gtk.Notebook.new()
@@ -27,6 +29,15 @@ function notebook:create()
    
    -- Create a stackswitcher
    --notebook.stackSwitcher = Gtk.StackSwitcher({ stack = notebook.stack })
+end
+
+function notebook:create_main()
+   
+   -- Create the widget
+   local widget = Gtk.Notebook.new()
+   widget:set_tab_pos(Gtk.PositionType.LEFT)
+   
+   return widget
 end
       
 return notebook

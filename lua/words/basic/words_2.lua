@@ -13,6 +13,10 @@ wordlist = {
    {"zarafat edirəm","i am joking" },
    {"sakit","calm" },
    {"sakit okean","pacific ocean" },
+   {"vergi","tax" },
+   {"pulsuz","free" },
+   {"maaş","salary"},
+   {"hökumət", "gouverment" },
 
  }
 

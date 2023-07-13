@@ -14,7 +14,7 @@ function show.summary(question,grid,grid2,theme)
       local count = 0
 
       local scrollWindow = Gtk.ScrolledWindow({
-            hscrollbar_policy = Gtk.PolicyType.NEVER,
+            hscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
             vscrollbar_policy = Gtk.PolicyType.AUTOMATIC,
             margin_end = 30,
             halign = Gtk.Align.START,
@@ -23,18 +23,10 @@ function show.summary(question,grid,grid2,theme)
       label_correct.main = Gtk.Label()
       label_incorrect.main = Gtk.Label()
       
-      label_correct.main:set_text("Correct: ")
-      label_incorrect.main:set_text("Incorrect: ")
 
       label_incorrect.main:set_halign(Gtk.Align.START)
       label_correct.main:set_halign(Gtk.Align.START)
 
-      label_correct.main:set_markup("<span foreground='".. theme.label_fg .. "' size='" .. font.welcome_size .. "'>" 
-      .. label_correct.main.label .. "</span>")
-      label_incorrect.main:set_markup("<span foreground='".. theme.label_fg .. "' size='" .. font.welcome_size .. "'>"
-      .. label_incorrect.main.label .. "</span>")
-
-      
       if question.label_correct ~= nil then
         local count = 0
         for key , value in pairs(question.label_correct) do
@@ -62,6 +54,10 @@ function show.summary(question,grid,grid2,theme)
               end
 
         end
+        
+        label_correct.main:set_text("Correct: " .. count) 
+        label_correct.main:set_markup("<span foreground='".. theme.label_fg .. "' size='" .. font.welcome_size .. "'>" 
+        .. label_correct.main.label .. "</span>")
         
         grid:attach(label_correct.main, 1, -1, 1, 1)
 
@@ -100,6 +96,10 @@ function show.summary(question,grid,grid2,theme)
 
         end
       
+        label_incorrect.main:set_text("Incorrect: " .. count)
+        label_incorrect.main:set_markup("<span foreground='".. theme.label_fg .. "' size='" .. font.welcome_size .. "'>"
+        .. label_incorrect.main.label .. "</span>")
+
         grid2:attach(label_incorrect.main, 1, -1, 1, 1)
 
         if count == 0 then 

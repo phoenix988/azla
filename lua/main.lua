@@ -346,6 +346,10 @@ function app1:on_startup()
         azla.start_azla(true,win,window,create_app2,luaWordsModule)
     end
 
+    function button.restore_mode:on_clicked()
+        azla.load_session(false,win,window,create_app2,luaWordsModule)
+    end
+
     -- Create an accelerator group
     local keyPress = Gtk.EventControllerKey()
      
@@ -434,8 +438,9 @@ function app1:on_startup()
     mainGrid:attach(combo.word_count, 0 ,8 ,1,1)
     mainGrid:attach(button.start, 0 ,11 ,1,1)
     mainGrid:attach(button.exam_mode, 0 ,12 ,1,1)
-    mainGrid:attach(button.setting, 0 ,13 ,1,1)
-    mainGrid:attach(button.exit, 0 ,14 ,1,1)
+    mainGrid:attach(button.restore_mode, 0 ,13 ,1,1)
+    mainGrid:attach(button.setting, 0 ,14 ,1,1)
+    mainGrid:attach(button.exit, 0 ,15 ,1,1)
 
     --themeGrid:attach(button.setting_submit,0,0,1,1)
     themeGrid:attach(button.setting_back,1,3,1,1)

@@ -1,6 +1,10 @@
 local list = {}
 
 list = {
+   {"vergi","tax" },
+   {"pulsuz","free" },
+   {"maaş","salary"},
+   {"hökumət", "gouverment"},
    {"minnoş","cute" },
    {"balam","my baby" },
    {"yaxşıyam","I am fine" },

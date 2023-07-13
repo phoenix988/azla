@@ -13,6 +13,7 @@ local response          = require("lua.question.response")
 local list              = require("lua.terminal.listFiles")
 local style             = require("lua.widgets.setting")
 local wordview          = require("lua.widgets.button.questionView")
+local json              = require("lua.question.save")
 
 local count = 0
 
@@ -23,6 +24,7 @@ question.correct = 0
 question.incorrect = 0
 question.current = 0
 
+local currentQuestion = 1
 
 -- Function to create a label with multiple span sections
 function question.create_label(spans)
@@ -38,6 +40,32 @@ function question.create_label(spans)
     return label
 end
 
+--function question.update_tree(question, list, widget)
+--
+--     -- Create the treetable so I can dynamiclly update the treeview
+--     local array = {}
+--     for i = 1, question.last do
+--           array[i] = wordlist[i][languageNumber_2]
+--           array[i] = list.to_upper(array[i])
+--     end
+--
+--     list:clear()
+--     
+--     -- Updates the treetable
+--     for key, value in pairs(array) do
+--         local check = widget[key].text:lower()
+--         local check = string.gsub(check, "%s", "")
+--         if check ~= nil and check ~= "" and string.match(check, "%S") then
+--            if key == current - 1 then
+--               local value = value .. " ✓ "
+--               array[key] = value
+--            end
+--         end 
+--         list:append({key .. " " .. array[key]})
+--     end
+--
+--end
+
 
 -- Runs the function
 function question.main(wordlist,
@@ -47,6 +75,11 @@ function question.main(wordlist,
                        currentQuestion,
                        bt)
  
+
+     question.jsonSettings = {}
+     question.jsonSettings.word = {}
+     question.jsonSettings.entry = {}
+
      -- Load the theme and font to use
      local theme = require("lua.theme.default")
      local font  = theme.font.load()
@@ -64,6 +97,7 @@ function question.main(wordlist,
      w.entry_fields       = {}
      w.result_labels      = {}
      w.show_result_labels = {}
+
 
      local prevButton = Gtk.Button({label = "Prev"})
      local submitButton = Gtk.Button({label = "Submit"})
@@ -91,6 +125,7 @@ function question.main(wordlist,
       local import = require("lua.switchQuestion")
       local switchQuestion = import.switchQuestion
 
+
       -- Imports the variable needed to determine which language you choose
       local mainWindowModule = require("lua.main")
       local getLanguageChoice = mainWindowModule.getLanguageChoice
@@ -111,11 +146,60 @@ function question.main(wordlist,
       local count = tonumber(wordlist.count)
 
       local wordTable = {}
-      
-      -- Create a table to list the words in a tree
-      for i = 1, math.min(#wordlist, count) do
 
-          local word = wordlist[i][languageNumber_2]
+      question.jsonSettings.wordlist = wordlist.name
+      question.jsonSettings.count_last = count
+
+      currentQuestion = import.loadLast(wordlist)
+      question.count_start = wordlist.count_start 
+
+      if wordlist.words then
+          local numTable = {}
+          local entryTable = {}
+          newWordList = {}
+
+          local function customSort(a, b)
+              local numA, strA = tonumber(a[1]:match("(%d+)_.*")), a[1]
+              local numB, strB = tonumber(b[1]:match("(%d+)_.*")), b[1]
+
+              return numA < numB
+          end
+
+          for key, value in pairs(wordlist.words) do
+              --local key = string.match(key, "([^_]+)")
+              --local result = string.match(variable, "_(.*)")
+              table.insert(numTable, { key, value } )
+          end
+
+          table.sort(numTable, customSort)
+
+          for i, value in ipairs(numTable) do
+              local new = string.match(value[1], "_(.*)")
+              table.insert(newWordList, {value[2], new })
+          end
+          
+          if wordlist.correct then
+             question.correct = wordlist.correct
+          end
+          
+          if wordlist.incorrect then
+             question.incorrect = wordlist.incorrect
+          end
+
+      end
+      
+      -- Create the main wordlist to loop through
+      if newWordList then
+         mainWordList = newWordList
+         newWordList = nil
+      else
+         mainWordList = wordlist
+      end
+
+      -- Create a table to list the words in a tree
+      for i = 1, math.min(#mainWordList, count) do
+
+          local word = mainWordList[i][languageNumber_2]
           local word = list.to_upper(word)
 
           local append = i .. " " .. word
@@ -125,19 +209,25 @@ function question.main(wordlist,
       
       -- create treeView widget
       local treeView = wordview:create_tree(question.last,wordTable)
+      wg.treeWidget = treeView
+
+      -- Adss the questionGrid to the wg table
       wg.tree = questionGrid
       
       -- Iterate over the wordlist using a for loop
       -- for i = 1, #wordlist do
-      for i = 1, math.min(#wordlist, count) do
+      for i = 1, math.min(#mainWordList, count) do
           -- Counts current question
           question.current = question.current + 1
           question.last = i
           
           -- Gets the correct answer and stores it in a variable
-          local correct = string.lower(wordlist[i][languageNumber_1])
-          local word = wordlist[i][languageNumber_2]
+          local correct = string.lower(mainWordList[i][languageNumber_1])
+          local word = mainWordList[i][languageNumber_2]
           local word = list.to_upper(word)
+          
+          -- Make a json setting table and write all the words to it
+          question.jsonSettings.word[tostring(i) .. "_" .. word] = correct 
           
            w.question_labels[i] = question.create_label(
               {
@@ -166,6 +256,7 @@ function question.main(wordlist,
           w.entry_fields[i] = style.set_theme(w.entry_fields[i], {
           {size = font.entry_size / 1000, color = theme.label_question, border_color = theme.label_fg}
           })
+
           
           -- Create submit button for each question
           w.submit_buttons[i] = Gtk.Button {
@@ -194,6 +285,19 @@ function question.main(wordlist,
               w,
               wg,
               bt)
+              
+              -- Updates click function on back button
+              -- Resets the session if you reach the last question
+              function bt.last.back:on_clicked()
+                     currentQuestion = currentQuestion
+                     if tonumber(currentQuestion) > tonumber(wordlist.count) then
+                        question.jsonSettings = {}
+                        json.saveSession(question.jsonSettings)
+                     end
+
+              end
+
+              question.count_start = currentQuestion
 
               if mode.mode == true then
                  if w.next_buttons[currentQuestion] ~= nil then
@@ -222,10 +326,75 @@ function question.main(wordlist,
           w.result_labels[i] = Gtk.Label({visible = false})
 
           w.show_result_labels[i] = Gtk.Label({visible = false})
+          
+          -- Create entry box text if you restore session
+          if wordlist.words then
+             for key, value in pairs(wordlist.entry) do 
+                 local altCorrectRun = false
+                 if value == i then
+                      response.labels(correct, key, word)
+                      local correctString    = response.correctString
+                      local correctStringAlt = response.correctStringAlt  
+                      local correctLabel     = response.correctLabel
+                      local incorrectString  = response.incorrectString
+                      local incorrectLabel   = response.incorrectLabel
+
+                      -- Alternative correct answer
+                      local altCorrect = replace.replace_main(correct)
+
+                      -- Remove leading spaces
+                      local key = string.gsub(key, "^%s*", "")
+                      
+                      -- Remove trailing spaces
+                      local key = string.gsub(key, "%s*$", "")
+                      if not mode.mode then
+                         if key == correct then
+                               opt = "correct" 
+                               correct_answers = response.main(opt, correctString,
+                                   w,i, correctLabel,choice, theme)
+                         else
+                               for _,value in pairs(altCorrect) do
+                                   if value == key then
+                                      opt = "correct" 
+                                      response.main(opt, correctStringAlt,
+                                          w,i, correctLabel,choice, theme)
+                                      altCorrectRun = true
+                                   end 
+                               end
+                         end
+                         
+                         if key ~= correct and not altCorrectRun then
+                               opt = "incorrect"
+                               incorrect_answers = response.main(opt, incorrectString,
+                                   w,i, incorrectLabel,choice, theme)
+                         end
+                         
+                      end
+                      w.entry_fields[i]:set_text(key)
+                      question.jsonSettings.entry[key] = value
+
+                      if not mode.mode then
+                         w.entry_fields[i]:set_editable(false)
+                      end
+                      break
+                 end
+             end
+          end
   
           -- Define the callback function for the submit button
           w.submit_buttons[i].on_clicked = function()
+              
+              question.jsonSettings.count = i 
+              -- Catch your choice 
               local choice = w.entry_fields[i].text:lower()
+ 
+              -- Remove leading spaces
+              local choice = string.gsub(choice, "^%s*", "")
+              
+              -- Remove trailing spaces
+              local choice = string.gsub(choice, "%s*$", "")
+              
+              question.jsonSettings.entry[choice] = i  
               
               -- Alternative correct answer
               local altCorrect = replace.replace_main(correct)
@@ -249,6 +418,8 @@ function question.main(wordlist,
                    local opt = "correct"
                    correct_answers = response.main(opt, correctString,
                                  w,i, correctLabel,choice, theme)
+ 
+                   question.jsonSettings.correct = question.correct
   
               else
                    for key,value in pairs(altCorrect) do
@@ -271,15 +442,24 @@ function question.main(wordlist,
               if choice ~= correct and not dontRun then
                  
                    question.incorrect = question.incorrect + 1
+                   question.jsonSettings.incorrect = question.incorrect
                    -- runs the function
                    local opt = "incorrect"
                    response.main(opt,incorrectString,
                                w,i, incorrectLabel,choice, theme)
               elseif dontRun then
                    question.correct = question.correct + 1
+                   question.jsonSettings.correct = question.correct
               end
 
               w.entry_fields[i]:set_editable(false)
+
+              -- Create the treetable so I can dynamiclly update the treeview
+              local treeTable = {}
+              for i = 1, question.last do
+                    treeTable[i] = mainWordList[i][languageNumber_2]
+                    treeTable[i] = list.to_upper(treeTable[i])
+              end
                 
           end
  
@@ -291,14 +471,11 @@ function question.main(wordlist,
                     w[widget][i]:set_visible(false)
                  end
           end
-
+          
           if i == 1 then
                  w.next_buttons[i]:set_visible(false)
-          elseif mode.mode == true then       
-                 w.next_buttons[currentQuestion]:set_visible(true)
           end
-
-        
+                            
           -- Appends them all to the main box
           mainGrid:attach(w.question_labels[i],0,0,1,1)
           mainGrid:attach(w.entry_fields[i],0,1,1,1)
@@ -318,14 +495,27 @@ function question.main(wordlist,
           mainGrid:attach(submitButton,0,4,1,1)
           mainGrid:attach(nextButton,0,4,1,1)
           submitButton:set_visible(false)
+          question.jsonSettings.exam_mode = true
+      else
+          question.jsonSettings.exam_mode = false
       end   
 
 
 
      questionGrid:attach(treeView,0,0,1,1)
 
-     local selection = treeView:get_selection()
 
+     -- Create the treetable so I can dynamiclly update the treeview
+     local treeTable = {}
+     for i = 1, question.last do
+           treeTable[i] = wordlist[i][languageNumber_2]
+           treeTable[i] = list.to_upper(treeTable[i])
+     end
+
+     local selection = treeView:get_selection()
+     
+     local treeFirst = true
+     -- action to run when you change the treeview
      selection.on_changed:connect(function()
           
           local selection = treeView:get_selection()
@@ -335,10 +525,12 @@ function question.main(wordlist,
                 stringValue = value:get_string() -- Convert value to string
           end
 
-
            local stringValue = string.match(stringValue, "(%d+)%s")
           
            local stringValue = tonumber(stringValue)
+
+           question.count_start = stringValue
+           
            -- Move to the next question
            currentQuestion = switchQuestion(
            stringValue,
@@ -358,6 +550,9 @@ function question.main(wordlist,
               submitButton:set_visible(false)
               nextButton:set_visible(true)
            end
+
+           
+           treeFirst = false
 
      end)
    
@@ -387,8 +582,6 @@ function question.main(wordlist,
            local iter = model:get_iter_from_string(tostring(currentQuestion - 1)) -- Select the first row
            selection:select_iter(iter)
 
-
-           
            if currentQuestion < question.last then
               nextButton:set_visible(true)
            end
@@ -398,7 +591,7 @@ function question.main(wordlist,
      -- Define the callback function for the submit button
      submitButton.on_clicked = function()
             -- runs the exam mode evaluation on all your answers
-            local choice = question.mode.exam(w,question.last,response,replace,list)
+            local choice = question.mode.exam(mainWordList,w,question.last,response,replace,list)
             
             -- Will run if you didn't complete all questions
             if question.complete == false then
@@ -420,6 +613,9 @@ function question.main(wordlist,
                   submitButton:set_visible(false)
                end  
             end
+
+            question.jsonSettings = {}
+            json.saveSession(question.jsonSettings)
     end       
     
     -- Single next button made for exam mode
@@ -428,7 +624,6 @@ function question.main(wordlist,
              nextButton:set_visible(false)
              submitButton:set_visible(true)
           end   
-
           
           -- Move to the next question
           currentQuestion = switchQuestion(
@@ -439,19 +634,25 @@ function question.main(wordlist,
           bt)
 
           current = currentQuestion
-          
-          wordview.listStore:clear()
 
-          for i = 1, question.last do
-             local word = wordlist[i][languageNumber_2]
-             local word = list.to_upper(word)
-             if i == current - 1 then
-                  word = word .. " V"
-             end
-             wordview.listStore:append({i .. " " .. word})
+          question.count_start = current
+
+          wordview.listStore:clear()
+          
+          -- Updates the treetable
+          for key, value in pairs(treeTable) do
+              local check = w.entry_fields[key].text:lower()
+              local check = string.gsub(check, "%s", "")
+              if check ~= nil and check ~= "" and string.match(check, "%S") then
+                 if key == current - 1 then
+                    local value = value .. " ✓ "
+                    treeTable[key] = value
+                 end
+              end 
+              wordview.listStore:append({key .. " " .. treeTable[key]})
           end
 
-          local model = treeView:get_model()
+
           -- Get the tree selection and set the default selection
           local selection = treeView:get_selection()
           local model = treeView:get_model()
@@ -460,10 +661,42 @@ function question.main(wordlist,
              selection:select_iter(iter)
           end
 
+          for i = 1, math.min(#mainWordList, question.last) do
+              local choice = w.entry_fields[i].text:lower()
+ 
+              -- Remove leading spaces
+              local choice = string.gsub(choice, "^%s*", "")
+              
+              -- Remove trailing spaces
+              local choice = string.gsub(choice, "%s*$", "")
+              
+              question.jsonSettings.entry[choice] = i  
+          end
           
     end
 
-    
+    -- Get the tree selection and set the default selection
+    local selection = wg.treeWidget:get_selection()
+    local model = wg.treeWidget:get_model()
+    if question.count_start then
+        local iter = model:get_iter_from_string(tostring(question.count_start - 1)) -- Select the first row
+        if iter then
+           selection:select_iter(iter)
+        end
+    else
+        local iter = model:get_iter_from_string(tostring(0)) -- Select the first row
+        if iter then
+           selection:select_iter(iter)
+        end
+    end
+
+    -- Restart the start counter by the end so it restarts when
+    -- pressing the restart button
+    wordlist.count_start = 1
+
+    return currentQuestion
+
 end
 
+-- Return the main function
 return question

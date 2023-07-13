@@ -12,9 +12,11 @@ local gio               = require("lgi").Gio
 local lfs               = require("lfs")
 local os                = require("os")
 local theme             = require("lua.theme.default")
+local json              = require("lua.question.save")
 
 -- Sets the import table
 local import = {}
+local firstStart = true
 
 -- sets currentquestion
 local currentQuestion = 1
@@ -24,20 +26,26 @@ function import.setQuestion()
    currentQuestion = 1
 end
 
+function import.loadLast(list)
+    currentQuestion = list.count_start
+
+    return currentQuestion
+end
+
 -- Function so it switch question after you submit your answer
 function import.switchQuestion(next,question, 
                                w,wg,bt)
-
      local theme = require("lua.theme.default")
      local font  = theme.font.load()
      local theme = theme.load()
-     
+
      -- Imports active wordlist
      local mainWindowModule = require("lua.main")
      local getWordList = mainWindowModule.getWordList
      local wordlist = getWordList()
      local count = tonumber(wordlist.count)
-     
+
+
      if next == true then
         currentQuestion = currentQuestion + 1
      elseif next == false then
@@ -55,7 +63,8 @@ function import.switchQuestion(next,question,
      if chosen_wordlist < count then
          count = chosen_wordlist
      end
-
+     
+     -- Checks if your on the last question
      if currentQuestion > count then
         wg.labelEnd:set_visible(true)
         wg.labelEnd:set_text("You reached the last question")
@@ -66,21 +75,35 @@ function import.switchQuestion(next,question,
         bt.sum.summary:set_visible(true)
         bt.last.back:set_margin_top(30)
         wg.tree:set_visible(false)
+        
+        -- Only append pages to the notebook if there is labels to show
+        if question.label_correct ~= nil then
+            bt.notebook:append_page(bt.resultWindow1, Gtk.Label({ label = "Correct" }))
+        end
+
+        if question.label_incorrect ~= nil then
+            bt.notebook:append_page(bt.resultWindow2, Gtk.Label({ label = "Incorrect" }))
+        end
 
      end
-
+     
      -- Hide all question elements
      --for i = 1, #wordlist do
-     for i = 1, math.min(#wordlist, count) do
-        w.question_labels[i]:set_visible(false)
-        w.entry_fields[i]:set_visible(false)
-        w.submit_buttons[i]:set_visible(false)
-        w.result_labels[i]:set_visible(false)
-        w.next_buttons[i]:set_visible(false)
-        w.current_labels[i]:set_visible(false)
-     end
-  
+      for i = 1, math.min(#wordlist, count) do
+         w.question_labels[i]:set_visible(false)
+         w.entry_fields[i]:set_visible(false)
+         w.submit_buttons[i]:set_visible(false)
+         w.result_labels[i]:set_visible(false)
+         w.next_buttons[i]:set_visible(false)
+         w.current_labels[i]:set_visible(false)
+      end
+     
 
+     if firstStart then
+        currentQuestion = wordlist.count_start
+        firstStart = false
+     end
+     
      -- Show the active question elements
      if w.question_labels[currentQuestion] ~= nil then 
        w.question_labels[currentQuestion]:set_visible(true)

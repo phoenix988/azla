@@ -16,6 +16,11 @@ wordlist = {
    {"Isti","Hot" },
    {"Yemək","Food" },
    {"şad oldum","nice to meet you" },
+   {"vergi","tax" },
+   {"pulsuz","free" },
+   {"maaş","salary"},
+   {"hökumət", "gouverment" },
+
 }
 
 return wordlist

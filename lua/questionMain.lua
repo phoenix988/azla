@@ -79,8 +79,6 @@ end
 -- Creates empty table to make some widgets 
 local w                 = {}
 
--- Calculates current question
-local currentQuestion   = 1
 
 -- Function to create the app
 local function create_app2()
@@ -176,11 +174,14 @@ local function create_app2()
      
       -- Set margin of the grid
       questionGrid:set_margin_end(20)
+
+      local bt = {}
+      
+      -- Create notebook widget
+      bt.notebook = notebook:create_main()
       
       -- Makes result button to show your result
       wc.button.result_create(show_result)
-      
-      local bt = {}
 
       -- Create restart button and function
       bt.again = wc.button.restart_create(win,app2,currentQuestion,import,window_alt)
@@ -188,23 +189,15 @@ local function create_app2()
       -- Create summary buttons
       bt.sum = wc.button.summary_create(grid.grid_1,grid.grid_2,wg, box3)
       
-      -- Create exit and back button
-      bt.last = wc.button.back_exit_create(
-                           currentQuestion,question,import,win,mainWindowModule.app1,
-                           replace,cacheFile,combo,window_alt)
-
-
+      -- hides the result button in exam mode 
       if mode.mode == true then
          wc.button.result:set_visible(false)
       end
       
-      -- Calls the question Function
-      questionMain(wordlist,
-                   w,
-                   mainGrid,
-                   questionGrid,
-                   currentQuestion,
-                   bt)
+      -- Create exit and back button
+      bt.last = wc.button.back_exit_create(
+                           currentQuestion,question,import,win,mainWindowModule.app1,
+                           replace,cacheFile,combo,window_alt)
 
       -- Create checkbvox widget
       local checkbox = widget.checkbox_create(win)
@@ -240,6 +233,19 @@ local function create_app2()
             margin_end = 30,
       })
 
+      bt.resultWindow1 = resultWindow
+      bt.resultWindow2 = resultWindow2
+
+      -- Calls the question Function
+      local currentQuestion = questionMain(
+                   wordlist,
+                   w,
+                   mainGrid,
+                   questionGrid,
+                   currentQuestion,
+                   bt)
+
+
       -- Set the text view as the child of the scrolled window
       scrolledWindow:set_child(boxMain)
       questionWindow:set_child(questionGrid)
@@ -262,7 +268,7 @@ local function create_app2()
       style.set_theme(bt.sum.hideSummary)
       style.set_theme(bt.again.restart)
       style.set_theme(wc.button.result)
-      
+
       -- Exports the checkbox
       window_alt.checkbox = widget.checkbox_1
       
@@ -287,9 +293,8 @@ local function create_app2()
       -- Appends these widgets to box3
       resultWindow2:set_child(wc.grid.grid_2)
       resultWindow:set_child(wc.grid.grid_1)
-      box3:append(resultWindow)
-      box3:append(resultWindow2)
-      box3:set_size_request(200, 200)
+      box3:append(bt.notebook)
+      box3:set_size_request(200, 350)
 
       -- Appends the image on the top
       box4:append(image)

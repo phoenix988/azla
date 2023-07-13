@@ -38,8 +38,8 @@ end
 
 -- Function for the question window
 function M.back_exit_create(currentQuestion,question,import,
-                            win,mainWin,
-                            replace,cacheFile,combo,window_alt)
+                            win,mainWin,replace,cacheFile,
+                            combo,window_alt)
 
       local backButton = Gtk.Button({label = "Go Back", width_request = 300,})
       
@@ -47,46 +47,34 @@ function M.back_exit_create(currentQuestion,question,import,
       local exitButton = Gtk.Button({label = "Exit"})
             
       
-       -- Defines the function of Exitbutton
+      -- Defines the function of Exitbutton
       -- Function for back button for the question window
       function backButton:on_clicked()
-                -- Resets the variables that keep tracks of current 
-                -- question and correct answers
-                question.correct = 0
-                question.incorrect = 0
+         local action = require("lua.widgets.button.backButton")
+         action.back(currentQuestion,question,window_alt,win,import,mainWin)
+      end
+      
+      -- Function for exit button for the question window
+      function exitButton:on_clicked()
+      
+         local mainWindowModule = require("lua.main")
+         local write            = require("lua.config.init")
+         local getDim           = mainWindowModule.getWindowDim
+         local window           = getDim()
+         local json             = require("lua.question.save")
 
-                -- resets current question
-                question.current = 0
-                currentQuestion = 1  -- Start from the first question if reached the end
-                
-                -- Make these variables empty to avoid stacking
-                question.label_correct = {}
-                question.label_incorrect = {}
-      
-                window_alt.windowState    = win:is_fullscreen()
-                window_alt.windowStateMax = win:is_maximized()
-                
-                import.setQuestion(currentQuestion)
-                
-                win:destroy()
-                mainWin:activate()
-            end
-            
-            -- Function for exit button for the question window
-            function exitButton:on_clicked()
-      
-               local mainWindowModule = require("lua.main")
-               local write            = require("lua.config.init")
-               local getDim           = mainWindowModule.getWindowDim
-               local window           = getDim()
+         window.width  = win:get_allocated_width()
+         window.height = win:get_allocated_height()
+          
+         question.jsonSettings.count_start = question.count_start
+         json.saveSession(question.jsonSettings)
 
-               window.width  = win:get_allocated_width()
-               window.height = win:get_allocated_height()
+         question.jsonSettings = {}
       
-               write.write.cache.config_main(cacheFile,combo)
+         write.write.cache.config_main(cacheFile,combo)
       
-               win:destroy()
-               mainWin:quit()
+         win:destroy()
+         mainWin:quit()
       
       end
 
@@ -290,6 +278,7 @@ function M.restart_create(win,app2,currentQuestion,import,window_alt)
           -- Relaunch the app
           win:destroy()
           app2:activate()
+
       end
 
       return {restart = restartButton}

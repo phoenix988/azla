@@ -33,7 +33,7 @@ local function lol(controller, keyval, keycode, state, win)
                 local wordModule  = "lua.words"
 
                 local window = winDim()
-                azla.start_azla(window.main,window,create_app2,wordModule)
+                azla.start_azla(false,window.main,window,create_app2,wordModule)
          end
 end
 

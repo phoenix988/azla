@@ -1,5 +1,6 @@
 local themeModule = require("lua.theme.default")
 local font        = themeModule.font.load()
+local theme       = themeModule.load()
 
 -- Function that create all labels we need for azla
 local response = {}
@@ -8,8 +9,8 @@ function response.labels(correct, choice, word)
       response.correctString = "Congratulations, your answer is correct!"
       response.correctStringAlt = "Great Try!, \nyour answer is partially correct!, \ncorrect: " .. correct
       response.correctLabel = "Question: " .. word .. ": " .. "Answer: " .. choice
-      response.incorrectString = "Sorry, your answer is incorrect. Correct answer: " .. correct
-      response.incorrectLabel = "Correct: " .. correct .. ": " .. "Answer: " .. choice
+      response.incorrectString = "Sorry, your answer is incorrect.\nQuestion: " .. word .. "\nCorrect answer: " .. correct
+      response.incorrectLabel = "Question: " .. word .. "\nCorrect: " .. correct .. ": " .. "\nAnswer: " .. choice .. "\n"
 
       return response
 end

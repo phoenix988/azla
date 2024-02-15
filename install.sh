@@ -80,6 +80,7 @@ build() {
           luastatic main.lua -llua5.4 $MODULES_PATH
      else
           echo -e "${RED}-- luastatic is not installed"
+          exit
      fi
 }
 

@@ -14,7 +14,7 @@ M.colorSchemes = {
    "Custom",
    "Dracula",
    "Iceberg",
-   "Nord"
+   "Nord",
 }
 
 -- Gets active colorscheme if its set

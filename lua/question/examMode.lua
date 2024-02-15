@@ -1,3 +1,8 @@
+local themeModule = require("lua.theme.default")
+local font        = themeModule.font.load()
+local theme       = themeModule.load()
+
+
 local M = {}
 
 

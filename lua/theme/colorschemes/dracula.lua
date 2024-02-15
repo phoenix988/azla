@@ -1,5 +1,3 @@
-
-
 -- Sets default theme values to load so you can reset
 local theme = {
        label_welcome        = '#f1fa8c',

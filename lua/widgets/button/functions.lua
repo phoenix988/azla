@@ -38,8 +38,8 @@ end
 
 -- Function for the question window
 function M.back_exit_create(currentQuestion,question,import,
-                            win,mainWin,
-                            replace,cacheFile,combo)
+                            win,mainWin,replace,cacheFile,
+                            combo,window_alt)
 
       local backButton = Gtk.Button({label = "Go Back", width_request = 300,})
       
@@ -47,43 +47,34 @@ function M.back_exit_create(currentQuestion,question,import,
       local exitButton = Gtk.Button({label = "Exit"})
             
       
-       -- Defines the function of Exitbutton
+      -- Defines the function of Exitbutton
       -- Function for back button for the question window
       function backButton:on_clicked()
-                -- Resets the variables that keep tracks of current 
-                -- question and correct answers
-                question.correct = 0
-                question.incorrect = 0
+         local action = require("lua.widgets.button.backButton")
+         action.back(currentQuestion,question,window_alt,win,import,mainWin)
+      end
+      
+      -- Function for exit button for the question window
+      function exitButton:on_clicked()
+      
+         local mainWindowModule = require("lua.main")
+         local write            = require("lua.config.init")
+         local getDim           = mainWindowModule.getWindowDim
+         local window           = getDim()
+         local json             = require("lua.question.save")
 
-                -- resets current question
-                question.current = 0
-                currentQuestion = 1  -- Start from the first question if reached the end
-                
-                -- Make these variables empty to avoid stacking
-                question.label_correct = {}
-                question.label_incorrect = {}
-      
-                import.setQuestion(currentQuestion)
-                
-                win:destroy()
-                mainWin:activate()
-            end
-            
-            -- Function for exit button for the question window
-            function exitButton:on_clicked()
-      
-               local mainWindowModule = require("lua.main")
-               local write            = require("lua.config.init")
-               local getDim           = mainWindowModule.getWindowDim
-               local window           = getDim()
+         window.width  = win:get_allocated_width()
+         window.height = win:get_allocated_height()
+          
+         question.jsonSettings.count_start = question.count_start
+         json.saveSession(question.jsonSettings)
 
-               window.width  = win:get_allocated_width()
-               window.height = win:get_allocated_height()
+         question.jsonSettings = {}
       
-               write.write.cache.config_main(cacheFile,combo)
+         write.write.cache.config_main(cacheFile,combo)
       
-               win:destroy()
-               mainWin:quit()
+         win:destroy()
+         mainWin:quit()
       
       end
 
@@ -258,7 +249,7 @@ function M.result_create(result)
 end
 
 -- Function to create restart button for the question window
-function M.restart_create(win,app2,currentQuestion,import)
+function M.restart_create(win,app2,currentQuestion,import,window_alt)
 
       -- Creates the restart button if you want to restart the list
       local restartButton = Gtk.Button({label = "Restart"})
@@ -280,10 +271,14 @@ function M.restart_create(win,app2,currentQuestion,import)
           question.label_incorrect = {}
 
           import.setQuestion(currentQuestion)
+
+          window_alt.windowState = win:is_fullscreen()
+          window_alt.windowStateMax = win:is_maximized()
           
           -- Relaunch the app
           win:destroy()
           app2:activate()
+
       end
 
       return {restart = restartButton}
@@ -313,9 +308,10 @@ function M.summary_create(grid1,grid2,wg,box)
           clear.grid(grid1)
           clear.grid(grid2)
           
-          -- shows the summary
-          show.summary(question,grid1,theme)
+          -- shows the summary labels
+          show.summary(question,grid1,grid2,theme)
 
+          -- Hides and shows widgets
           grid1:set_visible(true)
           grid2:set_visible(true)
           box:set_visible(true)
@@ -332,7 +328,8 @@ function M.summary_create(grid1,grid2,wg,box)
       -- Create click action on hidesummaryButton
       function hidesummaryButton:on_clicked()
           
-          box:set_visible(true)
+          -- Hides and shows widgets
+          box:set_visible(false)
           label.summary:set_visible(false)
           wg.labelEnd:set_visible(true)
           wg.labelEndCorrect:set_visible(true)
@@ -347,7 +344,7 @@ function M.summary_create(grid1,grid2,wg,box)
 
       end
 
-
+      -- return the buttons
       return { summary = summaryButton, hideSummary = hidesummaryButton }
 
 end

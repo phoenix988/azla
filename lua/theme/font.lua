@@ -24,6 +24,7 @@ M.font_default = {
        fg_size        = '14000',
        welcome_size   = '20000',
        question_size  = '20000',
+       entry_size     = '26000',
 }
 
 
@@ -46,6 +47,7 @@ function M.load()
            fg_size        = '14000',
            welcome_size   = '20000',
            question_size  = '20000',
+           entry_size     = '26000',
         }
         
         -- Overwrites config if you have a custom one

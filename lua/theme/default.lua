@@ -103,7 +103,8 @@ end
 
 -- Function to set the colorscheme
 function M.color_scheme(treeView,write,update)
-      
+    
+    local theme = M.load()
     -- Get active value of the treeview
     local selection = treeView.tree:get_selection()
     local model, iter = selection:get_selected()

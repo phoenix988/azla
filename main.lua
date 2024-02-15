@@ -61,7 +61,7 @@ p.processSwitches(luaWordsPath,luaWordsModule)
 
 -- Runs the GUI app if you dont specify --term (-t)
 if p.terminal == false then 
-
+  -- Imports init
   local import   = require("lua.init")
   
   -- Main window

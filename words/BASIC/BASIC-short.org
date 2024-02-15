@@ -1,6 +1,6 @@
-#+title| Azerbajani Vocabulary
-#+DESCRIPTION| azerbajani vocabulary words
-#+AUTHOR| Karl Fredin
+#+title: Azerbajani Vocabulary
+#+AUTHOR: Karl Fredin
+#+DESCRIPTION: azerbajani vocabulary words
 
 
 

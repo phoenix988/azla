@@ -7,7 +7,7 @@ local theme = {
        label_correct        = '#A3BE8C',
        label_incorrect      = '#BF616A',
        label_fg             = '#B48EAD',
-    
+
 }
 
 

@@ -3,7 +3,7 @@ local Gtk               = lgi.require("Gtk", "4.0")
 local theme             = require("lua.theme.default")
 local theme             = theme.load()
 
-local css = {} 
+local css = {}
 
 css.provider = Gtk.CssProvider()
 

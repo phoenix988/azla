@@ -56,6 +56,10 @@ log() {
 
 # declares the main function
 main() {
+     
+     # Deletes install path
+     sudo rm -rf "$INSTALL_PATH"
+
      # Create the INSTALL_PATH if it doesn't exist
      [ -d "$INSTALL_PATH" ] || sudo mkdir "$INSTALL_PATH"
      

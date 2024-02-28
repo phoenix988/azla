@@ -1,6 +1,5 @@
-local wordlist = {}
 
-wordlist = {
+local wordlist = {
   {"aş", "head"           },
   {"Qulaq", "ear"         },
   {"Saç", "hair"          },

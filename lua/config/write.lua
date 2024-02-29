@@ -4,6 +4,7 @@ local load_config_custom = require("lua.loadConfig").load_config_custom
 -- Create empty table
 local M = {}
 
+-- Function to set the window size
 function M.window_size(customConfig, setting, config, fileExist)
 	-- Gets the width and height to set on the window
 	-- You can configure this in a config file

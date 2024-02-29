@@ -7,7 +7,7 @@ local file = require("lua.config.init")
 local loadConfig = require("lua.loadConfig").load_config_theme
 
 -- Sets custom config path
-local customConfig = file.customConfig
+local customConfig = file.config.custom
 
 local M = {}
 

@@ -75,7 +75,7 @@ local imagePath = setting_default.image
 local cacheFile = var.cacheFile
 
 -- Sets path to customConfig
-local customConfig = var.customConfig
+local customConfig = var.config.custom
 
 -- load cacheFile config
 local configPath = loadConfig(cacheFile)
@@ -108,7 +108,7 @@ end
 -- Creates the config array if the custom file exist
 if fileExist(customConfig) then
 	-- load custom config
-	local customPath = loadConfigCustom(customConfig) --Custom config exist
+	local customPath = loadConfigCustom(customConfig) -- Custom config exist
 else
 	-- sets empty array if it doesnt exist
 	local setting = {} --Custom config file doesn't exist

@@ -13,7 +13,7 @@ local file = require("lua.config.init")
 local array = require("lua.widgets.setting")
 
 -- Sets custom config path
-local customConfig = file.customConfig
+local customConfig = file.config.custom
 
 local M = {}
 

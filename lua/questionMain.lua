@@ -37,7 +37,7 @@ local imagePath = setting_default.image
 
 -- Cache file path
 local cacheFile = var.cacheFile
-local confFile = var.customConfig
+local confFile = var.config.custom
 
 -- load config
 local loadConfig = require("lua.loadConfig").load_config_custom

@@ -20,6 +20,8 @@ local restoreList = {
 label.text = {
   welcome = "Welcome to AZLA",
   last_text = "You reached the last question",
+  aze = "in Azerbajani ?",
+  eng = "in English ?",
 }
 
 -- Some labels used on the startup window

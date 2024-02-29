@@ -20,8 +20,8 @@ local var = require("lua.config.init")
 
 local M = {}
 
-local confPath = var.customConfig
-local confDir = var.confDir
+local confPath = var.config.custom
+local confDir = var.config.dir
 
 -- Function to convert rgb to hash values
 local function RGBToHash(red, green, blue)

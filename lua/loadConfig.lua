@@ -1,6 +1,7 @@
 local io      = require("io")
 
-function load_config(filename)
+-- Function to load the configuration file
+local function load_config(filename)
     local config = {}
     local file = io.open(filename, "r")
 
@@ -13,7 +14,8 @@ function load_config(filename)
     return config
 end
 
-function load_config_custom(filename)
+-- Function to load the custom configuration file
+local function load_config_custom(filename)
     local custom = {}
     local file = io.open(filename, "r")
 
@@ -26,7 +28,7 @@ function load_config_custom(filename)
     return custom
 end
 
-function load_config_theme(filename)
+local function load_config_theme(filename)
     local theme = {}
     local file = io.open(filename, "r")
 

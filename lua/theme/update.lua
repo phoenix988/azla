@@ -15,8 +15,8 @@ local treeView = require("lua.widgets.button.treeView")
 -- Imports string functions
 local list = require("lua.terminal.listFiles")
 
-local confPath = var.customConfig
-local confDir = var.confDir
+local confPath = var.config.custom
+local confDir = var.config.dir
 
 local M = {}
 

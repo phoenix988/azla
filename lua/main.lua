@@ -55,7 +55,7 @@ local currentDir = debug.getinfo(1, "S").source:sub(2)
 local currentDir = currentDir:match("(.*/)") or ""
 
 -- Variable to store word arrays
-local luaWordsPath = var.word_dir
+local luaWordsPath = var.wordDir
 local luaWordsModule = "lua.words"
 
 -- adds some variables to the wordItems table

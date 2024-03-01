@@ -21,14 +21,12 @@ local wordlist = {
    {"Böyük","Big"},
    {"Ucuz","Cheap"},
    {"bahalı","Expensive"},
-   {"Yaxın","Near"},
    {"Uzak","Far"},
    {"Qırmızı","Red"},
    {"Mavi","Blue"},
    {"Qoyu","Dark"},
    {"Açıq","Light"},
    {"Yaxın","Close"},
-   {"Uzaq","Distant"},
    {"Qeyri-adi","Unusual"},
 
  }

@@ -2,10 +2,6 @@
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
 local GLib = require("lgi").GLib
-local GObject = lgi.require("GObject", "2.0")
-local GdkPixbuf = lgi.require("GdkPixbuf")
-local lfs = require("lfs")
-local os = require("os")
 local theme = require("lua.theme.default")
 local update = require("lua.theme.update")
 local array = require("lua.widgets.setting")
@@ -36,8 +32,42 @@ local function RGBToHash(red, green, blue)
 	return hash
 end
 
+local function backAction(currentQuestion, question, window_alt, win, import, mainWin)
+	local json = require("lua.question.save")
+
+	-- Resets the variables that keep tracks of current
+	-- question and correct answers
+	question.correct = 0
+	question.incorrect = 0
+
+	question.jsonSettings.count_start = question.count_start
+
+	-- Make these variables empty to avoid stacking
+	question.label_correct = nil
+	question.label_incorrect = nil
+
+	window_alt.windowState = win:is_fullscreen()
+	window_alt.windowStateMax = win:is_maximized()
+
+	json.saveSession(question.jsonSettings)
+
+	question.jsonSettings = {}
+
+	-- resets current question
+	question.current = 0
+	currentQuestion = 1 -- Start from the first question
+
+	question.jsonSettings.lang = nil
+
+	import.setQuestion(currentQuestion)
+
+	win:destroy()
+	mainWin:activate()
+end
+
 -- Function for the question window
 function M.back_exit_create(currentQuestion, question, import, win, mainWin, replace, cacheFile, combo, window_alt)
+	-- Create back button
 	local backButton = Gtk.Button({ label = "Go Back", width_request = 300 })
 
 	-- Makes exit button to exit
@@ -46,8 +76,7 @@ function M.back_exit_create(currentQuestion, question, import, win, mainWin, rep
 	-- Defines the function of Exitbutton
 	-- Function for back button for the question window
 	function backButton:on_clicked()
-		local action = require("lua.widgets.button.backButton")
-		action.back(currentQuestion, question, window_alt, win, import, mainWin)
+		backAction(currentQuestion, question, window_alt, win, import, mainWin)
 	end
 
 	-- Function for exit button for the question window

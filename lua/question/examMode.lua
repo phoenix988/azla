@@ -6,13 +6,19 @@ local M = {}
 
 function M.exam(wordlist, widget, last, response, replace, list)
     -- Checks if you completed all questions
+    local amountComplete = 0
     for i = 1, last do
         local check = widget.entry_fields[i].text:lower()
         if string.match(check, "^%s*$") then
-            question.complete = false
+            local trash
         else
-            question.complete = true
+            amountComplete = amountComplete + 1
         end
+    end
+
+    -- Will skip the prompt if you did answer all questions
+    if amountComplete == last then
+        question.complete = true
     end
 
     for i = 1, last do

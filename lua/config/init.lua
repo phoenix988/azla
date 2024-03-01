@@ -2,8 +2,10 @@
 -- Values throught the app
 local os = require("os")
 
+-- Set home variable
 local home = os.getenv("HOME")
 
+-- Create empty tables
 local file = {}
 file.write = {}
 file.config = {}
@@ -12,13 +14,13 @@ file.config = {}
 file.cacheFile = home .. "/.cache/azla/conf.lua"
 file.cacheDir = home .. "/.cache/azla"
 
+-- Sets path to word files
+file.wordDir = "/opt/azla/lua/words"
+file.widgetDir = "/opt/azla/lua/widgets"
+
 -- Sets path to customConfig
 file.config.custom = home .. "/.config/azla/conf.lua"
 file.config.dir = home .. "/.config/azla"
-
--- Sets path to word files
-file.word_dir = "/opt/azla/lua/words"
-file.widget_dir = "/opt/azla/lua/widgets"
 
 -- Import some write functions
 file.write.cache = require("lua.config.cache").write_cache

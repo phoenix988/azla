@@ -28,6 +28,11 @@ question.current = 0
 -- keep track of questions
 local currentQuestion = 1
 
+
+local previous = nil
+local previousModel = nil
+local previousIter = nil
+
 -- check so you dont add unlimited checkmarks to the treeview
 local checkForMultiple = {}
 
@@ -46,15 +51,20 @@ function question.create_label(spans)
 end
 
 -- Update the treeview for the wordlist on the left side
-function question.update_tree(treeTable,w)
+function question.update_tree(treeTable, w)
 	for key, value in pairs(treeTable) do
 		local check = w.entry_fields[key].text:lower()
 		local check = string.gsub(check, "%s", "")
 		if check ~= nil and check ~= "" and string.match(check, "%S") then
 			local value = mainWordList[key][languageNumber_2] .. " ✓ "
+			local value = list.to_upper(value)
 			mainWordList[key][languageNumber_2] = value
+			wordview.listStore:append({ key .. " " .. value })
+		else
+			local value = mainWordList[key][languageNumber_2]
+			local value = list.to_upper(value)
+			wordview.listStore:append({ key .. " " .. value })
 		end
-		wordview.listStore:append({ key .. " " .. mainWordList[key][languageNumber_2] })
 	end
 end
 
@@ -421,7 +431,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			end
 		end
 
-		-- Define the callback function for the submit button
+        question.jsonSettings.entry = {}
+		
+        -- Define the callback function for the submit button
 		w.submit_buttons[i].on_clicked = function()
 			question.jsonSettings.count = i
 			-- Catch your choice
@@ -539,19 +551,44 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 	local selection = treeView:get_selection()
 
-	local treeFirst = true
+	-- Initialize variables to store previous tree selection
+	local previous = nil
+	local previousModel = nil
+	local previousIter = nil
+    local checkForMultiple = {}
+	
+    local treeFirst = true
 
 	-- Clear wordview
 	wordview.listStore:clear()
 
-
 	-- Add checkmark if the question is answered from previous session
-    question.update_tree(treeTable,w)
-	
-    -- action to run when you change the treeview
+	question.update_tree(treeTable, w)
+
+	-- action to run when you change the treeview
 	selection.on_changed:connect(function()
+		if previousModel and previousIter then
+			local value = previousModel:get_value(previousIter, 0) -- Assuming the value is in column 0
+			stringValue = value:get_string() -- Convert value to string
+			for key, value in pairs(w.entry_fields) do
+				local check = w.entry_fields[key].text:lower()
+				local check = string.gsub(check, "%s", "")
+				if checkForMultiple[key] == "1" then
+                     local trash
+				elseif check ~= nil and check ~= "" and string.match(check, "%S") then
+					previousModel:set(previousIter, { stringValue .. " ✓ " })
+                    check = nil
+				    checkForMultiple[key] = "1" 
+				end
+			end
+		end
+
+		local currentPath, currentIter = selection:get_selected()
+
 		local selection = treeView:get_selection()
 		local model, iter = selection:get_selected()
+		local selectedRows = selection.get_selected_rows
+
 		if model and iter then
 			local value = model:get_value(iter, 0) -- Assuming the value is in column 0
 			stringValue = value:get_string() -- Convert value to string
@@ -578,6 +615,11 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		end
 
 		treeFirst = false
+        
+        -- Updates previous value
+		previous = stringValue
+		previousModel, previousIter = model, iter
+
 	end)
 
 	-- Button to go back one question
@@ -605,7 +647,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		end
 	end
 
-	-- Define the callback function for the submit button in exam mode
+    question.complete = false
+	
+    -- Define the callback function for the submit button in exam mode
 	submitButton.on_clicked = function()
 		-- runs the exam mode evaluation on all your answers
 		local choice = question.mode.exam(mainWordList, w, question.last, response, replace, list)
@@ -650,28 +694,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		currentQuestion = switchQuestion(true, question, w, wg, bt)
 
 		current = currentQuestion
-        
-        -- current question
+
+		-- current question
 		question.count_start = current
-        
-        -- Clear the treeview
-		wordview.listStore:clear()
-        
-		for key, value in pairs(treeTable) do
-			local check = w.entry_fields[key].text:lower()
-			local check = string.gsub(check, "%s", "")
-			if check ~= nil and check ~= "" and string.match(check, "%S") then
-                if checkForMultiple[key] == "1" then
-                    -- Will do nothing if there is a checkmark already
-                    local trash
-				elseif key == current - 1 then
-					local value = mainWordList[key][languageNumber_2] .. " ✓ "
-					mainWordList[key][languageNumber_2] = value
-                    checkForMultiple[key] = "1"
-				end
-			end
-			wordview.listStore:append({ key .. " " .. mainWordList[key][languageNumber_2] })
-		end
 
 		-- Get the tree selection and set the default selection
 		local selection = treeView:get_selection()

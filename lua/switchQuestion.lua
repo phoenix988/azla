@@ -3,16 +3,15 @@
 -- Also declaring some buttons in this module
 --}}
 
-
 -- Imports of Libaries
-local lgi               = require("lgi")
-local Gtk               = lgi.require("Gtk", "4.0")
-local GObject           = lgi.require("GObject", "2.0")
-local gio               = require("lgi").Gio
-local lfs               = require("lfs")
-local os                = require("os")
-local theme             = require("lua.theme.default")
-local json              = require("lua.question.save")
+local lgi = require("lgi")
+local Gtk = lgi.require("Gtk", "4.0")
+local GObject = lgi.require("GObject", "2.0")
+local gio = require("lgi").Gio
+local lfs = require("lfs")
+local os = require("os")
+local theme = require("lua.theme.default")
+local json = require("lua.question.save")
 
 -- Sets the import table
 local import = {}
@@ -27,119 +26,127 @@ function import.setQuestion()
 end
 
 function import.loadLast(list)
-    currentQuestion = list.count_start
+   currentQuestion = list.count_start
 
-    return currentQuestion
+   return currentQuestion
 end
 
 -- Function so it switch question after you submit your answer
-function import.switchQuestion(next,question, 
-                               w,wg,bt)
-     local theme = require("lua.theme.default")
-     local font  = theme.font.load()
-     local theme = theme.load()
+function import.switchQuestion(next, question, w, wg, bt)
+   local theme = require("lua.theme.default")
+   local font = theme.font.load()
+   local theme = theme.load()
 
-     -- Imports active wordlist
-     local mainWindowModule = require("lua.main")
-     local getWordList = mainWindowModule.getWordList
-     local wordlist = getWordList()
-     local count = tonumber(wordlist.count)
+   -- Imports active wordlist
+   local mainWindowModule = require("lua.main")
+   local getWordList = mainWindowModule.getWordList
+   local wordlist = getWordList()
+   local count = tonumber(wordlist.count)
 
-
-     if next == true then
-        currentQuestion = currentQuestion + 1
-     elseif next == false then
-        if currentQuestion ~= 1 then
-           currentQuestion = currentQuestion - 1
-        end  
-     else 
-        currentQuestion = next
-     end
- 
-     local chosen_wordlist = #wordlist 
-     
-     -- Checks if the wordlist has less words than the count choice
-     -- If true then it will change the value of count
-     if chosen_wordlist < count then
-         count = chosen_wordlist
-     end
-     
-     -- Checks if your on the last question
-     if currentQuestion > count then
-        wg.labelEnd:set_visible(true)
-        wg.labelEnd:set_text("You reached the last question")
-        wg.labelEnd:set_markup("<span foreground='" .. theme.label_fg .. "'size='" .. font.welcome_size .. "'>" .. wg.labelEnd.label .. "</span>")
-        bt.again.restart:set_visible(true)
-        wg.labelEndCorrect:set_markup("<span foreground='" .. theme.label_correct .. "'>Correct: " .. question.correct .. "</span>")
-        wg.labelEndIncorrect:set_markup("<span foreground='" .. theme.label_incorrect .. "'>Incorrect: " .. question.incorrect .. "</span>")
-        bt.sum.summary:set_visible(true)
-        bt.last.back:set_margin_top(30)
-        wg.tree:set_visible(false)
-        
-        -- Only append pages to the notebook if there is labels to show
-        if question.label_correct ~= nil then
-            bt.notebook:append_page(bt.resultWindow1, Gtk.Label({ label = "Correct" }))
-        end
-
-        if question.label_incorrect ~= nil then
-            bt.notebook:append_page(bt.resultWindow2, Gtk.Label({ label = "Incorrect" }))
-        end
-
-     end
-     
-     -- Hide all question elements
-     --for i = 1, #wordlist do
-      for i = 1, math.min(#wordlist, count) do
-         w.question_labels[i]:set_visible(false)
-         w.entry_fields[i]:set_visible(false)
-         w.submit_buttons[i]:set_visible(false)
-         w.result_labels[i]:set_visible(false)
-         w.next_buttons[i]:set_visible(false)
-         w.current_labels[i]:set_visible(false)
+   if next == true then
+      currentQuestion = currentQuestion + 1
+   elseif next == false then
+      if currentQuestion ~= 1 then
+         currentQuestion = currentQuestion - 1
       end
-     
+   else
+      currentQuestion = next
+   end
 
-     if firstStart then
-        currentQuestion = wordlist.count_start
-        firstStart = false
-     end
-     
-     -- Show the active question elements
-     if w.question_labels[currentQuestion] ~= nil then 
-       w.question_labels[currentQuestion]:set_visible(true)
-     end
-     
-     if w.entry_fields[currentQuestion] ~= nil then 
-       w.entry_fields[currentQuestion]:set_visible(true)
-     end
+   local chosen_wordlist = #wordlist
 
-     if w.submit_buttons[currentQuestion] ~= nil then 
-       w.submit_buttons[currentQuestion]:set_visible(true)
-     end
+   -- Checks if the wordlist has less words than the count choice
+   -- If true then it will change the value of count
+   if chosen_wordlist < count then
+      count = chosen_wordlist
+   end
 
-     if w.result_labels[currentQuestion] ~= nil then 
-       local mode = require("lua.main").getWordList()
-       if mode.mode == false then
-          w.result_labels[currentQuestion]:set_visible(true)
-       end
-     end
+   -- Checks if your on the last question
+   if currentQuestion > count then
+      wg.labelEnd:set_visible(true)
+      wg.labelEnd:set_text("You reached the last question")
+      wg.labelEnd:set_markup(
+         "<span foreground='"
+         .. theme.label_fg
+         .. "'size='"
+         .. font.welcome_size
+         .. "'>"
+         .. wg.labelEnd.label
+         .. "</span>"
+      )
+      bt.again.restart:set_visible(true)
+      wg.labelEndCorrect:set_markup(
+         "<span foreground='" .. theme.label_correct .. "'>Correct: " .. question.correct .. "</span>"
+      )
+      wg.labelEndIncorrect:set_markup(
+         "<span foreground='" .. theme.label_incorrect .. "'>Incorrect: " .. question.incorrect .. "</span>"
+      )
+      bt.sum.summary:set_visible(true)
+      bt.last.back:set_margin_top(30)
+      wg.tree:set_visible(false)
 
-     if w.next_buttons[currentQuestion] ~= nil then 
-       if next == false or type(next) == "number" then
-          w.next_buttons[currentQuestion]:set_visible(true)
-       else
-          w.next_buttons[currentQuestion]:set_visible(false)
-       end
-     end
+      -- Only append pages to the notebook if there is labels to show
+      if question.label_correct ~= nil then
+         bt.notebook:append_page(bt.resultWindow1, Gtk.Label({ label = "Correct" }))
+      end
 
-     if w.current_labels[currentQuestion] ~= nil then 
-       w.current_labels[currentQuestion]:set_visible(false)
-     end
+      if question.label_incorrect ~= nil then
+         bt.notebook:append_page(bt.resultWindow2, Gtk.Label({ label = "Incorrect" }))
+      end
 
-     -- Return currentquestion variable
-     return currentQuestion
+   end
+
+   -- Hide all question elements
+   --for i = 1, #wordlist do
+   for i = 1, math.min(#wordlist, count) do
+      w.question_labels[i]:set_visible(false)
+      w.entry_fields[i]:set_visible(false)
+      w.submit_buttons[i]:set_visible(false)
+      w.result_labels[i]:set_visible(false)
+      w.next_buttons[i]:set_visible(false)
+      w.current_labels[i]:set_visible(false)
+   end
+
+   if firstStart then
+      currentQuestion = wordlist.count_start
+      firstStart = false
+   end
+
+   -- Show the active question elements
+   if w.question_labels[currentQuestion] ~= nil then
+      w.question_labels[currentQuestion]:set_visible(true)
+   end
+
+   if w.entry_fields[currentQuestion] ~= nil then
+      w.entry_fields[currentQuestion]:set_visible(true)
+   end
+
+   if w.submit_buttons[currentQuestion] ~= nil then
+      w.submit_buttons[currentQuestion]:set_visible(true)
+   end
+
+   if w.result_labels[currentQuestion] ~= nil then
+      local mode = require("lua.main").getWordList()
+      if mode.mode == false then
+         w.result_labels[currentQuestion]:set_visible(true)
+      end
+   end
+
+   if w.next_buttons[currentQuestion] ~= nil then
+      if next == false or type(next) == "number" then
+         w.next_buttons[currentQuestion]:set_visible(true)
+      else
+         w.next_buttons[currentQuestion]:set_visible(false)
+      end
+   end
+
+   if w.current_labels[currentQuestion] ~= nil then
+      w.current_labels[currentQuestion]:set_visible(false)
+   end
+
+   -- Return currentquestion variable
+   return currentQuestion
 end
-
 
 -- Returns the functions
 return import

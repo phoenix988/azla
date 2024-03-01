@@ -31,6 +31,7 @@ local wordlist = {
 	{ "Göndərmək", "To send" },
 	{ "Tanış olmaq", "To meet" },
 	{ "Görüşmək", "To meet up" },
+	{ "Eşitmək", "To hear" },
 	{ "hiss etmək", "feel" },
 }
 

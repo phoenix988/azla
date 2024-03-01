@@ -17,7 +17,6 @@ local wordlist = {
 	{ "Yeni", "New" },
 	{ "Qara", "Black" },
 	{ "Ağ", "White" },
-	{ "Əsas", "Main" },
 	{ "Böyük", "Big" },
 	{ "Ucuz", "Cheap" },
 	{ "bahalı", "Expensive" },

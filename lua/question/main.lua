@@ -28,7 +28,6 @@ question.current = 0
 -- keep track of questions
 local currentQuestion = 1
 
-
 local previous = nil
 local previousModel = nil
 local previousIter = nil
@@ -68,24 +67,24 @@ function question.update_tree(treeTable, w)
 	end
 end
 
--- Runs the function
+-- create the function for questions
 function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	-- Import labels
 	local label = require("lua.widgets.label")
-
-	question.jsonSettings = {}
-	question.jsonSettings.word = {}
-	question.jsonSettings.entry = {}
-	question.session_count = 1
 
 	-- Load the theme and font to use
 	local theme = require("lua.theme.default")
 	local font = theme.font.load()
 	local theme = theme.load()
-
+	
 	-- Gets the current mode of Azla
 	local mode = require("lua.main").getWordList()
 	question.mode = require("lua.question.examMode")
+    question.jsonSettings = {}
+	question.jsonSettings.word = {}
+	question.jsonSettings.entry = {}
+	question.session_count = 1
+
 
 	-- Making empty widgets
 	w.question_labels = {}
@@ -95,11 +94,13 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	w.entry_fields = {}
 	w.result_labels = {}
 	w.show_result_labels = {}
-
+    
+    -- Creating button for exam mode
 	local prevButton = Gtk.Button({ label = "Prev" })
 	local submitButton = Gtk.Button({ label = "Submit" })
 	local nextButton = Gtk.Button({ label = "Next" })
-
+    
+    -- Set theme for the buttons
 	local prevButton = style.set_theme(prevButton, {
 		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
 	})
@@ -230,8 +231,14 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		question.current = question.current + 1
 		question.last = i
 
-		-- Gets the correct answer and stores it in a variable
-		local correct = string.lower(mainWordList[i][languageNumber_1])
+		-- Make sure special characters also converts so lowercase
+		local correct = replace.lower_case(mainWordList[i][languageNumber_1])
+
+		---- Gets the correct answer and stores it in a variable
+		if correct == nil then
+			correct = string.lower(mainWordList[i][languageNumber_1])
+		end
+
 		local word = mainWordList[i][languageNumber_2]
 		local word = list.to_upper(word)
 		-- Make a json setting table and write all the words to it
@@ -401,6 +408,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 					-- Remove trailing spaces
 					local key = string.gsub(key, "%s*$", "")
+
 					if not mode.mode then
 						if key == correct then
 							opt = "correct"
@@ -431,9 +439,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			end
 		end
 
-        question.jsonSettings.entry = {}
-		
-        -- Define the callback function for the submit button
+		question.jsonSettings.entry = {}
+
+		-- Define the callback function for the submit button
 		w.submit_buttons[i].on_clicked = function()
 			question.jsonSettings.count = i
 			-- Catch your choice
@@ -460,6 +468,16 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			local correctLabel = response.correctLabel
 			local incorrectString = response.incorrectString
 			local incorrectLabel = response.incorrectLabel
+
+		    -- Make sure special characters also converts so lowercase
+		    local checkChoice = replace.lower_case(choice)
+
+		    ---- Gets the correct answer and stores it in a variable
+		    if checkChoice == nil then
+		    	choice = string.lower(choice)
+            else   
+		    	choice = string.lower(checkChoice)
+		    end
 
 			-- Evaluates if answer is correct
 			if choice == correct then
@@ -555,9 +573,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	local previous = nil
 	local previousModel = nil
 	local previousIter = nil
-    local checkForMultiple = {}
-	
-    local treeFirst = true
+	local checkForMultiple = {}
+
+	local treeFirst = true
 
 	-- Clear wordview
 	wordview.listStore:clear()
@@ -574,11 +592,11 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 				local check = w.entry_fields[key].text:lower()
 				local check = string.gsub(check, "%s", "")
 				if checkForMultiple[key] == "1" then
-                     local trash
+					local trash
 				elseif check ~= nil and check ~= "" and string.match(check, "%S") then
 					previousModel:set(previousIter, { stringValue .. " ✓ " })
-                    check = nil
-				    checkForMultiple[key] = "1" 
+					check = nil
+					checkForMultiple[key] = "1"
 				end
 			end
 		end
@@ -615,11 +633,10 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		end
 
 		treeFirst = false
-        
-        -- Updates previous value
+
+		-- Updates previous value
 		previous = stringValue
 		previousModel, previousIter = model, iter
-
 	end)
 
 	-- Button to go back one question
@@ -647,16 +664,16 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		end
 	end
 
-    question.complete = false
-	
-    -- Define the callback function for the submit button in exam mode
+	question.complete = false
+
+	-- Define the callback function for the submit button in exam mode
 	submitButton.on_clicked = function()
-		-- runs the exam mode evaluation on all your answers
-		local choice = question.mode.exam(mainWordList, w, question.last, response, replace, list)
+		local pop = require("lua.question.popups")
+
+		question.mode.lastChance(w, question, question.last)
 
 		-- Will run if you didn't complete all questions
 		if question.complete == false then
-			local pop = require("lua.question.popups")
 			currentQuestion = pop.are_you_sure(
 				currentQuestion,
 				switchQuestion,
@@ -678,6 +695,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 				submitButton:set_visible(false)
 			end
 		end
+
+		-- runs the exam mode evaluation on all your answers
+		local choice = question.mode.exam(mainWordList, w, question.last, response, replace, list)
 
 		question.jsonSettings = {}
 		json.saveSession(question.jsonSettings)

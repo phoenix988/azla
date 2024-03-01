@@ -4,7 +4,7 @@ local theme = themeModule.load()
 
 local M = {}
 
-function M.exam(wordlist, widget, last, response, replace, list)
+function M.lastChance(widget, question, last)
     -- Checks if you completed all questions
     local amountComplete = 0
     for i = 1, last do
@@ -20,7 +20,9 @@ function M.exam(wordlist, widget, last, response, replace, list)
     if amountComplete == last then
         question.complete = true
     end
+end
 
+function M.exam(wordlist, widget, last, response, replace, list)
     for i = 1, last do
         local correct = string.lower(wordlist[i][languageNumber_1])
         local word = wordlist[i][languageNumber_2]

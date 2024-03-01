@@ -16,6 +16,7 @@ file.cacheDir = home .. "/.cache/azla"
 
 -- Sets path to word files
 file.wordDir = "/opt/azla/lua/words"
+file.wordMod = "lua.words"
 file.widgetDir = "/opt/azla/lua/widgets"
 
 -- Sets path to customConfig
@@ -24,6 +25,6 @@ file.config.dir = home .. "/.config/azla"
 
 -- Import some write functions
 file.write.cache = require("lua.config.cache").write_cache
-file.write.config = require("lua.config.write").write
+file.write.config = require("lua.config.write").write_config
 
 return file

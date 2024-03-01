@@ -34,6 +34,10 @@ p.terminal = false
 local cacheDir = var.cacheDir
 local cacheFile = var.cacheFile
 
+-- Gets word module path
+local wordMod = var.wordMod
+
+-- Import mkdir function
 local mkdir = require("lua.terminal.mkdir").mkdir
 
 -- Create the cache file if it doesn't exist
@@ -53,7 +57,7 @@ end
 
 -- set luawords path
 local luaWordsPath = currentDir .. "lua/words/"
-local luaWordsModule = "lua.words"
+local luaWordsModule = wordMod
 
 -- Process the switches
 p.processSwitches(luaWordsPath, luaWordsModule)

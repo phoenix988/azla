@@ -10,7 +10,7 @@ local wordlist = {
 	{ "Getmək", "To go" },
 	{ "Gəlmək", "To come" },
 	{ "Işlemək", "To work" },
-	{ "Səyahət etmək", "to travel" },
+	{ "Səyahət etmək", "To travel" },
 	{ "Öyrənmək", "To learn" },
 	{ "Oxumaq", "To read" },
 	{ "Yemək", "To eat" },
@@ -43,6 +43,7 @@ local wordlist = {
 	{ "Göndərmək", "To send" },
 	{ "Tanış olmaq", "To meet" },
 	{ "Görüşmək", "To meet up" },
+	{ "Xatırlamaq", "To remeber" },
 	{ "Zarafat etmək", "i am joking" },
 }
 

@@ -305,12 +305,20 @@ function M.summary_create(grid1, grid2, wg, box)
 	-- Create click action on summaryButton
 	function summaryButton:on_clicked()
 		-- Imports some modules
-		local clear = require("lua.clear_grid")
 		local show = require("lua.summary.show")
+        
+		-- function to clear grid
+		local function clear(grid)
+			local child = grid:get_last_child()
+			while child do
+				grid:remove(child)
+				child = grid:get_last_child()
+			end
+		end
 
 		-- clears the grid
-		clear.grid(grid1)
-		clear.grid(grid2)
+		clear(grid1)
+		clear(grid2)
 
 		-- shows the summary labels
 		show.summary(question, grid1, grid2, theme)

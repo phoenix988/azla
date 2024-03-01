@@ -24,16 +24,17 @@ local create_image = require("lua.createImage").create_image
 local create_app2 = require("lua.questionMain").create_app2
 
 -- import widgets and create a table
-local wc = require("lua.widgets.init")
+local import_widgets = require("lua.widgets.init")
+
+-- Create widget list table
 local widget_list = {}
 
--- Imports Config function
+-- Imports Config function that will load config files
 local loadConfig = require("lua.loadConfig").load_config
 local loadConfigCustom = require("lua.loadConfig").load_config_custom
 
--- Imports fileexist module
-local fileExistModule = require("lua.fileExist")
-local fileExist = fileExistModule.fileExists
+-- Imports filexist module
+local fileExist = require("lua.fileExist").fileExists
 
 -- Import list function
 local list = require("lua.terminal.listFiles")
@@ -56,7 +57,7 @@ local currentDir = currentDir:match("(.*/)") or ""
 
 -- Variable to store word arrays
 local luaWordsPath = var.wordDir
-local luaWordsModule = "lua.words"
+local luaWordsModule = var.wordMod
 
 -- adds some variables to the wordItems table
 local wordItems = {
@@ -96,13 +97,13 @@ local appTitle = "Azla"
 local app1 = Gtk.Application({ application_id = appID1 })
 
 -- Make a table of all widgets
-for key, _ in pairs(wc) do
+for key, _ in pairs(import_widgets) do
 	table.insert(widget_list, key)
 end
 
 -- Loops through them and shortens the name
 for _, value in ipairs(widget_list) do
-	_G[value] = wc[value]
+	_G[value] = import_widgets[value]
 end
 
 -- Creates the config array if the custom file exist
@@ -400,8 +401,8 @@ function app1:on_startup()
 	widget.box_theme_main:append(label.theme)
 
 	-- Create listBox
-	local listBox = wc.listBox:create()
-	local listTree = wc.listBox:create_tree()
+	local listBox = import_widgets.listBox:create()
+	local listTree = import_widgets.listBox:create_tree()
 
 	local schemeGrid = grid.main_create()
 

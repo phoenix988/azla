@@ -161,4 +161,4 @@ function M.color_scheme(replacement, path)
 end
 
 -- Returns all variables
-return { write = M }
+return { write_config = M }

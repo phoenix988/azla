@@ -7,5 +7,5 @@ local colors = {
        }
 
 return colors
-  
+
 

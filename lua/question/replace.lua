@@ -1,4 +1,5 @@
 -- functions that replace special azerbajani letters with english in my language app
+local utf8 = require("lua-utf8")
 
 -- creates empty table
 local word = {}
@@ -29,52 +30,6 @@ function word.replace_letter(word, letters, replace)
     end
 
     return update
-end
-
--- Function to set special letters to lowercase
--- Which is not detected by lower method
-function word.lower_case(word)
-    -- Function that replace the letters
-    -- Will be called inside the main function
-
-    -- local function to replace letters
-    local function replace_letter(word, letters, replace)
-        local catch = string.match(word, letters)
-
-        if catch ~= nil then
-            update = string.gsub(word, letters, replace)
-            -- returns all to lowercase
-            update = string.lower(update)
-        end
-
-        return update
-    end
-
-    -- List of letters
-    local list = {}
-    list.U = { { "Ü", "ü" } }
-    list.S = { { "Ş", "ş" } }
-    list.C = { { "Ç", "ç" } }
-    list.O = { { "Ö", "ö" } }
-    list.G = { { "Ğ", "ğ" } }
-    list.I = { { "I", "ı" } }
-    list.E = { { "Ə", "ə" } }
-
-    -- loops through all the letter tables
-    for key, value in pairs(list) do
-        for i = 1, #list[key] do
-            local match = string.match(word, list[key][i][1])
-            local replace = list[key][i][2]
-            if match ~= nil then
-                local update = replace_letter(word, match, replace)
-                return update
-            else
-                local noChange = string.lower(word)
-            end
-        end
-    end
-
-
 end
 
 -- main function to run in order to loop through the word
@@ -109,30 +64,38 @@ function word.replace_main(words)
     return myTable
 end
 
-function word.count(words)
-    local letter = word.letters()
-    local count = 0
-    local searchPosition = 1
-    local myTable = {}
+-- Updated function to generate all kind of variations of letters
+-- Containing special letters not in english alphabet
+function word.generate_word(word)
+    local special_characters = {
+        ['ə'] = {'e', 'ə'},
+        ['ü'] = {'u', 'ü'},
+        ['ö'] = {'o', 'ö'},
+        ['ı'] = {'i', 'ı'},
+        ['ç'] = {'c', 'ç'},
+        ['ğ'] = {'g', 'ğ'},
+        ['ş'] = {'s', 'ş'}
+    }
 
-    for _, value in pairs(letter) do
-        for i = 1, #value do
-            while true do
-                local foundPosition = string.find(words, value[i][1], searchPosition, true)
-                if foundPosition then
-                    count = count + 1
-                    searchPosition = foundPosition + 1
-                else
-                    myTable[value[i][2]] = count
-                    count = 0
-                    searchPosition = 1
-                    break
+    local function replace_char_at_index(str, index, char)
+        return utf8.sub(str, 1, index - 1) .. char .. utf8.sub(str, index + 1)
+    end
+
+    local variations = {word}
+    for i = 1, #word do
+        local char = utf8.sub(word, i, i)
+        if special_characters[char] then
+            local new_variations = {}
+            for _, alternative in ipairs(special_characters[char]) do
+                for _, variation in ipairs(variations) do
+                    table.insert(new_variations, replace_char_at_index(variation, i, alternative))
                 end
             end
+            variations = new_variations
         end
     end
 
-    return myTable
+    return variations
 end
 
 return word

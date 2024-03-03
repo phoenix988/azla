@@ -16,23 +16,23 @@ local style = require("lua.widgets.setting")
 local wordview = require("lua.widgets.button.questionView")
 local json = require("lua.question.save")
 
+-- Set count variable to keep track of
 local count = 0
 
+-- Create empty table to store important vairables
 question = {}
 
--- Counts correct answer to export
+-- Counts correct answer to export and current
 question.correct = 0
 question.incorrect = 0
 question.current = 0
 
--- keep track of questions
-local currentQuestion = 1
-
+-- Variables to store previous tree selection
 local previous = nil
 local previousModel = nil
 local previousIter = nil
 
--- check so you dont add unlimited checkmarks to the treeview
+-- Check so you dont add unlimited checkmarks to the treeview
 local checkForMultiple = {}
 
 -- Function to create a label with multiple span sections
@@ -232,7 +232,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		question.last = i
 
 		-- Make sure special characters also converts so lowercase
-		local correct = replace.lower_case(mainWordList[i][languageNumber_1])
+		local correct = list.lower_case(mainWordList[i][languageNumber_1])
 
 		---- Gets the correct answer and stores it in a variable
 		if correct == nil then
@@ -401,7 +401,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 					local incorrectLabel = response.incorrectLabel
 
 					-- Alternative correct answer
-					local altCorrect = replace.replace_main(correct)
+					local altCorrect = replace.generate_word(correct)
 
 					-- Remove leading spaces
 					local key = string.gsub(key, "^%s*", "")
@@ -414,7 +414,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 							opt = "correct"
 							correct_answers = response.main(opt, correctString, w, i, correctLabel, choice, theme)
 						else
-							for _, value in pairs(altCorrect) do
+							for _, value in ipairs(altCorrect) do
 								if value == key then
 									opt = "correct"
 									response.main(opt, correctStringAlt, w, i, correctLabel, choice, theme)
@@ -456,7 +456,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			question.jsonSettings.entry[choice] = i
 
 			-- Alternative correct answer
-			local altCorrect = replace.replace_main(correct)
+			local altCorrect = replace.generate_word(correct)
 
 			-- sets dont run variable
 			local dontRun = false
@@ -470,7 +470,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			local incorrectLabel = response.incorrectLabel
 
 		    -- Make sure special characters also converts so lowercase
-		    local checkChoice = replace.lower_case(choice)
+		    local checkChoice = list.lower_case(choice)
 
 		    ---- Gets the correct answer and stores it in a variable
 		    if checkChoice == nil then
@@ -478,7 +478,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
             else   
 		    	choice = string.lower(checkChoice)
 		    end
-
+            
 			-- Evaluates if answer is correct
 			if choice == correct then
 				-- runs the function
@@ -669,7 +669,6 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	-- Define the callback function for the submit button in exam mode
 	submitButton.on_clicked = function()
 		local pop = require("lua.question.popups")
-
 		question.mode.lastChance(w, question, question.last)
 
 		-- Will run if you didn't complete all questions

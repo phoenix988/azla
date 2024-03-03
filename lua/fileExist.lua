@@ -12,5 +12,4 @@ function fileExists(filename)
   end
 end
 
-return {fileExists = fileExists}
-
+return { fileExists = fileExists }

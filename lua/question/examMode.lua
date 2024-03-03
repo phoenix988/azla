@@ -31,7 +31,7 @@ function M.exam(wordlist, widget, last, response, replace, list)
         local choice = widget.entry_fields[i].text:lower()
 
         -- Alternative correct answer
-        local altCorrect = replace.replace_main(correct)
+        local altCorrect = replace.generate_word(correct)
 
         -- sets dont run variable
         local dontRun = false
@@ -51,7 +51,7 @@ function M.exam(wordlist, widget, last, response, replace, list)
             local opt = "correct"
             correct_answers = response.main(opt, correctString, widget, i, correctLabel, choice, theme)
         else
-            for key, value in pairs(altCorrect) do
+            for key, value in ipairs(altCorrect) do
                 if value == choice then
                     -- runs the function
                     local opt = "correct"

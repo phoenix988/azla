@@ -32,7 +32,7 @@ local wordlist = {
 	{ "Tanış olmaq", "To meet" },
 	{ "Görüşmək", "To meet up" },
 	{ "Eşitmək", "To hear" },
-	{ "hiss etmək", "feel" },
+	{ "Hiss etmək", "feel" },
 }
 
 return wordlist

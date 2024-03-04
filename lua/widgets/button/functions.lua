@@ -49,6 +49,8 @@ local function backAction(currentQuestion, question, window_alt, win, import, ma
 	window_alt.windowState = win:is_fullscreen()
 	window_alt.windowStateMax = win:is_maximized()
 
+	local settings = json.loadSession()
+
 	json.saveSession(question.jsonSettings)
 
 	question.jsonSettings = {}
@@ -306,7 +308,7 @@ function M.summary_create(grid1, grid2, wg, box)
 	function summaryButton:on_clicked()
 		-- Imports some modules
 		local show = require("lua.summary.show")
-        
+
 		-- function to clear grid
 		local function clear(grid)
 			local child = grid:get_last_child()

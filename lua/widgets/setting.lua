@@ -273,7 +273,7 @@ function array.font_table(theme, font)
             array.theme_labels[key] = Gtk.SpinButton({
                 adjustment = Gtk.Adjustment({ lower = 0, upper = 100, step_increment = 1 }),
                 digits = 0,
-                margin_top = 50,
+                margin_top = 100,
                 halign = Gtk.Align.CENTER,
             })
 

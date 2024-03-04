@@ -11,7 +11,7 @@ function M.first_question()
 	local window = getDim()
 
 	-- Gets the posistion of the main window
-	local windowX, windowY = getCenterPosition(window.main)
+	--local windowX, windowY = getCenterPosition(window.main)
 
 	local dialog = Gtk.MessageDialog({
 		message_type = Gtk.MessageType.INFO,
@@ -26,7 +26,7 @@ function M.first_question()
 	end
 
 	-- Calculate the center position of the dialog box
-	local dialogX, dialogY = getCenterPosition(dialog)
+	--local dialogX, dialogY = getCenterPosition(dialog)
 
 	-- Move the dialog box to the new position
 	dialog:set_transient_for(window.main)

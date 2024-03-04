@@ -244,25 +244,12 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		-- Make a json setting table and write all the words to it
 		-- If you choose english option
 		if wordlist.lang == "english" then
-			if question.session_count == 1 then
 				question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
 				question.session_count = question.session_count + 1
-			elseif question.session_count == 2 then
-				question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
-				question.session_count = 1
-			end
 		-- If you choose azerbajani option
 		elseif wordlist.lang == "azerbajani" then
-			mainWordList[i][1] = mainWordList[i][2]
-			if question.session_count == 1 then
-				mainWordList[i][2], mainWordList[i][1] = mainWordList[i][1], mainWordList[i][2]
 				question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
 				question.session_count = question.session_count + 1
-			elseif question.session_count == 2 then
-				mainWordList[i][1], mainWordList[i][2] = mainWordList[i][2], mainWordList[i][1]
-				question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
-				question.session_count = 1
-			end
 		-- Make sure that it write to the json file correctly
 		-- otherwise the restore button will restore the words in the wrong order
 		else
@@ -388,7 +375,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 		w.show_result_labels[i] = Gtk.Label({ visible = false })
 
-		-- Create entry box text if you restore session
+		question.jsonSettings.entry = {}
+		
+        -- Create entry box text if you restore session
 		if wordlist.words then
 			for key, value in pairs(wordlist.entry) do
 				local altCorrectRun = false
@@ -427,19 +416,20 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 							opt = "incorrect"
 							incorrect_answers = response.main(opt, incorrectString, w, i, incorrectLabel, choice, theme)
 						end
+
+
 					end
 					w.entry_fields[i]:set_text(key)
 					question.jsonSettings.entry[key] = value
-
-					if not mode.mode then
+                    wordlist.entry[key] = value
+					
+                    if not mode.mode then
 						w.entry_fields[i]:set_editable(false)
 					end
 					break
 				end
 			end
 		end
-
-		question.jsonSettings.entry = {}
 
 		-- Define the callback function for the submit button
 		w.submit_buttons[i].on_clicked = function()

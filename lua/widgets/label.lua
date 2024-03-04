@@ -29,7 +29,7 @@ function label.text.create_response(opt)
 
 	M.correctString = "Congratulations, your answer is Corrrect!!!"
 	M.correctStringAlt = "Great Try!, \nyour answer is partially correct!, \nCorrect: " .. opt.correct
-	M.correctLabel = "Question: " .. opt.word .. ": " .. "Answer: " .. opt.choice
+	M.correctLabel = "Question: " .. opt.word .. "\n " .. "Answer: " .. opt.choice .. "\n"
 	M.incorrectString = "Sorry, your answer is incorrect.\nQuestion: "
 		.. opt.word
 		.. "\nCorrect answer: "

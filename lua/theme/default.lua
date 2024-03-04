@@ -124,7 +124,7 @@ function M.color_scheme(treeView, write, update)
 			.. label.current_color_scheme.label
 			.. "</span>"
 	)
-
+        
 	local status = write.write.config.color_scheme('color_scheme = "' .. stringValue .. '"\n', customConfig)
 
 	local theme = M.load()

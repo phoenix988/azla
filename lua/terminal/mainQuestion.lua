@@ -116,7 +116,7 @@ function question_main(wordlist, colors, language, word_count)
         local choice = choice:lower()
 
         -- Sets alternative correct answer
-        local altCorrect = replace.replace_main(correct)
+        local altCorrect = replace.generate_word(correct)
 
         -- Sets variable that will be set to true if your anser matches
         -- altCorrect

@@ -14,6 +14,7 @@ local array = {}
 array.theme_labels = {}
 array.theme_labels_setting = {}
 array.setting_labels = {}
+array.restore_button = {}
 
 
 -- Function to convert hash to Gdk.RGBA color
@@ -106,6 +107,7 @@ function array.theme_table(theme, font)
     local button = require("lua.widgets.button")
     local update = require("lua.theme.update")
     local restoreButton = button.reset_create()
+    array.restore_button.theme = restoreButton
 
     -- Creates empty tables
     local theme_table = {}
@@ -167,7 +169,7 @@ function array.theme_table(theme, font)
     function restoreButton:on_clicked()
         update.restore("theme")
     end
-
+    
     return widget
 end
 
@@ -177,6 +179,7 @@ function array.setting_table(theme, font)
     local button = require("lua.widgets.button")
     local update = require("lua.theme.update")
     local restoreButton = button.reset_create()
+    array.restore_button.setting = restoreButton
 
     local setting_table = {}
     for key in pairs(setting_default) do
@@ -229,13 +232,14 @@ function array.setting_table(theme, font)
     function restoreButton:on_clicked()
         update.restore("setting")
     end
-
+    
     return widget
 end
 
 function array.font_table(theme, font)
     local update = require("lua.theme.update")
     local restoreButton = button.reset_create()
+    array.restore_button.font = restoreButton
 
     local fontTable = {}
 
@@ -302,10 +306,11 @@ function array.font_table(theme, font)
     widget.box_theme_alt:append(label.theme_restore.font)
     widget.box_theme_alt:append(restoreButton)
 
+    
     function restoreButton:on_clicked()
         update.restore("font")
     end
-
+    
     return widget
 end
 

@@ -11,11 +11,18 @@ local response = {}
 
 function response.labels(correct, choice, word)
 	local label = require("lua.widgets.label")
+    -- converts first letter of correct and choice tp uppercase
     local correctTemp = correct
 	local correct = list.lower_case(correct, 2)
+    local choiceTemp = choice
+	local choice = list.lower_case(choice, 2)
     
     if correct == nil then
 	    correct = list.to_upper(correctTemp)
+    end
+    
+    if choice == nil then
+	    choice = list.to_upper(choiceTemp)
     end
 
 	local text = {}
@@ -35,6 +42,7 @@ function response.labels(correct, choice, word)
 	return response
 end
 
+-- Function to create the labels to print for every answer
 function response.main(opt, labels, w, i, answer_result, choice, theme)
 	local mode = require("lua.main").getWordList()
 

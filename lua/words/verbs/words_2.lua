@@ -8,7 +8,7 @@ local wordlist = {
 	{ "Görmək", "To see" },
 	{ "Oynamaq", "To play" },
 	{ "Oyanmaq", "To wake up" },
-	{ "Dincəlmeq", "To rest" },
+	{ "Dincəlmək", "To rest" },
 	{ "Almaq", "To buy" },
 	{ "Bilmək", "To know" },
 	{ "Yumaq", "To wash" },

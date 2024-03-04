@@ -7,7 +7,7 @@ local gio = require("lgi").Gio
 local lfs = require("lfs")
 local os = require("os")
 
--- Import theme
+-- Import theme and settings
 local theme = require("lua.theme.default")
 local setting_default = require("lua.theme.setting")
 local setting_default = setting_default.load()
@@ -67,11 +67,12 @@ local wc = require("lua.widgets.init")
 local widget_list = {}
 local window_alt = {}
 
+-- Import all lua files under lua/widgets
 for key, _ in pairs(wc) do
 	table.insert(widget_list, key)
 end
 
--- Loops through them
+-- Loops through them and add to wc table
 for _, value in ipairs(widget_list) do
 	_G[value] = wc[value]
 end
@@ -79,7 +80,8 @@ end
 -- Creates empty table to make some widgets
 local w = {}
 
--- Function to create the app
+-- Function to create the app window
+-- For the question sectioon of the app
 local function create_app2()
 	-- Create the application object
 	local app2 = Gtk.Application({
@@ -94,6 +96,8 @@ local function create_app2()
 		local mode = require("lua.main").getWordList()
 		local getWordList = mainWindowModule.getWordList
 		local getDim = mainWindowModule.getWindowDim
+		
+		-- Get windoow Dimensions
 		local window = getDim()
 
 		-- Load theme everytime you launch this app
@@ -111,7 +115,8 @@ local function create_app2()
 			decorated = true,
 			deletable = true,
 		})
-
+        
+		-- Create azlaLabel
 		local azlaLabel = Gtk.Label({ label = "AZLA", margin_bottom = 30 })
 		style.set_theme(
 			azlaLabel,

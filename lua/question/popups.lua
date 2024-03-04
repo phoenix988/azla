@@ -83,19 +83,29 @@ function M.are_you_sure(
 		})
 
 		-- Create a label with the prompt message
-		local label = Gtk.Label({
-			label = "You didn't answer all questions,\n Are you sure you want to continue ?",
-			margin_top = 8,
-			margin_bottom = 20,
-		})
+		if question.complete then
+			M.label = Gtk.Label({
+				label = "You Are done,\n Are you sure you want to continue ?",
+				margin_top = 8,
+				margin_bottom = 20,
+			})
+
+		else
+			M.label = Gtk.Label({
+				label = "You didn't answer all questions,\n Are you sure you want to continue ?",
+				margin_top = 8,
+				margin_bottom = 20,
+			})
+
+		end
 
 		style.set_theme(
-			label,
+			M.label,
 			{ { color = theme.label_fg, border_color = theme.label_fg, size = font.fg_size / 1000 } }
 		)
 
 		-- Add the label to the box container
-		box:append(label)
+		box:append(M.label)
 
 		-- Create a Gtk button box
 		local buttonBox = Gtk.Box({
@@ -115,8 +125,7 @@ function M.are_you_sure(
 			print("User confirmed.")
 
 			qurrentQuestion =
-			    buttonYesAction(currentQuestion, switchQuestion, question, prevButton, submitButton, w, wg,
-				    bt)
+				buttonYesAction(currentQuestion, switchQuestion, question, prevButton, submitButton, w, wg, bt)
 
 			-- Close the window
 			window:close()

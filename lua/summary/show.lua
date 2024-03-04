@@ -85,7 +85,6 @@ function show.summary(question, grid, grid2, theme)
         for key, value in pairs(question.label_incorrect) do
             -- Counts how many times it runs
             count = count + 1
-
             if type(key) == "number" then
                 -- Calculate the number of rows and columns
                 local numRows = math.ceil(count / 1)

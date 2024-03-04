@@ -14,7 +14,8 @@ M.colorSchemes = {
    "Dracula",
    "Iceberg",
    "Nord",
-   "Tokyo-night",
+   "Tokyo_night",
+   "Rose_pine",
 }
 
 -- Gets active colorscheme if its set
@@ -30,6 +31,10 @@ else
    defaultIndex = 1
 end
 
+-- Fail switch if you choose a theme that doesn't exist
+if defaultIndex == nil then
+   defaultIndex = 1
+end
 -- Create a list box 
 function M:create()
    local listBox = Gtk.ListBox()

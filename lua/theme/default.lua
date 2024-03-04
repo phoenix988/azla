@@ -60,8 +60,12 @@ function M.load()
 		local theme = require("lua.theme.colorschemes.nord")
 
 		return theme
-	elseif color_scheme == "Tokyo-night" or color_scheme == "tokyo-night" then
-		local theme = require("lua.theme.colorschemes.tokyo-night")
+	elseif color_scheme == "Tokyo_night" or color_scheme == "tokyo_night" then
+		local theme = require("lua.theme.colorschemes.tokyo_night")
+
+		return theme
+	elseif color_scheme == "Rose_pine" or color_scheme == "rose_pine" then
+		local theme = require("lua.theme.colorschemes.rose_pine")
 
 		return theme
 	elseif color_scheme == "Custom" or color_scheme == "custom" or not color_scheme then
@@ -92,7 +96,7 @@ function M.load()
 
 		return theme
     else
-		local theme = require("lua.theme.colorschemes.tokyo-night")
+		local theme = require("lua.theme.colorschemes.tokyo_night")
 
 		return theme
     end

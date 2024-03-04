@@ -187,7 +187,7 @@ function app1:on_startup()
 		custom = customConfig,
 		fileExist = fileExist,
 	}
-
+    
 	-- Create all the combo words values on launch
 	-- Creates the class instances
 	combo.set = combo:new(input)
@@ -228,11 +228,11 @@ function app1:on_startup()
 
 		if n == 0 then
 			-- Determines which languages to use
-			-- Will use azerbajani
+			-- Will use azerbajani export the var
 			exportLanguageChoice = "azerbajani"
 		elseif n == 1 then
 			-- Determines which languages to use
-			-- Will use english
+			-- Will use english and export the var
 			exportLanguageChoice = "english"
 		end
 
@@ -328,7 +328,7 @@ function app1:on_startup()
 	-- Exports the default language option on startup
 	local lang_value = combo.lang:get_active()
 
-	-- Sets language option
+	-- Sets language option on startup
 	if lang_value == 0 then
 		exportLanguageChoice = "azerbajani"
 	elseif lang_value == 1 then
@@ -337,19 +337,22 @@ function app1:on_startup()
 
 	--Combo --END
 
-	-- Returns som settings start
+	-- Returns some settings start
 	-- Gets the active items in the combo boxes
 	-- And stores it in settings just so we dont get errors
 	-- Sometimes I got some errors when Launching the app
 	-- If I didn't set these
+	-- settings start
 	settings = {}
+	
+	-- adds the active wordlist and stores it in settings table
 	settings.word = combo.word:get_active()
+	-- adds the active lang and stores it in settings table
 	settings.lang = combo.lang:get_active()
 	settings.comboWord = comboWord
 
 	-- adds the active word_count and stores it in settings
 	settings.word_count = combo.word_count:get_active()
-
 	-- settings end
 
 	-- Sets function to run when you click the exit button
@@ -440,6 +443,7 @@ function app1:on_startup()
 	-- Create default setting empty boxes
 	local list2 = array.setting_table(theme, font)
 
+	-- Create font setting boxes
 	local list3 = array.font_table(theme, font)
 
 	-- Create a scrolled window

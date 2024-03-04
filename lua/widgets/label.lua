@@ -27,8 +27,8 @@ label.text = {
 function label.text.create_response(opt)
 	local M = {}
 
-	M.correctString = "Congratulations, your answer is correct!"
-	M.correctStringAlt = "Great Try!, \nyour answer is partially correct!, \ncorrect: " .. opt.correct
+	M.correctString = "Congratulations, your answer is Corrrect!!!"
+	M.correctStringAlt = "Great Try!, \nyour answer is partially correct!, \nCorrect: " .. opt.correct
 	M.correctLabel = "Question: " .. opt.word .. ": " .. "Answer: " .. opt.choice
 	M.incorrectString = "Sorry, your answer is incorrect.\nQuestion: "
 		.. opt.word
@@ -38,7 +38,7 @@ function label.text.create_response(opt)
 		.. opt.word
 		.. "\nCorrect: "
 		.. opt.correct
-		.. ": "
+		.. " "
 		.. "\nAnswer: "
 		.. opt.choice
 		.. "\n"

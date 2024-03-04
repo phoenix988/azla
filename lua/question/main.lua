@@ -668,12 +668,16 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 	-- Define the callback function for the submit button in exam mode
 	submitButton.on_clicked = function()
+        -- reset the count so it doesn't keep stacking
+        question.correct = 0
+        question.incorrect = 0
 		local pop = require("lua.question.popups")
 		question.mode.lastChance(w, question, question.last)
 
 		-- Will run if you didn't complete all questions
 		if question.complete == false then
-			currentQuestion = pop.are_you_sure(
+            -- Prompt you to be sure you want to continue
+			pop.are_you_sure(
 				currentQuestion,
 				switchQuestion,
 				question,
@@ -686,13 +690,19 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 				font
 			)
 		else
-			-- Move to the next question
-			currentQuestion = switchQuestion(true, question, w, wg, bt)
-
-			if currentQuestion > question.last then
-				prevButton:set_visible(false)
-				submitButton:set_visible(false)
-			end
+            -- Prompt you to be sure you want to continue
+			pop.are_you_sure(
+				currentQuestion,
+				switchQuestion,
+				question,
+				prevButton,
+				submitButton,
+				w,
+				wg,
+				bt,
+				theme,
+				font
+			)
 		end
 
 		-- runs the exam mode evaluation on all your answers

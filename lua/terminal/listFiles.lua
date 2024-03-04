@@ -87,6 +87,7 @@ end
 
 -- Function to set special letters to lowercase
 -- Which is not detected by lower method
+-- if you set ver to 2 then it üill convert first letter to uppercase
 function list.lower_case(word, ver)
    -- Function that replace the letters
    -- Will be called inside the main function
@@ -119,6 +120,17 @@ function list.lower_case(word, ver)
       return update
    end
 
+   -- replace first letter of the word (SPECIAL LETTERS ONLY)
+   local function replace_first(str, replacement)
+    -- Check if the string is not empty
+    if #str > 0 then
+        -- Replace the first character with the replacement character
+        return replacement .. utf8.sub(str, 2)
+    else
+        return str
+    end
+end
+
    if ver == 1 then
       -- loops through all the letter tables
       for key, value in pairs(list) do
@@ -141,7 +153,10 @@ function list.lower_case(word, ver)
             local firstLetter = utf8.sub(word, 1, 1)
             local replace = list[key][i][1]
             if match == firstLetter then
-               local update = replace_letter(word, match, replace)
+               --local update = replace_letter(word, match, replace)
+               -- Only replace first letter of the word to uppercase
+               -- if there is multiple instances oof the letter
+               local update = replace_first(word, replace)
                return update
             end
          end

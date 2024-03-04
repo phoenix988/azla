@@ -5,6 +5,7 @@ local utf8 = require("lua-utf8")
 local word = {}
 
 -- letter function
+-- create a table with special letters
 function word.letters()
     local list = {}
     list.U = { { "ü", "u" } }
@@ -51,8 +52,6 @@ function word.replace_main(words)
 
             -- If letter match then it will go ahead and replace it
             if match ~= nil then
-                local continue = occurence
-
                 local update = word.replace_letter(words, match, replace)
                 myTable.final = word.replace_letter(myTable.final, match, replace)
                 myTable[match] = update

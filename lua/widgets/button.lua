@@ -48,6 +48,12 @@ button.setting_submit = style.set_theme(
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
 )
 
+button.setting_wordlist = Gtk.Button({ label = "Show WordLists", margin_top = 8, width_request = 200 })
+button.setting_wordlist = style.set_theme(
+	button.setting_wordlist,
+	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
+)
+
 button.exit_alt = style.set_theme(
 	button.exit_alt,
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }

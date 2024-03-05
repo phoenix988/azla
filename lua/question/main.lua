@@ -76,15 +76,14 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	local theme = require("lua.theme.default")
 	local font = theme.font.load()
 	local theme = theme.load()
-	
+
 	-- Gets the current mode of Azla
 	local mode = require("lua.main").getWordList()
 	question.mode = require("lua.question.examMode")
-    question.jsonSettings = {}
+	question.jsonSettings = {}
 	question.jsonSettings.word = {}
 	question.jsonSettings.entry = {}
 	question.session_count = 1
-
 
 	-- Making empty widgets
 	w.question_labels = {}
@@ -94,13 +93,13 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	w.entry_fields = {}
 	w.result_labels = {}
 	w.show_result_labels = {}
-    
-    -- Creating button for exam mode
+
+	-- Creating button for exam mode
 	local prevButton = Gtk.Button({ label = "Prev" })
 	local submitButton = Gtk.Button({ label = "Submit" })
 	local nextButton = Gtk.Button({ label = "Next" })
-    
-    -- Set theme for the buttons
+
+	-- Set theme for the buttons
 	local prevButton = style.set_theme(prevButton, {
 		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
 	})
@@ -224,6 +223,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	-- Adss the questionGrid to the wg table
 	wg.tree = questionGrid
 
+	question.word = mainWordList
+	question.widget = w
+
 	-- Iterate over the wordlist using a for loop
 	-- for i = 1, #wordlist do
 	for i = 1, math.min(#mainWordList, count) do
@@ -244,12 +246,12 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		-- Make a json setting table and write all the words to it
 		-- If you choose english option
 		if wordlist.lang == "english" then
-				question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
-				question.session_count = question.session_count + 1
+			question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
+			question.session_count = question.session_count + 1
 		-- If you choose azerbajani option
 		elseif wordlist.lang == "azerbajani" then
-				question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
-				question.session_count = question.session_count + 1
+			question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
+			question.session_count = question.session_count + 1
 		-- Make sure that it write to the json file correctly
 		-- otherwise the restore button will restore the words in the wrong order
 		else
@@ -376,8 +378,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		w.show_result_labels[i] = Gtk.Label({ visible = false })
 
 		question.jsonSettings.entry = {}
-		
-        -- Create entry box text if you restore session
+
+		-- Create entry box text if you restore session
 		if wordlist.words then
 			for key, value in pairs(wordlist.entry) do
 				local altCorrectRun = false
@@ -416,14 +418,12 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 							opt = "incorrect"
 							incorrect_answers = response.main(opt, incorrectString, w, i, incorrectLabel, choice, theme)
 						end
-
-
 					end
 					w.entry_fields[i]:set_text(key)
 					question.jsonSettings.entry[key] = value
-                    wordlist.entry[key] = value
-					
-                    if not mode.mode then
+					wordlist.entry[key] = value
+
+					if not mode.mode then
 						w.entry_fields[i]:set_editable(false)
 					end
 					break
@@ -459,16 +459,16 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			local incorrectString = response.incorrectString
 			local incorrectLabel = response.incorrectLabel
 
-		    -- Make sure special characters also converts so lowercase
-		    local checkChoice = list.lower_case(choice)
+			-- Make sure special characters also converts so lowercase
+			local checkChoice = list.lower_case(choice)
 
-		    ---- Gets the correct answer and stores it in a variable
-		    if checkChoice == nil then
-		    	choice = string.lower(choice)
-            else   
-		    	choice = string.lower(checkChoice)
-		    end
-            
+			---- Gets the correct answer and stores it in a variable
+			if checkChoice == nil then
+				choice = string.lower(choice)
+			else
+				choice = string.lower(checkChoice)
+			end
+
 			-- Evaluates if answer is correct
 			if choice == correct then
 				-- runs the function
@@ -572,21 +572,41 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 	-- Add checkmark if the question is answered from previous session
 	question.update_tree(treeTable, w)
+	if wordlist.checkForMultiple ~= nil then
+		checkForMultiple = wordlist.checkForMultiple
+		previous = nil
+		previousModel = nil
+		previousIter = nil
+		stringValue = nil
+		myFirst = true
+	end
 
-	-- action to run when you change the treeview
+	function containsOnlySpaces(str)
+		return str:match("^%s*$") ~= nil
+	end
+
+	-- Action to run when you change the treeview
 	selection.on_changed:connect(function()
 		if previousModel and previousIter then
+			local check = nil
 			local value = previousModel:get_value(previousIter, 0) -- Assuming the value is in column 0
 			stringValue = value:get_string() -- Convert value to string
 			for key, value in pairs(w.entry_fields) do
 				local check = w.entry_fields[key].text:lower()
 				local check = string.gsub(check, "%s", "")
-				if checkForMultiple[key] == "1" then
+				local word = question.word[key][languageNumber_2]
+				local word = string.gsub(word, " ✓ ", "")
+				if checkForMultiple[word] == "1" then
 					local trash
-				elseif check ~= nil and check ~= "" and string.match(check, "%S") then
-					previousModel:set(previousIter, { stringValue .. " ✓ " })
+				--elseif containsOnlySpaces(check) then
+				--	local trash
+				--	break
+ 				elseif check ~= nil and check ~= "" and string.match(check, "%S") then
+                    local newWord = string.gsub(stringValue," ✓ ", "")
+					previousModel:set(previousIter, { newWord .. " ✓ " })
 					check = nil
-					checkForMultiple[key] = "1"
+					checkForMultiple[word] = "1"
+                    break
 				end
 			end
 		end
@@ -629,6 +649,9 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		previousModel, previousIter = model, iter
 	end)
 
+	question.checkForMultiple = checkForMultiple
+    question.langVer = languageNumber_2
+
 	-- Button to go back one question
 	function prevButton:on_clicked()
 		submitButton:set_visible(false)
@@ -658,15 +681,15 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 	-- Define the callback function for the submit button in exam mode
 	submitButton.on_clicked = function()
-        -- reset the count so it doesn't keep stacking
-        question.correct = 0
-        question.incorrect = 0
+		-- reset the count so it doesn't keep stacking
+		question.correct = 0
+		question.incorrect = 0
 		local pop = require("lua.question.popups")
 		question.mode.lastChance(w, question, question.last)
 
 		-- Will run if you didn't complete all questions
 		if question.complete == false then
-            -- Prompt you to be sure you want to continue
+			-- Prompt you to be sure you want to continue
 			pop.are_you_sure(
 				currentQuestion,
 				switchQuestion,
@@ -680,7 +703,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 				font
 			)
 		else
-            -- Prompt you to be sure you want to continue
+			-- Prompt you to be sure you want to continue
 			pop.are_you_sure(
 				currentQuestion,
 				switchQuestion,

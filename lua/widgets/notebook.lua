@@ -11,6 +11,7 @@ function notebook:create()
    -- Create the notebook
    notebook.theme = Gtk.Notebook.new()
    notebook.setting = Gtk.Notebook.new()
+   notebook.wordlist = Gtk.Notebook.new()
 
    -- Set notebook tab location
    notebook.theme:set_tab_pos(Gtk.PositionType.LEFT)
@@ -20,16 +21,19 @@ function notebook:create()
    notebook.theme:append_page(widget.box_theme_alt, Gtk.Label({ label = "Font" }))
    notebook.theme:append_page(widget.box_setting, Gtk.Label({ label = "Window" }))
    notebook.theme:append_page(widget.box_theme, Gtk.Label({ label = "Colors" }))
+   notebook.wordlist:append_page(widget.box_word_list, Gtk.Label({ label = "Words" }))
 
-   -- Create a stack widget
-   -- notebook.stack = Gtk.Stack()
+   --widget.box_word_list:append(notebook.setting)
+   --notebook.setting:append_page(widget.box_word_list_2, Gtk.Label({ label = "Test 1" }))
+   --notebook.setting:append_page(widget.box_word_list_3, Gtk.Label({ label = "Test 2" }))
 
-   -- appends widget to stack
-   --notebook.stack:add_titled(button.setting_back, "stack", "Back")
-
-   -- Create a stackswitcher
-   --notebook.stackSwitcher = Gtk.StackSwitcher({ stack = notebook.stack })
 end
+
+-- Create a stackswitcher
+--      notebook.stackSwitcher = Gtk.StackSwitcher({ stack = stack_list_stack[i] })
+--notebook.stack = Gtk.Stack()
+
+--widget.box_word_list:append(notebook.stackSwitcher)
 
 function notebook:create_main()
    -- Create the widget

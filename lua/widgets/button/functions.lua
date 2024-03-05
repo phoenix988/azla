@@ -49,7 +49,29 @@ local function backAction(currentQuestion, question, window_alt, win, import, ma
 	window_alt.windowState = win:is_fullscreen()
 	window_alt.windowStateMax = win:is_maximized()
 
-	local settings = json.loadSession()
+	-- Make sure the entry fields are not empty when restoring session
+	for i = 1, math.min(#question.word, question.last) do
+		local choice = question.widget.entry_fields[i].text:lower()
+
+		-- Remove leading spaces
+		local choice = string.gsub(choice, "^%s*", "")
+
+		-- Remove trailing spaces
+		local choice = string.gsub(choice, "%s*$", "")
+
+		if question.jsonSettings.entry ~= nil then
+			question.jsonSettings.entry[choice] = i
+		end
+	end
+
+	question.jsonSettings.treeViewCheck = {}
+
+	for i = 1, math.min(#question.word, question.last) do
+		local choice = question.widget.entry_fields[i].text:lower()
+		local word = question.word[i][question.langVer]
+		local word = string.gsub(word, " ✓ ", "")
+		question.jsonSettings.treeViewCheck[word] = question.checkForMultiple[word]
+	end
 
 	json.saveSession(question.jsonSettings)
 
@@ -93,6 +115,31 @@ function M.back_exit_create(currentQuestion, question, import, win, mainWin, rep
 		window.height = win:get_allocated_height()
 
 		question.jsonSettings.count_start = question.count_start
+
+		-- Make sure the entry fields are not empty when restoring session
+		for i = 1, math.min(#question.word, question.last) do
+			local choice = question.widget.entry_fields[i].text:lower()
+
+			-- Remove leading spaces
+			local choice = string.gsub(choice, "^%s*", "")
+
+			-- Remove trailing spaces
+			local choice = string.gsub(choice, "%s*$", "")
+
+			if question.jsonSettings.entry ~= nil then
+				question.jsonSettings.entry[choice] = i
+			end
+		end
+
+		question.jsonSettings.treeViewCheck = {}
+
+		for i = 1, math.min(#question.word, question.last) do
+			local choice = question.widget.entry_fields[i].text:lower()
+			local word = question.word[i][question.langVer]
+			local word = string.gsub(word, " ✓ ", "")
+			question.jsonSettings.treeViewCheck[word] = question.checkForMultiple[word]
+		end
+
 		json.saveSession(question.jsonSettings)
 
 		question.jsonSettings = {}
@@ -108,6 +155,9 @@ end
 
 -- click actions for the main window
 function M.click_action(widget, image, label, theme, setting, write)
+	-- keep track of the widgets to show and hide
+	button.setting_wordlist_count = 0
+
 	-- Creates the setting button click event
 	function button.setting:on_clicked()
 		local hideBox = widget.hideBox
@@ -127,6 +177,18 @@ function M.click_action(widget, image, label, theme, setting, write)
 		button.setting:set_visible(false)
 
 		notebook.theme:set_current_page(2)
+	end
+
+	function button.setting_wordlist:on_clicked()
+		if button.setting_wordlist_count == 0 then
+			notebook.wordlist:set_visible(true)
+			button.setting_wordlist_count = 1
+            button.setting_wordlist:set_label("Hide WordList")
+		elseif button.setting_wordlist_count == 1 then
+			notebook.wordlist:set_visible(false)
+            button.setting_wordlist:set_label("Show WordLists")
+			button.setting_wordlist_count = 0
+		end
 	end
 
 	-- Creates the back button function

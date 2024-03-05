@@ -205,6 +205,7 @@ function M.live(theme)
 		setting = button.setting,
 		setting_back = button.setting_back,
 		setting_submit = button.setting_submit,
+		setting_wordlist = button.setting_wordlist,
 		exit_alt = button.exit_alt,
 		exit = button.exit,
 		start = button.start,

@@ -70,7 +70,7 @@ label.theme_apply =
 	Gtk.Label({ label = "Applied new settings. Please restart the app", margin_top = 40, visible = false })
 label.theme_nochange = Gtk.Label({ label = "No change made", margin_top = 40, visible = false })
 
-label.current_color_scheme = Gtk.Label()
+label.current_color_scheme = Gtk.Label({margin_start = 50})
 label.current_color_scheme:set_margin_bottom(120)
 
 -- Create theme_restore labels
@@ -155,6 +155,7 @@ label.theme_apply:set_markup(
 		.. "</span>"
 )
 
+-- Labels to show after the user has answered all the questions
 function label.end_create()
 	-- Creates some labels to show at the end
 	local M = {}
@@ -176,6 +177,7 @@ function label.end_create()
 	return M
 end
 
+-- Using custom function to create summary button
 function label.summary_create()
 	label.summary = question.create_label({
 		{
@@ -183,6 +185,9 @@ function label.summary_create()
 			text = "Summary",
 		},
 	})
+
+    label.summary:set_margin_bottom(30)
 end
+
 
 return label

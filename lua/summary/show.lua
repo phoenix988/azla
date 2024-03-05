@@ -26,7 +26,7 @@ function show.summary(question, grid, grid2, theme)
 
     label_incorrect.main:set_halign(Gtk.Align.START)
     label_correct.main:set_halign(Gtk.Align.START)
-
+    
     -- If question is correct
     if question.label_correct ~= nil then
         local count = 0

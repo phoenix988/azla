@@ -400,8 +400,8 @@ function app1:on_startup()
 	image2:set_size_request(200, 150)
 
 	-- apend widgets to box theme
-	widget.box_theme_main:append(image2)
-	widget.box_theme_main:append(label.theme)
+	--widget.box_theme_main:append(image2)
+	--widget.box_theme_main:append(label.theme)
 
 	-- Create listBox
 	local listBox = import_widgets.listBox:create()
@@ -460,7 +460,7 @@ function app1:on_startup()
 	notebook:create()
 
 	-- Make the notebook scrollable
-	scrolledTheme:set_child(notebook.theme)
+	scrolledTheme:set_child(themeGrid)
 
 	-- Creates some grids
 	local mainGrid = grid.main_create()
@@ -481,17 +481,25 @@ function app1:on_startup()
 	mainGrid:attach(button.exit, 0, 15, 1, 1)
 
 	--themeGrid:attach(button.setting_submit,0,0,1,1)
-	themeGrid:attach(button.setting_back, 1, 3, 1, 1)
-	themeGrid:attach(button.setting_submit, 1, 2, 1, 1)
-	themeGrid:attach(button.exit_alt, 1, 4, 1, 1)
-	themeGrid:attach(label.theme_apply, 1, 1, 1, 1)
+	themeGrid:attach(image2, 1, -2, 1, 1)
+	themeGrid:attach(label.theme, 1, -1, 1, 1)
+	themeGrid:attach(notebook.theme, 1, 0, 1, 1)
+	themeGrid:attach(notebook.wordlist, 1, 1, 1, 1)
+	themeGrid:attach(button.setting_wordlist, 1, 3, 1, 1)
+	themeGrid:attach(button.setting_back, 1, 5, 1, 1)
+	themeGrid:attach(button.setting_submit, 1, 4, 1, 1)
+	themeGrid:attach(button.exit_alt, 1, 6, 1, 1)
+	themeGrid:attach(label.theme_apply, 1, 2, 1, 1)
+    
+	-- Hide wordlist on startup
+	notebook.wordlist:set_visible(false)
 
 	-- appends all the widgets to make them wisible
-	widget.box_theme_main:append(scrolledTheme)
+	--widget.box_theme_main:append(scrolledTheme)
 	widget.box_theme_button:append(themeGrid)
 
 	-- Sets the size of the main theme box
-	widget.box_theme_main:set_size_request(750, 750)
+	--widget.box_theme_main:set_size_request(750, 750)
 
 	widget.image = image2
 	widget.label = label

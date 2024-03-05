@@ -47,6 +47,7 @@ function M.load_session(exam, win, window, create_app2, luaWordsModule)
       wordlist.correct = settings.correct
       wordlist.incorrect = settings.incorrect
       wordlist.lang = settings.lang
+      wordlist.checkForMultiple = settings.treeViewCheck
 
       local exam = settings.exam_mode or exam
 

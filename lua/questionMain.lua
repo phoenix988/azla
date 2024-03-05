@@ -310,6 +310,9 @@ local function create_app2()
 		box3:append(bt.notebook)
 		box3:set_size_request(200, 350)
 
+		-- Sets minimum size of notebook widget
+		bt.notebook:set_size_request(600, 350)
+
 		-- Appends the image on the top
 		box4:append(image)
 		box4:append(azlaLabel)

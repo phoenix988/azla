@@ -9,7 +9,7 @@ local wordlist = {
 	{ "soyuq", "cold" },
 	{ "isti", "hot" },
 	{ "pulsuz", "free" },
-	{ "qürur", "proud" },
+	{ "qürurlu", "proud" },
 	{ "köhnə", "old" },
 	{ "Gözəl", "Beautiful" },
 	{ "Yaxşı", "Good" },

@@ -27,7 +27,7 @@ button.exit_alt = Gtk.Button({ label = "Exit", margin_top = 8 })
 button.exit_alt = style.set_theme(button.exit_alt)
 
 -- Create some setting buttons
-button.setting = Gtk.Button({ label = "Settings", margin_bottom = 20 })
+button.setting = Gtk.Button({ label = "Settings"})
 
 button.setting = style.set_theme(
 	button.setting,

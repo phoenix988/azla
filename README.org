@@ -37,10 +37,11 @@ If you just clone this repo and want to run this app you need to have those liba
 **** ARCH
 on arch you can run these commands to install all dependencies to build from source
 #+begin_src sh
-paru -S luarocks gtk4 lua-lgi-git
+# you can also use pacman etc or if you use ubuntu the package name can be diffrent
+paru -S luarocks gtk4 lua-lgi-git lua53-lgi luastatic lua53 lua
 
 # install some lua modules
-sudo luarocks install filesystem luautf8
+sudo luarocks install filesystem luautf8 dkjson
 #+end_src
 *** INSTALL
 All you need to do to install this is to run install.sh.

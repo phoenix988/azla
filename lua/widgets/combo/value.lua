@@ -92,7 +92,9 @@ function widget:set_count()
 
       if isFirstStart then
          isFirstStart = false
-         combo.word_count:set_active(self.app.word_count_set)
+         if self.app.word_count_set ~= nil then
+            combo.word_count:set_active(self.app.word_count_set)
+         end
       else
          combo.word_count:set_active(3)
       end

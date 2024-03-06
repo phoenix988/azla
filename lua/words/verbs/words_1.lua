@@ -44,7 +44,8 @@ local wordlist = {
 	{ "Tanış olmaq", "To meet" },
 	{ "Görüşmək", "To meet up" },
 	{ "Xatırlamaq", "To remeber" },
-	{ "Zarafat etmək", "i am joking" },
+	{ "Zarafat etmək", "To joke" },
+	{ "Iyləmək", "To smell" },
 }
 
 return wordlist

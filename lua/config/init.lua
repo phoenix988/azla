@@ -16,6 +16,7 @@ file.cacheDir = home .. "/.cache/azla"
 
 -- Sets path to word files
 file.wordDir = "/opt/azla/lua/words"
+file.wordDir_alt = home .. "/.config/azla/words"
 file.wordMod = "lua.words"
 file.widgetDir = "/opt/azla/lua/widgets"
 

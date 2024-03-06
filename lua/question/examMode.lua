@@ -28,8 +28,18 @@ function M.exam(wordlist, widget, last, response, replace, list)
 		local correct = string.lower(wordlist[i][languageNumber_1])
 		local word = wordlist[i][languageNumber_2]
 		local word = list.to_upper(word)
-
+  
 		local choice = widget.entry_fields[i].text:lower()
+
+		-- Make sure special characters also converts so lowercase
+		local checkChoice = list.lower_case(choice)
+
+		---- Gets the correct answer and stores it in a variable
+		if checkChoice == nil then
+			choice = string.lower(choice)
+		else
+			choice = string.lower(checkChoice)
+		end
 
 		-- Alternative correct answer
 		local altCorrect = replace.generate_word(correct)
@@ -69,8 +79,8 @@ function M.exam(wordlist, widget, last, response, replace, list)
 			question.incorrect = question.incorrect + 1
 			-- runs the function
 			local opt = "incorrect"
-			
-            response.main(opt, incorrectString, widget, i, incorrectLabel, choice, theme)
+
+			response.main(opt, incorrectString, widget, i, incorrectLabel, choice, theme)
 		elseif dontRun then
 			question.correct = question.correct + 1
 		end

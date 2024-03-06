@@ -87,7 +87,7 @@ end
 
 -- Function to set special letters to lowercase
 -- Which is not detected by lower method
--- if you set ver to 2 then it üill convert first letter to uppercase
+-- if you set ver to 2 then it will convert first letter to uppercase
 function list.lower_case(word, ver)
    -- Function that replace the letters
    -- Will be called inside the main function

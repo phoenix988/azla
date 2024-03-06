@@ -21,6 +21,180 @@ local confDir = var.config.dir
 
 local M = {}
 
+
+-- function to update word list menu when updating theme
+function M.update_word_list()
+	-- Update the word list menu settings
+	local menu = require("lua.widgets.menu.init")
+    local theme = require("lua.theme.default").load()
+    local font = require("lua.theme.default").font.load()
+
+	-- Function to remove childs from grid or any widget
+	local function clear_grid(grid)
+		local child = grid:get_last_child()
+		while child do
+			grid:remove(child)
+			child = grid:get_last_child()
+		end
+	end
+
+	for key, value in pairs(menu.grid_items) do
+		clear_grid(menu.grid_items[key])
+	end
+
+	local newMenu = {}
+	newMenu.wordList_items = {}
+	newMenu.grid_items = {}
+	newMenu.entry_items = {}
+	newMenu.import_items = {}
+	newMenu.new_list = {}
+	newMenu.label_list = {}
+
+	local directoryPath = var.wordDir
+	local luaFiles = list.dir(directoryPath)
+
+	for i, item_label in ipairs(luaFiles) do
+		local wordList = list.modify(item_label)
+
+		newMenu.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+
+		-- Clear box
+		clear_grid(menu.box[i])
+
+		-- Sets the first entry boxes to add a new word
+		local entry_az = Gtk.Entry({ margin_top = 50, placeholder_text = "Azerbajani Word" })
+		local entry_eng = Gtk.Entry({ margin_top = 50, placeholder_text = "English Word" })
+
+		-- Create submit and add button for the grid
+		local submit = Gtk.Button({ label = "Submit" })
+		local addAnother = Gtk.Button({ margin_top = 50, label = "Add" })
+
+		-- Make all dirs to lowercase
+		local lower = wordList:lower()
+
+		-- Create label az and append it to the box
+		local label_az = Gtk.Label({ label = "Azerbajani - English" })
+
+		-- Create spacer widget
+		local spacer = Gtk.Label()
+		-- Set theme on title label
+		label_az:set_markup(
+			"<span size='"
+				.. font.welcome_size
+				.. "' foreground='"
+				.. theme.label_welcome
+				.. "'>"
+				.. label_az.label
+				.. "</span>"
+		)
+
+		-- Append to the box widget when updating color
+		menu.box[i]:append(label_az)
+		menu.box[i]:append(spacer)
+		menu.box[i]:append(menu.grid_main[i])
+
+		-- Make sure you dont get errors
+		local success, result = pcall(function()
+			NewSubDir = list.dir(directoryPath .. "/" .. lower)
+		end)
+
+		-- If pcall succedd this will run
+		if success then
+			newMenu.import_items[wordList] = {}
+			newMenu.new_list[wordList] = {}
+			for k = 1, #NewSubDir do
+				local last = list.modify(NewSubDir[k])
+				local allWords = lower .. "/" .. last
+				local import = require(var.wordMod .. "." .. allWords)
+				table.insert(newMenu.import_items[wordList], import)
+
+				for key, value in ipairs(import) do
+					for j = 1, #value do
+						table.insert(newMenu.new_list[wordList], value[j])
+					end
+				end
+			end
+		end
+
+		-- append the button grid to the box
+		--menu.box[i]:append(menu.grid[i])
+
+		-- Function to check for even numbers
+		local function isEven(number)
+			return number % 2 == 0
+		end
+
+		if type(newMenu.import_items[wordList]) == "table" then
+			-- Keep track of even and uneven
+			local countTime = 0
+			-- Create final WordTable to add all words from the diffrent lists
+			-- To one single table
+			NewWordTable = {}
+			for key, value in ipairs(newMenu.new_list[wordList]) do
+				if not isEven(key) then
+					countTime = countTime + 1
+					NewWordTable[countTime] = { newMenu.new_list[wordList][key], newMenu.new_list[wordList][key + 1] }
+				end
+			end
+
+			-- Finally we create the diffrent labels for the words in the wordlist
+			for j = 1, #NewWordTable do
+				newMenu.label_list[wordList] = {}
+				local english = list.to_upper(NewWordTable[j][2])
+				local aze = list.to_upper(NewWordTable[j][1])
+				local form = aze .. " : " .. english
+				local row = math.floor((j - 1) / 3)
+				local col = (j - 1) % 3
+				local label = Gtk.Label({ label = form })
+				-- Set label theme
+				label:set_markup(
+					"<span size='"
+						.. font.word_list_size
+						.. "' foreground='"
+						.. theme.label_fg
+						.. "'>"
+						.. label.label
+						.. "</span>"
+				)
+
+				menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
+
+				menu.label_list[wordList][j] = label
+			end
+		else
+			for j = 1, #newMenu.wordList_items[i] do
+				newMenu.label_list[wordList] = {}
+				local english = list.to_upper(newMenu.wordList_items[i][j][2])
+				local aze = list.to_upper(newMenu.wordList_items[i][j][1])
+				local form = aze .. " : " .. english
+				if wordList == "Phrases" then
+					row = math.floor((j - 1) / 1)
+					col = (j - 1) % 1
+				else
+					row = math.floor((j - 1) / 3)
+					col = (j - 1) % 3
+				end
+				local label = Gtk.Label({ label = form })
+
+				-- Set label theme
+				label:set_markup(
+					"<span size='"
+						.. font.word_list_size
+						.. "' foreground='"
+						.. theme.label_fg
+						.. "'>"
+						.. label.label
+						.. "</span>"
+				)
+
+				newMenu.label_list[wordList][j] = label
+
+				menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
+			end
+		end
+	end
+end
+
 -- Function to update your theme while the app is running
 function M.live(theme)
 	local themeModule = require("lua.theme.default")
@@ -200,7 +374,7 @@ function M.live(theme)
 	)
 
 	-- Update button properties when updating theme
-    -- Creating button update table
+	-- Creating button update table
 	button.update = {
 		setting = button.setting,
 		setting_back = button.setting_back,
@@ -212,19 +386,16 @@ function M.live(theme)
 		exam_mode = button.exam_mode,
 		restore_mode = button.restore_mode,
 	}
-    
-    -- Update colors of all buttoons that I stored in button update table
+
+	-- Update colors of all buttoons that I stored in button update table
 	for key, _ in pairs(button.update) do
-		button.update[key] = style.set_theme(
-			button.update[key],
+		button.update[key] = style.set_theme(button.update[key], {
 			{
-				{
-					color = style.color.label_welcome,
-					border_color = style.color.label_welcome,
-					size = font.fg_size / 1000,
-				},
-			}
-		)
+				color = style.color.label_welcome,
+				border_color = style.color.label_welcome,
+				size = font.fg_size / 1000,
+			},
+		})
 	end
 
 	-- Update all restore buttons
@@ -234,6 +405,9 @@ function M.live(theme)
 			{ { color = style.color.label_fg, border_color = style.color.label_fg, size = font.welcome_size / 1000 } }
 		)
 	end
+
+	-- Runs the function to update wordlist menu
+	M.update_word_list()
 end
 
 -- Restore default settings

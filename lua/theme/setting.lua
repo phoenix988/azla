@@ -12,32 +12,34 @@ local customConfig = file.config.custom
 local M = {}
 
 function M.load()
-  -- check if custom file exist
-  if fileExist(customConfig) then
-    themeCustom = loadConfig(customConfig)
-  end
+	-- check if custom file exist
+	if fileExist(customConfig) then
+		themeCustom = loadConfig(customConfig)
+	end
 
-  if setting ~= nil then
-    settingCompare = setting
-  end
+	if setting ~= nil then
+		settingCompare = setting
+	end
 
-  -- default values
-  local setting = {
-    default_width = 1200,
-    default_height = 1000,
-    image = "/opt/azla/images/flag.jpg",
-  }
+	-- Default values
+	local setting = {
+		default_width = 1200,
+		default_height = 1000,
+		image = "/opt/azla/images/flag.jpg",
+		word_path = "/opt/azla/lua/words",
+	}
+    
 
-  -- Overwrites config if you have a custom one
-  if settingCompare ~= nil then
-    for key, value in pairs(setting) do
-      if settingCompare[key] ~= nil then
-        setting[key] = settingCompare[key]
-      end
-    end
-  end
+	-- Overwrites config if you have a custom one
+	if settingCompare ~= nil then
+		for key, value in pairs(setting) do
+			if settingCompare[key] ~= nil then
+				setting[key] = settingCompare[key]
+			end
+		end
+	end
 
-  return setting
+	return setting
 end
 
 return M

@@ -11,6 +11,7 @@ local M = {}
 -- List of color schemes
 M.colorSchemes = {
    "Custom",
+   "Default",
    "Dracula",
    "Iceberg",
    "Nord",

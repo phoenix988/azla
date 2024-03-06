@@ -73,7 +73,8 @@ function word.generate_word(word)
         ['ı'] = {'i', 'ı'},
         ['ç'] = {'c', 'ç'},
         ['ğ'] = {'g', 'ğ'},
-        ['ş'] = {'s', 'ş'}
+        ['ş'] = {'s', 'ş'},
+        ['i'] = {'i', 'ı'}
     }
 
     local function replace_char_at_index(str, index, char)

@@ -184,10 +184,12 @@ function M.click_action(widget, image, label, theme, setting, write)
 			notebook.wordlist:set_visible(true)
 			button.setting_wordlist_count = 1
             button.setting_wordlist:set_label("Hide WordList")
+			notebook.theme:set_visible(false)
 		elseif button.setting_wordlist_count == 1 then
 			notebook.wordlist:set_visible(false)
             button.setting_wordlist:set_label("Show WordLists")
 			button.setting_wordlist_count = 0
+			notebook.theme:set_visible(true)
 		end
 	end
 

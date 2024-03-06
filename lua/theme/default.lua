@@ -47,26 +47,24 @@ function M.load()
 	end
 
 	M.scheme = color_scheme
-
+	-- Determines colorscheme
 	if color_scheme == "Iceberg" or color_scheme == "iceberg" then
 		local theme = require("lua.theme.colorschemes.iceberg")
-
 		return theme
 	elseif color_scheme == "Dracula" or color_scheme == "dracula" then
 		local theme = require("lua.theme.colorschemes.dracula")
-
 		return theme
 	elseif color_scheme == "Nord" or color_scheme == "nord" then
 		local theme = require("lua.theme.colorschemes.nord")
-
 		return theme
 	elseif color_scheme == "Tokyo_night" or color_scheme == "tokyo_night" then
 		local theme = require("lua.theme.colorschemes.tokyo_night")
-
 		return theme
 	elseif color_scheme == "Rose_pine" or color_scheme == "rose_pine" then
 		local theme = require("lua.theme.colorschemes.rose_pine")
-
+		return theme
+	elseif color_scheme == "Default" or color_scheme == "default" then
+		local theme = M.theme_default
 		return theme
 	elseif color_scheme == "Custom" or color_scheme == "custom" or not color_scheme then
 		if theme ~= nil then
@@ -95,17 +93,20 @@ function M.load()
 		end
 
 		return theme
-    else
-		local theme = require("lua.theme.colorschemes.tokyo_night")
+	else
+		--local theme = require("lua.theme.colorschemes.tokyo_night")
+		local theme = M.theme_default
 
 		return theme
-    end
-
+	end
 end
 
 -- Function to set the colorscheme
 function M.color_scheme(treeView, write, update)
 	local theme = M.load()
+	if font == nil then
+		font = M.font.load()
+	end
 	-- Get active value of the treeview
 	local selection = treeView.tree:get_selection()
 	local model, iter = selection:get_selected()
@@ -124,7 +125,7 @@ function M.color_scheme(treeView, write, update)
 			.. label.current_color_scheme.label
 			.. "</span>"
 	)
-        
+
 	local status = write.write.config.color_scheme('color_scheme = "' .. stringValue .. '"\n', customConfig)
 
 	local theme = M.load()

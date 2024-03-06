@@ -56,16 +56,7 @@ local wordlist = {
 	{ "sinif otağı", "classroom" },
 	{ "ev tapşırığı", "homework" },
 	{ "imtahan", "exam" },
-	{ "degree", "dərəcə" },
-	{ "diploma", "diploma" },
-	{ "education", "təhsil" },
-	{ "lesson", "dərs" },
-	{ "question", "sual" },
-	{ "answer", "cavab" },
-	{ "subject", "fənn" },
-	{ "office", "ofis" },
-	{ "meeting", "toplantı" },
-	{ "project", "layihə" },
+	{ "dərəcə", "degree" },
 }
 
 return wordlist

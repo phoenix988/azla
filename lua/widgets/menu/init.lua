@@ -202,10 +202,13 @@ for i, item_label in ipairs(luaFiles) do
 
 	-- Sets count to 0 at first
 	local entryCount = 0
+	local entryCounter = 0
 	local firstRun = true
 
 	-- Create table to store the buttons
 	local button_table = {}
+	local entry_table = {}
+	local count_table = {}
 
 	-- Function for add button
 	local function add_button_action()
@@ -213,10 +216,11 @@ for i, item_label in ipairs(luaFiles) do
 		entryCount = entryCount + 1
 		-- Will create new button for everytime you add a new word
 		button_table[entryCount] = Gtk.Button({ label = "Add" })
+		entry_table[entryCount] = Gtk.Button({ margin_top = 50, label = "X" })
 
-		local button = button_table[entryCount]
-		local label_x = Gtk.Button({ margin_top = 50, label = "X" })
-		label_x:set_size_request(2, 0)
+		local add = button_table[entryCount]
+		local remove = entry_table[entryCount]
+
 		M.entry_items.azerbajaniEntry[entryCount] = Gtk.Entry({ placeholder_text = "Azerbajani Word" })
 		M.entry_items.englishEntry[entryCount] = Gtk.Entry({ placeholder_text = "English Word" })
 		M.grid[i]:attach(M.entry_items.azerbajaniEntry[entryCount], 1, entryCount, 1, 1)
@@ -236,6 +240,9 @@ for i, item_label in ipairs(luaFiles) do
 				M.grid[i]:remove(button_table[entryCount - 1])
 			end
 			M.grid[i]:attach(button_table[entryCount], 3, entryCount, 1, 1)
+			M.grid[i]:attach(entry_table[entryCount], 3, entryCount - 1, 1, 1)
+			entry_table[entryCount]:set_margin_top(0)
+			entry_table[1]:set_margin_top(50)
 			-- Restore scroll position
 			return false -- Stop the idle handler
 		end)
@@ -243,8 +250,36 @@ for i, item_label in ipairs(luaFiles) do
 		addAnother:set_margin_top(0)
 
 		-- Attach the function
-		function button:on_clicked()
+		function add:on_clicked()
 			add_button_action()
+		end
+
+		function remove:on_clicked()
+			-- Function for temove entry section
+			local function remove_entry_action()
+				local azEntry = M.grid[i]:get_child_at(1, entryCount)
+				local enEntry = M.grid[i]:get_child_at(2, entryCount)
+				local entry = M.grid[i]:get_child_at(3, entryCount - 1)
+				local button = M.grid[i]:get_child_at(3, entryCount)
+				entryCount = entryCount - 1
+				if entryCount == 0 then
+					M.grid[i]:remove(azEntry)
+					M.grid[i]:remove(enEntry)
+					M.grid[i]:remove(entry)
+					M.grid[i]:remove(button)
+					M.grid[i]:attach(addAnother, 3, entryCount, 1, 1)
+					addAnother:set_margin_top(50)
+					firstRun = true
+				else
+					M.grid[i]:remove(entry)
+					M.grid[i]:remove(azEntry)
+					M.grid[i]:remove(enEntry)
+					M.grid[i]:remove(button)
+					M.grid[i]:attach(button_table[entryCount], 3, entryCount, 1, 1)
+				end
+			end
+
+			remove_entry_action()
 		end
 	end
 
@@ -263,7 +298,9 @@ for i, item_label in ipairs(luaFiles) do
 	end
 	-- function on submit button
 	function submit:on_clicked()
+		-- Reset the counters
 		firstRun = true
+		entryCount = 0
 		clear_grid(M.grid[i])
 
 		-- Reattach the default buttons

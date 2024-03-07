@@ -12,10 +12,8 @@
 
 # you need to run this script inside of the my git repo for it to work
 # install location
-
-LUA_EXTERNAL=$(find "/usr/share/lua/5.4" -name "*.lua" -type f)
 INSTALL_PATH=/opt/azla
-MODULES_PATH=$(printf '%s\n' "lua/**/*.lua lua/*.lua lua/**/**/*.lua" "${LUA_EXTERNAL[@]}") 
+MODULES_PATH="lua/**/*.lua lua/*.lua lua/**/**/*.lua" 
 BINARY_PATH=/usr/bin
 DESKTOP_FILE=azla.desktop
 
@@ -83,7 +81,7 @@ main() {
 build() {
      if command_exist luastatic ; then
           echo -e "${YELLOW}-- Building from source"
-          luastatic main.lua -llua5.4 "$MODULES_PATH"
+          luastatic main.lua -llua5.4 $MODULES_PATH
      else
           echo -e "${RED}-- luastatic is not installed"
           exit
@@ -93,7 +91,7 @@ build() {
 # Builds the binary using luastatic
 build
 
-# Creates space
+# creates space
 printf "\n"
 
 # Runs main function
@@ -101,4 +99,4 @@ main
 
 
 # Prints Installation exit code
-[ "$?" = "0" ] && log "ok" "$GREEN" || log "fail" "$RED"
+[ "$?" = "0" ] && log "ok" $GREEN || log "fail" $RED

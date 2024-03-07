@@ -11,6 +11,7 @@ local os = require("os")
 -- Import widgets
 local widget = require("lua.widgets.box")
 local notebook = require("lua.widgets.notebook")
+local combo = require("lua.widgets.combo")
 widget.grid = require("lua.widgets.grid")
 
 -- Import custom functions
@@ -24,11 +25,34 @@ local font = require("lua.theme.default").font.load()
 
 -- Import mkdir function
 local mkdir = require("lua.terminal.mkdir").mkdir
+local fileExist = require("lua.fileExist")
+
+-- Function to load config file
+local loadConfig = require("lua.loadConfig").load_config
+
+-- function to look for even number
+local function isEven(number)
+	return number % 2 == 0
+end
 
 -- Function to update the wordlist file with new entries
-local function updateWordlist(wordlist, words)
-	-- Import the chosen wordlist
-	local formatList = require(var.wordMod .. "." .. wordlist)
+local function updateWordlist(wordlist, words, check)
+	-- Checks if custom wordlist exist
+	local wordDir_alt = var.wordDir_alt .. "/" .. wordlist .. ".lua"
+	if fileExists(wordDir_alt) then
+		-- load the wordlist
+		local wordlist = loadConfig(wordDir_alt)
+		formatList = wordlist
+	else 
+		if check then -- Checks if the wordlist has multiple subfiles 
+		-- so it saves them all in one file and combine them in your home dir
+			-- Import the chosen wordlist
+			formatList = require(var.wordMod .. "." .. wordlist).all
+		else
+			-- Import the chosen wordlist
+			formatList = require(var.wordMod .. "." .. wordlist)
+		end
+	end
 
 	-- Loop through the new list to add
 	for i = 1, #words do
@@ -47,14 +71,28 @@ local function updateWordlist(wordlist, words)
 
 	-- Serialize the updated wordlist and write it back to the file
 	local file = io.open(var.wordDir_alt .. "/" .. wordlist .. ".lua", "w")
-	file:write("local = wordlist {\n")
+	file:write("local wordlist = {\n")
 	for _, entry in ipairs(formatList) do
 		file:write(string.format('\t{ "%s", "%s" },\n', entry[1], entry[2]))
 	end
 	file:write("}\n\nreturn wordlist")
 	file:close()
 
+	-- Prints to the terminal
 	print("Wordlist updated successfully!")
+
+	-- Table to pass to the combo update function
+	local inputCount = {
+		activeWord = combo.word:get_active(),
+		modelWord = combo.word_list_model,
+		module = var.wordMod,
+		word_count_set = config.word_count_set,
+	}
+
+	-- Sets the wordlist count when adding new words
+	-- so it updates whill app is running
+	combo.count = combo:new(inputCount)
+	combo.count:set_count()
 end
 
 -- Creating empty tables
@@ -97,13 +135,18 @@ local scrolledWindow = Gtk.ScrolledWindow({
 	min_content_height = 500,
 })
 
+-- Create button to add new wordlist
+local addWordListButton = Gtk.Button({ label = "Add New Wordlist", margin_bottom = 5, margin_top = 20 })
+
 -- Add notebook widget to the scrolled window
 scrolledWindow:set_child(M.notebook.word)
 
--- Append the scroll window
+-- Append the scroll window and button
+widget.box_word_list:append(addWordListButton)
 widget.box_word_list:append(scrolledWindow)
 
 for i, item_label in ipairs(luaFiles) do
+	local checkMultiple = false
 	local wordList = list.modify(item_label)
 
 	-- Create box widget for all items
@@ -142,8 +185,14 @@ for i, item_label in ipairs(luaFiles) do
 	M.box[i]:append(spacer)
 	M.box[i]:append(M.grid_main[i])
 
-	-- Import the wordlist
-	M.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+	-- Import the wordlist and custom wordlists if they exist
+	local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
+	if fileExists(wordDir_alt) then
+		local wordlist = loadConfig(wordDir_alt)
+		M.wordList_items[i] = wordlist
+	else
+		M.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+	end
 
 	-- Create grid widget for buttons
 	M.grid[i] = widget.grid:main_create()
@@ -171,13 +220,28 @@ for i, item_label in ipairs(luaFiles) do
 
 	-- If pcall succedd this will run
 	if success then
+		checkMultiple = true
 		M.import_items[wordList] = {}
 		M.new_list[wordList] = {}
 		for k = 1, #SubDir do
+			-- Import all words
 			local last = list.modify(SubDir[k])
 			local allWords = lower .. "/" .. last
 			local import = require(var.wordMod .. "." .. allWords)
 			table.insert(M.import_items[wordList], import)
+
+			-- Check if custom file exist and use those words instead
+			-- And breaks out of the loop if it does exist and load the custome words
+			local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
+			if fileExists(wordDir_alt) then
+				local wordlist = loadConfig(wordDir_alt)
+				for key, value in ipairs(wordlist) do
+					for j = 1, #value do
+						table.insert(M.new_list[wordList], value[j])
+					end
+				end
+				break
+			end
 
 			for key, value in ipairs(import) do
 				for j = 1, #value do
@@ -334,7 +398,7 @@ for i, item_label in ipairs(luaFiles) do
 		end
 
 		-- update the wordlist
-		updateWordlist(wordList, combTable)
+		updateWordlist(wordList, combTable, checkMultiple)
 
 		update.update_word_list()
 	end
@@ -343,6 +407,7 @@ for i, item_label in ipairs(luaFiles) do
 		return number % 2 == 0
 	end
 
+	-- Starts adding the words to the grid
 	if type(M.import_items[wordList]) == "table" then
 		-- Keep track of even and uneven
 		local countTime = 0
@@ -372,7 +437,7 @@ for i, item_label in ipairs(luaFiles) do
 			local form = aze .. " : " .. english
 			local row = math.floor((j - 1) / 3)
 			local col = (j - 1) % 3
-			local label = Gtk.Label({ label = form })
+			local label = Gtk.Label({ label = j .. " " .. form })
 			-- Set label theme
 			label:set_markup(
 				"<span size='"
@@ -421,7 +486,7 @@ for i, item_label in ipairs(luaFiles) do
 				row = math.floor((j - 1) / 3)
 				col = (j - 1) % 3
 			end
-			local label = Gtk.Label({ label = form })
+			local label = Gtk.Label({ label = j .. " " .. form })
 
 			-- Set label theme
 			label:set_markup(

@@ -19,12 +19,12 @@ local M = {}
 
 -- Sets default theme values to load so you can reset
 M.font_default = {
-    word_size = "12000",
-    word_list_size = "12000",
-    lang_size = "14000",
-    fg_size = "14000",
-    welcome_size = "20000",
-    question_size = "20000",
+    word_size = "16000",
+    word_list_size = "16000",
+    lang_size = "18000",
+    fg_size = "16000",
+    welcome_size = "30000",
+    question_size = "22000",
     entry_size = "26000",
 }
 
@@ -40,12 +40,12 @@ function M.load()
 
     -- Sets default theme values
     local font = {
-        word_size = "12000",
-        word_list_size = "12000",
-        lang_size = "14000",
-        fg_size = "14000",
-        welcome_size = "20000",
-        question_size = "20000",
+        word_size = "16000",
+        word_list_size = "16000",
+        lang_size = "18000",
+        fg_size = "16000",
+        welcome_size = "30000",
+        question_size = "22000",
         entry_size = "26000",
     }
 

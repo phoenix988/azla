@@ -63,14 +63,15 @@ local function backAction(currentQuestion, question, window_alt, win, import, ma
 			question.jsonSettings.entry[choice] = i
 		end
 	end
-
+        
+	-- Make table
 	question.jsonSettings.treeViewCheck = {}
-
+        -- Save treeview settings when saving the session
 	for i = 1, math.min(#question.word, question.last) do
 		local choice = question.widget.entry_fields[i].text:lower()
 		local word = question.word[i][question.langVer]
 		local word = string.gsub(word, " ✓ ", "")
-		question.jsonSettings.treeViewCheck[word] = question.checkForMultiple[word]
+		question.jsonSettings.treeViewCheck[i] = question.checkForMultiple[i]
 	end
 
 	json.saveSession(question.jsonSettings)
@@ -256,7 +257,7 @@ function M.click_action(widget, image, label, theme, setting, write)
 
 		-- Gets the new font values
 		for key, value in pairs(font) do
-			local font_choice = array.theme_labels[key]:get_value()
+			local font_choice = array.font_labels[key]:get_value()
 			local font_choice = tostring(font_choice):gsub("%.0+$", "")
 			local font_choice = font_choice * 1000
 			apply_font[key] = font_choice

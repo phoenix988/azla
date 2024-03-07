@@ -3,6 +3,7 @@ local fileExist = require("lua.fileExist").fileExists
 
 -- Import Variables
 local file = require("lua.config.init")
+local var = require("lua.config.init")
 
 local loadConfig = require("lua.loadConfig").load_config_theme
 
@@ -27,8 +28,9 @@ function M.load()
 		default_height = 1000,
 		image = "/opt/azla/images/flag.jpg",
 		word_path = "/opt/azla/lua/words",
+		word_path_alt = var.wordDir_alt,
 	}
-    
+
 
 	-- Overwrites config if you have a custom one
 	if settingCompare ~= nil then

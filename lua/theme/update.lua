@@ -16,18 +16,25 @@ local style = require("lua.widgets.setting")
 -- Imports string functions
 local list = require("lua.terminal.listFiles")
 
+-- Import function to check if a file exist
+local fileExist = require("lua.fileExist")
+
+-- Function to load config file
+local loadConfig = require("lua.loadConfig").load_config
+
+-- Update variables
 local confPath = var.config.custom
 local confDir = var.config.dir
 
+-- Create empty table
 local M = {}
-
 
 -- function to update word list menu when updating theme
 function M.update_word_list()
 	-- Update the word list menu settings
 	local menu = require("lua.widgets.menu.init")
-    local theme = require("lua.theme.default").load()
-    local font = require("lua.theme.default").font.load()
+	local theme = require("lua.theme.default").load()
+	local font = require("lua.theme.default").font.load()
 
 	-- Function to remove childs from grid or any widget
 	local function clear_grid(grid)
@@ -56,7 +63,13 @@ function M.update_word_list()
 	for i, item_label in ipairs(luaFiles) do
 		local wordList = list.modify(item_label)
 
-		newMenu.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+		local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
+		if fileExists(wordDir_alt) then
+			local wordlist = loadConfig(wordDir_alt)
+			newMenu.wordList_items[i] = wordlist
+		else
+			newMenu.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+		end
 
 		-- Clear box
 		clear_grid(menu.box[i])
@@ -103,10 +116,24 @@ function M.update_word_list()
 			newMenu.import_items[wordList] = {}
 			newMenu.new_list[wordList] = {}
 			for k = 1, #NewSubDir do
+				-- Import all words
 				local last = list.modify(NewSubDir[k])
 				local allWords = lower .. "/" .. last
 				local import = require(var.wordMod .. "." .. allWords)
 				table.insert(newMenu.import_items[wordList], import)
+
+				-- Check if custom file exist and use those words instead
+				-- And breaks out of the loop if it does exist and load the custome words
+				local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
+				if fileExists(wordDir_alt) then
+					local wordlist = loadConfig(wordDir_alt)
+					for key, value in ipairs(wordlist) do
+						for j = 1, #value do
+							table.insert(newMenu.new_list[wordList], value[j])
+						end
+					end
+					break
+				end
 
 				for key, value in ipairs(import) do
 					for j = 1, #value do
@@ -142,10 +169,17 @@ function M.update_word_list()
 				newMenu.label_list[wordList] = {}
 				local english = list.to_upper(NewWordTable[j][2])
 				local aze = list.to_upper(NewWordTable[j][1])
+
+				-- Make sure special characters also converts to uppercase
+				local checkAz = list.lower_case(aze, 2)
+
+				if checkAz ~= nil then
+					aze = checkAz
+				end
 				local form = aze .. " : " .. english
 				local row = math.floor((j - 1) / 3)
 				local col = (j - 1) % 3
-				local label = Gtk.Label({ label = form })
+				local label = Gtk.Label({ label = j .. " " .. form })
 				-- Set label theme
 				label:set_markup(
 					"<span size='"
@@ -166,6 +200,13 @@ function M.update_word_list()
 				newMenu.label_list[wordList] = {}
 				local english = list.to_upper(newMenu.wordList_items[i][j][2])
 				local aze = list.to_upper(newMenu.wordList_items[i][j][1])
+
+				-- Make sure special characters also converts to uppercase
+				local checkAz = list.lower_case(aze, 2)
+
+				if checkAz ~= nil then
+					aze = checkAz
+				end
 				local form = aze .. " : " .. english
 				if wordList == "Phrases" then
 					row = math.floor((j - 1) / 1)
@@ -174,7 +215,7 @@ function M.update_word_list()
 					row = math.floor((j - 1) / 3)
 					col = (j - 1) % 3
 				end
-				local label = Gtk.Label({ label = form })
+				local label = Gtk.Label({ label = j .. " " .. form })
 
 				-- Set label theme
 				label:set_markup(
@@ -286,6 +327,7 @@ function M.live(theme)
 			.. "</span>"
 	)
 
+	-- Update theme for the settings grid -- {{{ start
 	-- Updates theme labels
 	for key, value in pairs(theme) do
 		-- Removes the seperator and add a space instead
@@ -324,8 +366,12 @@ function M.live(theme)
 				.. "</span>"
 		)
 		array.setting_labels[key]:set_text(value)
+
+		-- Update theme for general settings
+		array.setting_labels[key] = array.set_theme(array.setting_labels[key])
 	end
 
+	-- Update theme foor font settings
 	for key, value in pairs(font) do
 		-- Removes the seperator and add a space instead
 		local labelValue = string.gsub(key, "_", " ")
@@ -344,8 +390,12 @@ function M.live(theme)
 		)
 		local value = value / 1000
 		local value = tostring(value):gsub("%.0+$", "")
-		array.theme_labels[key]:set_value(value)
+		array.font_labels[key]:set_value(value)
+
+		-- Update theme for font settings
+		array.font_labels[key] = array.set_theme(array.font_labels[key])
 	end
+	-- Update theme for the settings grid -- }}} end
 
 	-- Update treeview widget
 	treeView.tree = array.set_theme(

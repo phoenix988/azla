@@ -109,7 +109,7 @@ end
 -- Creates the config array if the custom file exist
 if fileExist(customConfig) then
 	-- load custom config
-	local customPath = loadConfigCustom(customConfig) -- Custom config exist
+	local customPath = loadConfig(customConfig) -- Custom config exist
 else
 	-- sets empty array if it doesnt exist
 	local setting = {} --Custom config file doesn't exist
@@ -347,6 +347,7 @@ function app1:on_startup()
 	
 	-- adds the active wordlist and stores it in settings table
 	settings.word = combo.word:get_active()
+    
 	-- adds the active lang and stores it in settings table
 	settings.lang = combo.lang:get_active()
 	settings.comboWord = comboWord

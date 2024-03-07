@@ -141,7 +141,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			question.jsonSettings.lang = "english"
 		end
 
-	-- Sets the variables depending on choice
+		-- Sets the variables depending on choice
 	elseif languageChoice == "azerbajani" then
 		languageNumber_1 = 1
 		languageNumber_2 = 2
@@ -248,12 +248,12 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		if wordlist.lang == "english" then
 			question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
 			question.session_count = question.session_count + 1
-		-- If you choose azerbajani option
+			-- If you choose azerbajani option
 		elseif wordlist.lang == "azerbajani" then
 			question.jsonSettings.word[tostring(i) .. "_" .. mainWordList[i][2]] = mainWordList[i][1]
 			question.session_count = question.session_count + 1
-		-- Make sure that it write to the json file correctly
-		-- otherwise the restore button will restore the words in the wrong order
+			-- Make sure that it write to the json file correctly
+			-- otherwise the restore button will restore the words in the wrong order
 		else
 			if languageChoice == "azerbajani" then
 				question.jsonSettings.word[tostring(i) .. "_" .. word] = correct
@@ -285,25 +285,25 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		w.current_labels[i] = Gtk.Label({ label = "Current: " .. question.current })
 		w.current_labels[i]:set_markup(
 			"<span size='"
-				.. font.fg_size
-				.. ""
-				.. "' foreground='"
-				.. theme.label_question
-				.. "'>"
-				.. w.current_labels[i].label
-				.. "</span>"
+			.. font.fg_size
+			.. ""
+			.. "' foreground='"
+			.. theme.label_question
+			.. "'>"
+			.. w.current_labels[i].label
+			.. "</span>"
 		)
 
 		-- sets size of question label
 		w.question_labels[i]:set_markup(
 			"<span size='"
-				.. font.question_size
-				.. ""
-				.. "' foreground='"
-				.. theme.label_fg
-				.. "'>"
-				.. w.question_labels[i].label
-				.. "</span>"
+			.. font.question_size
+			.. ""
+			.. "' foreground='"
+			.. theme.label_fg
+			.. "'>"
+			.. w.question_labels[i].label
+			.. "</span>"
 		)
 
 		-- Create entry field for each question
@@ -510,6 +510,11 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 				treeTable[i] = mainWordList[i][languageNumber_2]
 				treeTable[i] = list.to_upper(treeTable[i])
 			end
+
+			question.jsonSettings.count_start = question.count_start
+
+			-- save to json file
+			json.saveSession(question.jsonSettings)
 		end
 
 		-- Sets default visibility of all widgets
@@ -565,6 +570,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	local previousIter = nil
 	local checkForMultiple = {}
 
+	-- Keep track of the first time you run it
+	-- Without this there was some bug with treeview checkmarks
 	local treeFirst = true
 
 	-- Clear wordview
@@ -573,7 +580,11 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	-- Add checkmark if the question is answered from previous session
 	question.update_tree(treeTable, w)
 	if wordlist.checkForMultiple ~= nil then
+	    -- If you restore session then it will mark the
+		-- word with checkmarks already and avoid stacking of 
+		-- checkmarks
 		checkForMultiple = wordlist.checkForMultiple
+		-- Reset variables (Probably dont need them)
 		previous = nil
 		previousModel = nil
 		previousIter = nil
@@ -581,32 +592,24 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		myFirst = true
 	end
 
-	function containsOnlySpaces(str)
-		return str:match("^%s*$") ~= nil
-	end
-
 	-- Action to run when you change the treeview
 	selection.on_changed:connect(function()
 		if previousModel and previousIter then
-			local check = nil
+			--local check = nil
 			local value = previousModel:get_value(previousIter, 0) -- Assuming the value is in column 0
-			stringValue = value:get_string() -- Convert value to string
-			for key, value in pairs(w.entry_fields) do
+			stringValue = value:get_string()              -- Convert value to string
+			for key, _ in pairs(w.entry_fields) do
 				local check = w.entry_fields[key].text:lower()
 				local check = string.gsub(check, "%s", "")
-				local word = question.word[key][languageNumber_2]
-				local word = string.gsub(word, " ✓ ", "")
-				if checkForMultiple[word] == "1" then
-					local trash
-				--elseif containsOnlySpaces(check) then
-				--	local trash
-				--	break
- 				elseif check ~= nil and check ~= "" and string.match(check, "%S") then
-                    local newWord = string.gsub(stringValue," ✓ ", "")
+
+				if checkForMultiple[key] == "1" then
+					local info = "Treeview: Already done"
+				elseif check ~= nil and check ~= "" and string.match(check, "%S") then
+					local newWord = string.gsub(stringValue, " ✓ ", "")
 					previousModel:set(previousIter, { newWord .. " ✓ " })
-					check = nil
-					checkForMultiple[word] = "1"
-                    break
+					--check = nil
+					checkForMultiple[key] = "1"
+					break
 				end
 			end
 		end
@@ -622,7 +625,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			stringValue = value:get_string() -- Convert value to string
 		end
 
-		-- Dont know what to these lines do
+		-- Dont know what to these lines do (probably important things break if I remove them)
 		local stringValue = string.match(stringValue, "(%d+)%s")
 		local stringValue = tonumber(stringValue)
 		question.count_start = stringValue
@@ -634,6 +637,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			w.next_buttons[stringValue]:set_visible(false)
 		end
 
+		-- Check if its exam mode or not and adjust behavior accordingly
 		if stringValue == question.last and mode.mode == true then
 			submitButton:set_visible(true)
 			nextButton:set_visible(false)
@@ -642,15 +646,24 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			nextButton:set_visible(true)
 		end
 
+		-- keep track if its the first time
+		-- sets it to false
 		treeFirst = false
 
 		-- Updates previous value
 		previous = stringValue
 		previousModel, previousIter = model, iter
+
+		-- Saves to the json format
+		question.jsonSettings.count_start = question.count_start
+
+		-- Save to json file
+		json.saveSession(question.jsonSettings)
 	end)
 
+	-- save checkForMultiple to json file so you can restore
 	question.checkForMultiple = checkForMultiple
-    question.langVer = languageNumber_2
+	question.langVer = languageNumber_2
 
 	-- Button to go back one question
 	function prevButton:on_clicked()
@@ -677,6 +690,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		end
 	end
 
+	-- Sets question.complete to false
+	-- so it resets everytime you do a session
 	question.complete = false
 
 	-- Define the callback function for the submit button in exam mode
@@ -690,6 +705,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		-- Will run if you didn't complete all questions
 		if question.complete == false then
 			-- Prompt you to be sure you want to continue
+			-- you didnt answer all questions 
 			pop.are_you_sure(
 				currentQuestion,
 				switchQuestion,
@@ -704,6 +720,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			)
 		else
 			-- Prompt you to be sure you want to continue
+			-- answeered all questions but ask if you want to submit
 			pop.are_you_sure(
 				currentQuestion,
 				switchQuestion,
@@ -721,6 +738,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		-- runs the exam mode evaluation on all your answers
 		local choice = question.mode.exam(mainWordList, w, question.last, response, replace, list)
 
+		-- Resets the json file
 		question.jsonSettings = {}
 		json.saveSession(question.jsonSettings)
 	end
@@ -735,7 +753,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		-- Move to the next question
 		currentQuestion = switchQuestion(true, question, w, wg, bt)
 
-		current = currentQuestion
+		-- Current question
+	 	current = currentQuestion
 
 		-- current question
 		question.count_start = current
@@ -759,6 +778,12 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 			question.jsonSettings.entry[choice] = i
 		end
+
+		-- Saves the session in case of exit or crash
+		question.jsonSettings.count_start = question.count_start
+
+		-- save to json file
+		json.saveSession(question.jsonSettings)
 	end
 
 	-- Get the tree selection and set the default selection
@@ -783,8 +808,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	-- Empty the wordlist language for next session
 	wordlist.lang = nil
 
-	return currentQuestion
+	return currentQuestion -- returns qurrent question
 end
 
--- Return the main function
+-- Return the main function for the questions
 return question

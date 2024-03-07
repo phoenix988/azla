@@ -15,6 +15,15 @@ local theme = require("lua.theme.default").load()
 -- Import fonts
 local font = require("lua.theme.default").font.load()
 
+-- Import function to check if a file exist
+local fileExist = require("lua.fileExist")
+
+-- Function to load config file
+local loadConfig = require("lua.loadConfig").load_config
+
+-- Some variables to use
+local var = require("lua.config.init")
+
 -- Here we are defining some combo boxes to create
 -- Import some methods and functions for combo boxes
 local combo = require("lua.widgets.combo.value")
@@ -36,14 +45,23 @@ function combo:create_word_list()
     combo.word_list_model = Gtk.ListStore.new({ GObject.Type.STRING })
 
     -- Calls the getluafilesdirectory function
+
     local directoryPath = self.app.path
     local luaFiles = list.dir(directoryPath)
+
     combo.word_files = luaFiles
 
     -- Add items to the wordfile combo box
     for _, luafiles in ipairs(combo.word_files) do
+
         local add = list.modify(luafiles)
-        combo.word_list_model:append({ add })
+
+        local wordDir_alt = var.wordDir_alt .. "/" .. add .. ".lua"
+        if fileExists(wordDir_alt) then
+            combo.word_list_model:append({ add })
+        else
+            combo.word_list_model:append({ add })
+        end
     end
 
     -- Makes the combobox widget for wordlists
@@ -88,7 +106,7 @@ function combo:create_word_count()
     )
 end
 
--- Makes the combobox lang widget
+-- Create the language combo box
 function combo:create_lang()
     -- Define language options for language combo box
     combo.lang_items = {

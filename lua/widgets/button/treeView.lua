@@ -6,6 +6,9 @@ local GObject = lgi.require("GObject", "2.0")
 local style = require("lua.widgets.setting")
 local theme = require("lua.theme.default")
 
+-- Import Variables
+local var = require("lua.config.init")
+
 local M = {}
 
 -- List of color schemes
@@ -36,7 +39,7 @@ end
 if defaultIndex == nil then
    defaultIndex = 1
 end
--- Create a list box 
+-- Create a list box
 function M:create()
    local listBox = Gtk.ListBox()
 
@@ -106,6 +109,10 @@ function M:create_tree()
       local update = require("lua.theme.update")
       local write = require("lua.config.init")
       local theme = require("lua.theme.default")
+      local mkdir = require("lua.terminal.mkdir").mkdir
+      if not fileExists(var.config.dir) then
+         mkdir(var.config.dir)
+      end
       theme.color_scheme(M, write, update)
    end)
 

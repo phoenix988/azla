@@ -112,7 +112,7 @@ function M.setting(config, apply, apply_theme, font)
 		end
 		file:write("}\n")
 		file:close()
-	--print("Config file updated successfully.")
+		--print("Config file updated successfully.")
 	else
 		print("Failed to open config file.")
 	end
@@ -126,11 +126,13 @@ function M.color_scheme(replacement, path)
 	local replace
 	local file = io.open(path, "r")
 
-	for line in file:lines() do
-		local match = string.match(line, "color_scheme")
+	if file then
+		for line in file:lines() do
+			local match = string.match(line, "color_scheme")
 
-		if match then
-			replace = line
+			if match then
+				replace = line
+			end
 		end
 	end
 

@@ -1,6 +1,16 @@
 local widget = require("lua.widgets.init")
 local json = require("lua.question.save")
 
+-- Imports Config function that will load config files
+local loadConfig = require("lua.loadConfig").load_config
+
+-- Imports filexist module
+local fileExist = require("lua.fileExist").fileExists
+
+-- Import variables
+local var = require("lua.config.init")
+
+-- Create module
 local M = {}
 
 function M.start_azla(exam, win, window, create_app2, luaWordsModule)
@@ -9,7 +19,19 @@ function M.start_azla(exam, win, window, create_app2, luaWordsModule)
 
    local choice = widget.combo.word_list_model[activeWord][1]
    local choice_count = widget.combo.word_model[activeWordCount][1]
-   wordlist = require(luaWordsModule .. "." .. choice)
+
+   -- Sets alt path to the wordlist dir
+   local wordDir_alt = var.wordDir_alt .. "/" .. choice .. ".lua"
+
+   -- Use custom wordfile if it exist
+   if fileExists(wordDir_alt) then
+      local wordlist = loadConfig(wordDir_alt)
+      Update = wordlist
+   else
+      Update = require(luaWordsModule .. "." .. choice)
+   end
+
+   wordlist = Update
    wordlist.count = choice_count
    wordlist.name = choice
    wordlist.count_start = 1
@@ -37,7 +59,18 @@ function M.load_session(exam, win, window, create_app2, luaWordsModule)
    local settings = json.loadSession()
 
    local success, result = pcall(function()
-      wordlist = require(luaWordsModule .. "." .. settings.wordlist)
+      -- Sets alt path to the wordlist dir
+      local wordDir_alt = var.wordDir_alt .. "/" .. settings.wordlist .. ".lua"
+
+      -- Use custom wordfile if it exist
+      if fileExists(wordDir_alt) then
+         local wordlist = loadConfig(wordDir_alt)
+         Update = wordlist
+      else
+         Update = require(luaWordsModule .. "." .. settings.wordlist)
+      end
+
+      wordlist = Update
       wordlist.count = settings.count_last
       wordlist.name = settings.wordlist
       wordlist.count_start = settings.count_start

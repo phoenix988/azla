@@ -7,6 +7,7 @@ local label = require("lua.widgets.label")
 
 local widget = {}
 
+-- Set default label for combo box
 function widget:set_default_label()
    local set = {}
    set.wordActive = combo.word:get_active()
@@ -50,16 +51,38 @@ end
 
 -- Define a method to set label_count
 function widget:set_count()
+   -- Imports Config function that will load config files
+   local loadConfig = require("lua.loadConfig").load_config
+
+   -- Imports filexist module
+   local fileExist = require("lua.fileExist").fileExists
+
+   -- Import variables
+   local var = require("lua.config.init")
    -- sets first start variable
    local isFirstStart = true
+
    -- Gets the length of the wordlist
    self.app.choice = self.app.modelWord[self.app.activeWord][1]
-   self.app.wordlist = require(self.app.module .. "." .. self.app.choice)
 
+   -- Check if custom path exist 
+   local wordDir_alt = var.wordDir_alt .. "/" .. self.app.choice .. ".lua"
+
+   -- If the custom path exist it will load it instead 
+   if fileExists(wordDir_alt) then
+      self.app.wordlist = loadConfig(wordDir_alt)
+   else
+      self.app.wordlist = require(self.app.module .. "." .. self.app.choice)
+   end
+
+   -- Counts the amount of words a list have
    local wordlist = self.app.wordlist
    self.app.list_count = #wordlist
+
+   -- Create new empty table to use
    self.app.list_new = {}
 
+   -- The table count
    local wordlist = self.app.list_count
    local list_new = self.app.list_new
 
@@ -102,9 +125,23 @@ function widget:set_count()
 end
 
 function widget:set_count_value()
-   -- Gets the length of the wordlist
+   -- Imports Config function that will load config files
+   local loadConfig = require("lua.loadConfig").load_config
+
+   -- Imports filexist module
+   local fileExist = require("lua.fileExist").fileExists
+
+   -- Import variables
+   local var = require("lua.config.init")
+
    self.app.choice = self.app.modelWord[self.app.activeWord][1]
-   self.app.wordlist = require(self.app.module .. "." .. self.app.choice)
+   local wordDir_alt = var.wordDir_alt .. "/" .. self.app.choice .. ".lua"
+
+   if fileExists(wordDir_alt) then
+      self.app.wordlist = loadConfig(wordDir_alt)
+   else
+      self.app.wordlist = require(self.app.module .. "." .. self.app.choice)
+   end
 
    local wordlist = self.app.wordlist
    self.app.list_count = #wordlist

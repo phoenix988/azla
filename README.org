@@ -37,10 +37,10 @@ If you just clone this repo and want to run this app you need to have those liba
 **** ARCH
 on arch you can run these commands to install all dependencies to build from source
 #+begin_src sh
-# you can also use pacman etc or if you use ubuntu the package name can be diffrent
-paru -S luarocks gtk4 lua-lgi-git lua53-lgi luastatic lua53 lua
+# You can also use pacman etc or if you use ubuntu or any oother distro the package name can be diffrent
+sudo paru -S luarocks gtk4 lua-lgi-git lua53-lgi luastatic lua53 lua
 
-# install some lua modules
+# Install some lua modules
 sudo luarocks install filesystem luautf8 dkjson
 #+end_src
 *** INSTALL
@@ -68,29 +68,43 @@ Some Important Azerbajani Vocabluary words to know that will help me learn the a
 There is also a script that kinda works like an exam and it will give you a sentence in english or azerbajani.
 And you need to translate it
 
-**** BASICS
+**** Nouns
 
-This is some basics words in azerbajani
+This is some Nouns in azerbajani
 
  | Azerbajani        | English         |
  |-------------------+-----------------|
  | Kino              | Movie           |
- | Ügurlar           | Good Luck       |
- | Xoş gördük        | Good to see you |
- | Xeyr              | No              |
- | Kimi              | Who             |
  | Dəftər             | Notebook        |
  | Kilsə              | Church          |
- | Edec              | Do              |
+
+
+
+**** Adjectives
+
+This is some Nouns in azerbajani
+
+ | Azerbajani        | English         |
+ |-------------------+-----------------|
+ | Tez               | Early/Fast      |
+ | Gec               | Late            |
+ | Təzliklə           | Soon            |
+
+
+**** Phrases
+
+This is some common phrases in azerbajani
+
+ | Azerbajani        | English         |
+ |-------------------+-----------------|
+ | Ügurlar           | Good Luck       |
+ | Xoş gördük        | Good to see you |
+ | Kimi              | Who             |
  | Ola biler         | Maybe           |
  | Var               | There is        |
  | Hara              | Where           |
  | Hansı             | Which           |
  | Sənin nə yaşin var | How old are you |
- | Tez               | Early/Fast      |
- | Gec               | Late            |
- | Təzliklə           | Soon            |
-
 
 **** MONTHS
 
@@ -138,8 +152,8 @@ Family words in azerbajani
 | Qayınana    | Mother-in-law |
 | Sevgili     | Girlfriend    |
 | Ailə         | Family        |
-| nişanlı qız | Fiance        |
-| nişanlə      | Engaged       |
+| Nişanlı qız | Fiance        |
+| Nişanlə      | Engaged       |
 
 
 **** VERBS_INFINITE

@@ -18,7 +18,7 @@ local M = {}
 M.font = require("lua.theme.font")
 M.setting = require("lua.theme.setting")
 
--- Default values are set here
+-- Default colors are set here
 local label_welcome = "#84a0c6"
 local label_lang = "#89b8c2"
 local label_word = "#89b8c2"
@@ -132,7 +132,7 @@ function M.color_scheme(treeView, write, update)
 
 	update.live(theme)
 
-	for key, value in pairs(theme) do
+	for key, _ in pairs(theme) do
 		local value = theme[key]
 		local match = string.match(value, "#")
 

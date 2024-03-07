@@ -8,14 +8,14 @@ local list = require("lua.terminal.listFiles")
 local setting_default = require("lua.theme.setting").load()
 
 -- Create empty table
-local array = {}
+local M = {}
 
--- Creates some empty widget tables
-array.theme_labels = {}
-array.theme_labels_setting = {}
-array.setting_labels = {}
-array.restore_button = {}
-
+-- Creates some empty tables for the widgets
+M.theme_labels = {} -- For the theme (Color) setting menu
+M.font_labels = {} -- For the font setting menu
+M.setting_labels = {} -- For the general settings menu
+M.theme_labels_setting = {} -- For all the labels used in the settings
+M.restore_button = {} -- For all the restore buttons
 
 -- Function to convert hash to Gdk.RGBA color
 local function hashToRGBA(hash)
@@ -34,14 +34,14 @@ local function hashToRGBA(hash)
     color.blue = blue
     color.alpha = 1.0
 
-    return color
+    return color -- Resturn the color
 end
 
 -- Exports the hashtoRGBA function
-array.hashToRGBA = hashToRGBA
+M.hashToRGBA = hashToRGBA
 
 -- Function to set some css style to widgets
-function array.set_theme(widget, style)
+function M.set_theme(widget, style)
     -- Create style table if its empty
     if style == nil then
         style = {}
@@ -57,6 +57,7 @@ function array.set_theme(widget, style)
     local style_context = widget:get_style_context()
     local css_provider = Gtk.CssProvider()
 
+    -- Create a CSS style rule
     for i, style in ipairs(style) do
         css = string.format(
             [[
@@ -99,15 +100,17 @@ function array.set_theme(widget, style)
     -- Apply the CSS class to the Entry widget
     widget:get_style_context():add_class("style")
 
-    return widget
+    return widget -- return the widget
 end
 
 -- Function to create grid layout of theme settings
-function array.theme_table(theme, font)
+function M.theme_table(theme, font)
     local button = require("lua.widgets.button")
     local update = require("lua.theme.update")
+
+    -- Create restore button
     local restoreButton = button.reset_create()
-    array.restore_button.theme = restoreButton
+    M.restore_button.theme = restoreButton
 
     -- Creates empty tables
     local theme_table = {}
@@ -118,15 +121,16 @@ function array.theme_table(theme, font)
     end
     table.sort(theme_table)
 
-    array.grid_theme_color = Gtk.Grid({ margin_top = 0 })
-    array.grid_theme_color:set_row_spacing(10)
-    array.grid_theme_color:set_column_spacing(10)
+    M.grid_theme_color = Gtk.Grid({ margin_top = 0 })
+    M.grid_theme_color:set_row_spacing(10)
+    M.grid_theme_color:set_column_spacing(10)
 
     -- Grabs all the color settings
-    for i, key in ipairs(theme_table) do
+    for _, key in ipairs(theme_table) do
         local value = theme[key]
         local matchColor = string.match(value, "#")
 
+        -- Update the theme with only colors
         if matchColor then
             table.insert(colorTable, key)
         end
@@ -143,53 +147,65 @@ function array.theme_table(theme, font)
         local labelValue = list.to_upper(labelValue)
 
         -- Make label widgets
-        array.theme_labels_setting[key] = Gtk.Label({ margin_bottom = 50, label = labelValue })
-        array.theme_labels_setting[key]:set_markup(
+        M.theme_labels_setting[key] = Gtk.Label({ margin_bottom = 50, label = labelValue })
+        M.theme_labels_setting[key]:set_markup(
             "<span foreground='"
             .. theme.label_fg
             .. "'size='"
             .. font.fg_size
             .. "'>"
-            .. array.theme_labels_setting[key].label
+            .. M.theme_labels_setting[key].label
             .. "</span>"
         )
 
-        array.theme_labels[key] = Gtk.ColorButton({ margin_top = 50 })
+        -- Make the color buttons for the theme menu
+        M.theme_labels[key] = Gtk.ColorButton({ margin_top = 50 })
 
+        -- Sets the colors
         local defaultColor = hashToRGBA(value)
-        array.theme_labels[key]:set_rgba(defaultColor)
-        array.grid_theme_color:attach(array.theme_labels[key], col, row * 2 + 1, 1, 1)
-        array.grid_theme_color:attach(array.theme_labels_setting[key], col, row * 2 + 1, 1, 1)
+        M.theme_labels[key]:set_rgba(defaultColor)
+
+        -- Attach the options to the grid
+        M.grid_theme_color:attach(M.theme_labels[key], col, row * 2 + 1, 1, 1)
+        M.grid_theme_color:attach(M.theme_labels_setting[key], col, row * 2 + 1, 1, 1)
     end
 
-    widget.box_theme:append(array.grid_theme_color)
+    -- Attach the widgets to the theme box
+    widget.box_theme:append(M.grid_theme_color)
     widget.box_theme:append(label.theme_restore.theme)
     widget.box_theme:append(restoreButton)
 
+    -- Add click action too the button to restore the theme to default
     function restoreButton:on_clicked()
-        update.restore("theme")
+        update.restore("theme") -- function for restoration of theme
     end
-    
-    return widget
+
+    return widget -- Return the widget
 end
 
 -- Function to create grid layout of regular settings
-function array.setting_table(theme, font)
+function M.setting_table(theme, font)
     -- Import buttons
     local button = require("lua.widgets.button")
     local update = require("lua.theme.update")
-    local restoreButton = button.reset_create()
-    array.restore_button.setting = restoreButton
 
+    -- Create restore Button
+    local restoreButton = button.reset_create()
+
+    -- Restore button for setting
+    M.restore_button.setting = restoreButton
+
+    -- Creates table for all setting values
     local setting_table = {}
     for key in pairs(setting_default) do
         table.insert(setting_table, key)
     end
     table.sort(setting_table)
 
-    array.grid_widgets_setting = Gtk.Grid({ margin_top = 0 })
-    array.grid_widgets_setting:set_row_spacing(10)
-    array.grid_widgets_setting:set_column_spacing(10)
+    -- Create grid layout for general settings
+    M.grid_widgets_setting = Gtk.Grid({ margin_top = 0 })
+    M.grid_widgets_setting:set_row_spacing(10)
+    M.grid_widgets_setting:set_column_spacing(10)
 
     -- Creates all the entry boxes for some standard setting entry boxes
     for i, key in ipairs(setting_table) do
@@ -204,49 +220,62 @@ function array.setting_table(theme, font)
         local labelValue = list.to_upper(labelValue)
 
         -- Makes entry widgets
-        array.setting_labels[key] = Gtk.Entry({ margin_top = 50, text = value })
-        array.setting_labels[key]:set_size_request(20, 10) -- Set width = 200, height = 100
+        M.setting_labels[key] = Gtk.Entry({ margin_top = 50, text = value })
+        M.setting_labels[key]:set_size_request(20, 10) -- Set width = 200, height = 100
 
-        array.setting_labels[key] = array.set_theme(array.setting_labels[key])
+        -- Sets the theme
+        M.setting_labels[key] = M.set_theme(M.setting_labels[key])
 
         -- Make label widgets
-        array.theme_labels_setting[key] = Gtk.Label({ margin_bottom = 50, label = labelValue })
+        M.theme_labels_setting[key] = Gtk.Label({ margin_bottom = 50, label = labelValue })
 
-        array.theme_labels_setting[key]:set_markup(
+        -- Add theme to the label
+        M.theme_labels_setting[key]:set_markup(
             "<span foreground='"
             .. theme.label_fg
             .. "'size='"
             .. font.fg_size
             .. "'>"
-            .. array.theme_labels_setting[key].label
+            .. M.theme_labels_setting[key].label
             .. "</span>"
         )
-        array.grid_widgets_setting:attach(array.setting_labels[key], col, row * 2 + 1, 1, 1)
-        array.grid_widgets_setting:attach(array.theme_labels_setting[key], col, row * 2 + 1, 1, 1)
+
+        -- Attach the General setting widgets to the gird
+        M.grid_widgets_setting:attach(M.setting_labels[key], col, row * 2 + 1, 1, 1)
+        M.grid_widgets_setting:attach(M.theme_labels_setting[key], col, row * 2 + 1, 1, 1)
     end
 
-    widget.box_setting:append(array.grid_widgets_setting)
+    -- Attch the widget to the settings box
+    widget.box_setting:append(M.grid_widgets_setting)
     widget.box_setting:append(label.theme_restore.setting)
     widget.box_setting:append(restoreButton)
 
+    -- Attach the function for restore button
     function restoreButton:on_clicked()
         update.restore("setting")
     end
-    
-    return widget
+
+    return widget -- Return the widget
 end
 
-function array.font_table(theme, font)
+-- Create gird layout for font settings
+function M.font_table(theme, font)
+    -- Import functions I need
     local update = require("lua.theme.update")
-    local restoreButton = button.reset_create()
-    array.restore_button.font = restoreButton
 
+    -- Create restore button for fonts
+    local restoreButton = button.reset_create()
+    M.restore_button.font = restoreButton
+
+    -- Create empty table
     local fontTable = {}
 
-    array.grid_theme = Gtk.Grid({ margin_top = 0 })
-    array.grid_theme:set_row_spacing(10)
-    array.grid_theme:set_column_spacing(10)
+    -- Create grid layout for font settings
+    M.grid_theme = Gtk.Grid({ margin_top = 0 })
+    M.grid_theme:set_row_spacing(10)
+    M.grid_theme:set_column_spacing(10)
 
+    -- Create table for all the font values
     for key in pairs(font) do
         table.insert(fontTable, key)
     end
@@ -270,48 +299,52 @@ function array.font_table(theme, font)
             value = value / 1000
             value = tostring(value):gsub("%.0+$", "")
 
-            array.theme_labels[key] = Gtk.SpinButton({
+            -- Create spin button for the font size
+            M.font_labels[key] = Gtk.SpinButton({
                 adjustment = Gtk.Adjustment({ lower = 0, upper = 100, step_increment = 1 }),
                 digits = 0,
                 margin_top = 100,
                 halign = Gtk.Align.CENTER,
             })
 
-            array.theme_labels[key] = array.set_theme(array.theme_labels[key])
-            array.theme_labels[key]:set_value(value)
+            -- Set theme for the font buttons
+            M.font_labels[key] = M.set_theme(M.font_labels[key])
+            M.font_labels[key]:set_value(value)
         else
-            array.theme_labels[key] = Gtk.Entry({ margin_top = 50, text = value })
-            array.theme_labels[key]:set_size_request(20, 10) -- Set width = 200, height = 100
-            array.theme_labels[key] = array.set_theme(array.theme_labels[key])
+            -- Set theme for the font buttons
+            M.font_labels[key] = Gtk.Entry({ margin_top = 50, text = value })
+            M.font_labels[key]:set_size_request(20, 10) -- Set width = 200, height = 100
+            M.font_labels[key] = M.set_theme(M.font_labels[key])
         end
 
         -- Make label widgets
-        array.theme_labels_setting[key] = Gtk.Label({ margin_bottom = 50, label = labelValue })
-        array.theme_labels_setting[key]:set_markup(
+        M.theme_labels_setting[key] = Gtk.Label({ margin_bottom = 50, label = labelValue })
+        M.theme_labels_setting[key]:set_markup(
             "<span foreground='"
             .. theme.label_fg
             .. "'size='"
             .. font.fg_size
             .. "'>"
-            .. array.theme_labels_setting[key].label
+            .. M.theme_labels_setting[key].label
             .. "</span>"
         )
 
         -- Makes entry box and set theme
-        array.grid_theme:attach(array.theme_labels[key], col, row * 2 + 1, 1, 1)
-        array.grid_theme:attach(array.theme_labels_setting[key], col, row * 2 + 1, 1, 1)
+        M.grid_theme:attach(M.font_labels[key], col, row * 2 + 1, 1, 1)
+        M.grid_theme:attach(M.theme_labels_setting[key], col, row * 2 + 1, 1, 1)
     end
 
-    widget.box_theme_alt:append(array.grid_theme)
+    -- Attach the font widgets to the font box
+    widget.box_theme_alt:append(M.grid_theme)
     widget.box_theme_alt:append(label.theme_restore.font)
     widget.box_theme_alt:append(restoreButton)
 
-    
+    -- Add the click action to the font restore button
     function restoreButton:on_clicked()
         update.restore("font")
     end
-    
-    return widget
+
+    return widget -- return widget
 end
 
-return array
+return M -- Return the module

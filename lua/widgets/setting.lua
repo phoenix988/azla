@@ -177,6 +177,7 @@ function M.theme_table(theme, font)
 
     -- Add click action too the button to restore the theme to default
     function restoreButton:on_clicked()
+	    --local status = write.write.config.color_scheme('color_scheme = "' .. stringValue .. '"\n', customConfig)
         update.restore("theme") -- function for restoration of theme
     end
 

@@ -63,10 +63,10 @@ local function backAction(currentQuestion, question, window_alt, win, import, ma
 			question.jsonSettings.entry[choice] = i
 		end
 	end
-        
+
 	-- Make table
 	question.jsonSettings.treeViewCheck = {}
-        -- Save treeview settings when saving the session
+	-- Save treeview settings when saving the session
 	for i = 1, math.min(#question.word, question.last) do
 		local choice = question.widget.entry_fields[i].text:lower()
 		local word = question.word[i][question.langVer]
@@ -184,11 +184,11 @@ function M.click_action(widget, image, label, theme, setting, write)
 		if button.setting_wordlist_count == 0 then
 			notebook.wordlist:set_visible(true)
 			button.setting_wordlist_count = 1
-            button.setting_wordlist:set_label("Hide WordList")
+			button.setting_wordlist:set_label("Hide WordList")
 			notebook.theme:set_visible(false)
 		elseif button.setting_wordlist_count == 1 then
 			notebook.wordlist:set_visible(false)
-            button.setting_wordlist:set_label("Show WordLists")
+			button.setting_wordlist:set_label("Show WordLists")
 			button.setting_wordlist_count = 0
 			notebook.theme:set_visible(true)
 		end
@@ -289,10 +289,25 @@ function M.click_action(widget, image, label, theme, setting, write)
 		local theme = require("lua.theme.default")
 		local theme = theme.load()
 
-		update.live(theme)
+                -- Import functions we need
+		local update = require("lua.theme.update")
+		local write = require("lua.config.init")
+		local theme = require("lua.theme.default")
+		local mkdir = require("lua.terminal.mkdir").mkdir
+		
+		-- Create config if it doesn't exist
+		if not fileExists(var.config.dir) then
+			mkdir(var.config.dir)
+		end
+		-- Write the color scheme to file etc so it updates
+		theme.color_scheme(treeView, write, update)
+		
+		-- Live update the app while its running
+		--update.live(theme)
 		update.live(apply)
 	end
-
+        
+	-- Function for button color -- NOTE: this button is not used
 	function button.color_scheme:on_clicked()
 		local theme = require("lua.theme.default")
 		theme.color_scheme(treeView, write, update)
@@ -303,14 +318,15 @@ end
 function M.exit_click(window, write, win, cacheFile, combo)
 	window.width = win:get_allocated_width()
 	window.height = win:get_allocated_height()
-
+        -- Write to the cache file 
 	write.write.cache.config_main(cacheFile, combo)
-
+        -- Destroy the window
 	win:destroy()
 end
 
 -- Button create result
 function M.result_create(result)
+	-- Create the result button
 	button.result = Gtk.Button({ label = "Show Result" })
 
 	-- Defines the function of Resultbutton

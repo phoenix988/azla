@@ -48,12 +48,17 @@ function combo:create_word_list()
 
     local directoryPath = self.app.path
     local luaFiles = list.dir(directoryPath)
+    local dontAdd = {}
+    if var.wordDir_alt ~= nil then
+        if fileExists(var.wordDir_alt) then
+            luaFiles_alt = list.dir(var.wordDir_alt)
+        end
+    end
 
     combo.word_files = luaFiles
 
     -- Add items to the wordfile combo box
     for _, luafiles in ipairs(combo.word_files) do
-
         local add = list.modify(luafiles)
 
         local wordDir_alt = var.wordDir_alt .. "/" .. add .. ".lua"
@@ -61,6 +66,21 @@ function combo:create_word_list()
             combo.word_list_model:append({ add })
         else
             combo.word_list_model:append({ add })
+        end
+
+        dontAdd[add] = add
+    end
+
+    for _, luafiles in ipairs(luaFiles_alt) do
+        local add = list.modify(luafiles)
+        if not dontAdd[add] then
+            local success, result = pcall(function()
+                test_wordlist = loadConfig(var.wordDir_alt .. "/" .. add .. ".lua")
+            end)
+            if #test_wordlist ~= 0 then
+                combo.word_list_model:append({ add })
+                table.insert(combo.word_files, luafiles)
+            end
         end
     end
 
@@ -81,6 +101,7 @@ function combo:create_word_list()
         combo.word,
         { { size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg } }
     )
+
 end
 
 -- Create word count box

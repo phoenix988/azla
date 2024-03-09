@@ -1,6 +1,5 @@
 -- Update function to update the theme of the app
 -- mainly for live update and restore default value
-
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
 local label = require("lua.widgets.label")
@@ -29,12 +28,103 @@ local confDir = var.config.dir
 -- Create empty table
 local M = {}
 
+function M.import_wordlists(dont, list, count, wordList, i)
+	-- Import the wordlist items and check if you have custom files
+	local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
+	if not dont[wordList] then
+		count = count + 1
+		list.wordList_items[i] = list.custom_wordlist[count]
+		return list
+	elseif fileExists(wordDir_alt) then
+		local wordlist = loadConfig(wordDir_alt)
+		list.wordList_items[i] = wordlist
+		return list
+	else
+		list.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+		return list
+	end
+end
+
+-- Check if custom wordlist exists
+function M.check_custom_list(countCustom, luaFiles, M, dontAdd)
+	-- Check for custom dir
+	if var.wordDir_alt ~= nil then
+		if fileExists(var.wordDir_alt) then
+			luaFiles_alt = list.dir(var.wordDir_alt)
+		end
+	end
+
+	-- Check which files are not custom
+	for _, luafiles in ipairs(luaFiles) do
+		local add = list.modify(luafiles)
+		-- Dont add these values ass custom list
+		dontAdd[add] = add
+	end
+
+	-- Looks for the custom wordlist
+	for _, luafiles in ipairs(luaFiles_alt) do
+		local add = list.modify(luafiles)
+		if not dontAdd[add] then
+			local success, result = pcall(function()
+				test_wordlist = loadConfig(var.wordDir_alt .. "/" .. add .. ".lua")
+			end)
+			if #test_wordlist ~= 0 then
+				countCustom = countCustom + 1
+				M.custom_wordlist[countCustom] = test_wordlist
+				table.insert(luaFiles, add)
+				--notebook.wordlist:append_page(widget.box_word_list_2, Gtk.Label({ label = "Custom Wordlists" }))
+			else
+				noNeedtoRun = true
+			end
+		end
+	end
+end
+
+function M.check_mult_subdir(directoryPath, lower, newMenu, wordList)
+	local success = pcall(function()
+		NewSubDir = list.dir(directoryPath .. "/" .. lower)
+	end)
+
+	-- If pcall succedd this will run
+	if success then
+		newMenu.import_items[wordList] = {}
+		newMenu.new_list[wordList] = {}
+		for k = 1, #NewSubDir do
+			-- Import all words
+			local last = list.modify(NewSubDir[k])
+			local allWords = lower .. "/" .. last
+			local import = require(var.wordMod .. "." .. allWords)
+			table.insert(newMenu.import_items[wordList], import)
+
+			-- Check if custom file exist and use those words instead
+			-- And breaks out of the loop if it does exist and load the custome words
+			local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
+			if fileExists(wordDir_alt) then
+				local wordlist = loadConfig(wordDir_alt)
+				for key, value in ipairs(wordlist) do
+					for j = 1, #value do
+						table.insert(newMenu.new_list[wordList], value[j])
+					end
+				end
+				break
+			end
+
+			for key, value in ipairs(import) do
+				for j = 1, #value do
+					table.insert(newMenu.new_list[wordList], value[j])
+				end
+			end
+		end
+	end
+end
+
 -- function to update word list menu when updating theme
 function M.update_word_list()
 	-- Update the word list menu settings
+	-- Import colors etc and font and the widgets from the word menu
 	local menu = require("lua.widgets.menu.init")
-	local theme = require("lua.theme.default").load()
-	local font = require("lua.theme.default").font.load()
+	local theme = require("lua.theme.default").load()  -- load colors
+	local font = require("lua.theme.default").font.load() -- load font
 
 	-- Function to remove childs from grid or any widget
 	local function clear_grid(grid)
@@ -45,42 +135,44 @@ function M.update_word_list()
 		end
 	end
 
+	-- Clear some of the wigets
 	for key, value in pairs(menu.grid_items) do
 		clear_grid(menu.grid_items[key])
 	end
 
+	-- Create new tables to use for wordlist menu
 	local newMenu = {}
-	newMenu.wordList_items = {}
-	newMenu.grid_items = {}
-	newMenu.entry_items = {}
+	newMenu.wordList_items = {} -- for the words in the grid
 	newMenu.import_items = {}
 	newMenu.new_list = {}
 	newMenu.label_list = {}
+	newMenu.custom_wordlist = {} -- for custom wordlists
 
+	-- List all available lists
 	local directoryPath = var.wordDir
 	local luaFiles = list.dir(directoryPath)
 
+	-- Table for values not to add to custom list
+	local dontAdd = {}
+
+	-- Keep track of the amount of custom wordlist
+	local countCustom = 0
+	local countCustom_main = 0
+
+	M.check_custom_list(countCustom, luaFiles, newMenu, dontAdd)
+
 	for i, item_label in ipairs(luaFiles) do
 		local wordList = list.modify(item_label)
+		local match = string.match(wordList, "_")
 
-		local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
-		if fileExists(wordDir_alt) then
-			local wordlist = loadConfig(wordDir_alt)
-			newMenu.wordList_items[i] = wordlist
-		else
-			newMenu.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+		if match ~= nil then
+			wordList = item_label
 		end
+
+		M.import_wordlists(dontAdd, newMenu, countCustom_main, wordList, i)
 
 		-- Clear box
 		clear_grid(menu.box[i])
-
-		-- Sets the first entry boxes to add a new word
-		local entry_az = Gtk.Entry({ margin_top = 50, placeholder_text = "Azerbajani Word" })
-		local entry_eng = Gtk.Entry({ margin_top = 50, placeholder_text = "English Word" })
-
-		-- Create submit and add button for the grid
-		local submit = Gtk.Button({ label = "Submit" })
-		local addAnother = Gtk.Button({ margin_top = 50, label = "Add" })
 
 		-- Make all dirs to lowercase
 		local lower = wordList:lower()
@@ -90,15 +182,72 @@ function M.update_word_list()
 
 		-- Create spacer widget
 		local spacer = Gtk.Label()
+
+		-- Clears some grids to update colors
+		clear_grid(menu.grid_remove[i])
+		clear_grid(menu.grid[i])
+
+		menu.label_list.remove[i] = Gtk.Label({ label = "Write index of word\n you want to Delete", margin_top = 50 })
+
+		-- Entry box to remove word
+		menu.entry_remove[i] = Gtk.Entry({ placeholder_text = "Remove Word: Write Number" })
+
+		-- Set label theme
+		menu.label_list.remove[i]:set_markup(
+			"<span size='"
+			.. font.fg_size
+			.. "' foreground='"
+			.. theme.label_welcome
+			.. "'>"
+			.. menu.label_list.remove[i].label
+			.. "</span>"
+		)
+
+		-- Set style of entry boxes
+		menu.entry_remove[i] = style.set_theme(menu.entry_remove[i], {
+			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+		})
+
+		menu.entry_items.firstaz[i] = style.set_theme(menu.entry_items.firstaz[i], {
+			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+		})
+
+		menu.entry_items.firsten[i] = style.set_theme(menu.entry_items.firsten[i], {
+			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+		})
+
+		menu.addButton[i] = style.set_theme(menu.addButton[i], {
+			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+		})
+
+		menu.submitButton[i] = style.set_theme(menu.submitButton[i], {
+			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+		})
+
+		menu.removeButton[i] = style.set_theme(menu.removeButton[i], {
+			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+		})
+
+		-- Readd widgets to the grid
+		menu.grid_remove[i]:attach(menu.label_list.remove[i], 1, 0, 5, 1)
+		menu.grid_remove[i]:attach(menu.entry_remove[i], 1, 1, 1, 1)
+		menu.grid_remove[i]:attach(menu.removeButton[i], 2, 1, 1, 1)
+
+		-- Readd widgets to the grid
+		menu.grid[i]:attach(menu.entry_items.firstaz[i], 1, 0, 1, 1)
+		menu.grid[i]:attach(menu.entry_items.firsten[i], 2, 0, 1, 1)
+		menu.grid[i]:attach(menu.addButton[i], 3, 0, 1, 1)
+		menu.grid[i]:attach(menu.submitButton[i], 0, 1, 4, 1)
+
 		-- Set theme on title label
 		label_az:set_markup(
 			"<span size='"
-				.. font.welcome_size
-				.. "' foreground='"
-				.. theme.label_welcome
-				.. "'>"
-				.. label_az.label
-				.. "</span>"
+			.. font.welcome_size
+			.. "' foreground='"
+			.. theme.label_welcome
+			.. "'>"
+			.. label_az.label
+			.. "</span>"
 		)
 
 		-- Append to the box widget when updating color
@@ -106,42 +255,8 @@ function M.update_word_list()
 		menu.box[i]:append(spacer)
 		menu.box[i]:append(menu.grid_main[i])
 
-		-- Make sure you dont get errors
-		local success, result = pcall(function()
-			NewSubDir = list.dir(directoryPath .. "/" .. lower)
-		end)
 
-		-- If pcall succedd this will run
-		if success then
-			newMenu.import_items[wordList] = {}
-			newMenu.new_list[wordList] = {}
-			for k = 1, #NewSubDir do
-				-- Import all words
-				local last = list.modify(NewSubDir[k])
-				local allWords = lower .. "/" .. last
-				local import = require(var.wordMod .. "." .. allWords)
-				table.insert(newMenu.import_items[wordList], import)
-
-				-- Check if custom file exist and use those words instead
-				-- And breaks out of the loop if it does exist and load the custome words
-				local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
-				if fileExists(wordDir_alt) then
-					local wordlist = loadConfig(wordDir_alt)
-					for key, value in ipairs(wordlist) do
-						for j = 1, #value do
-							table.insert(newMenu.new_list[wordList], value[j])
-						end
-					end
-					break
-				end
-
-				for key, value in ipairs(import) do
-					for j = 1, #value do
-						table.insert(newMenu.new_list[wordList], value[j])
-					end
-				end
-			end
-		end
+       M.check_mult_subdir(directoryPath, lower, newMenu, wordList)
 
 		-- append the button grid to the box
 		--menu.box[i]:append(menu.grid[i])
@@ -151,6 +266,7 @@ function M.update_word_list()
 			return number % 2 == 0
 		end
 
+		-- Add words to grid start
 		if type(newMenu.import_items[wordList]) == "table" then
 			-- Keep track of even and uneven
 			local countTime = 0
@@ -183,12 +299,12 @@ function M.update_word_list()
 				-- Set label theme
 				label:set_markup(
 					"<span size='"
-						.. font.word_list_size
-						.. "' foreground='"
-						.. theme.label_fg
-						.. "'>"
-						.. label.label
-						.. "</span>"
+					.. font.word_list_size
+					.. "' foreground='"
+					.. theme.label_fg
+					.. "'>"
+					.. label.label
+					.. "</span>"
 				)
 
 				menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
@@ -220,19 +336,19 @@ function M.update_word_list()
 				-- Set label theme
 				label:set_markup(
 					"<span size='"
-						.. font.word_list_size
-						.. "' foreground='"
-						.. theme.label_fg
-						.. "'>"
-						.. label.label
-						.. "</span>"
+					.. font.word_list_size
+					.. "' foreground='"
+					.. theme.label_fg
+					.. "'>"
+					.. label.label
+					.. "</span>"
 				)
 
 				newMenu.label_list[wordList][j] = label
 
 				menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
 			end
-		end
+		end -- Add words to grid end
 	end
 end
 
@@ -248,12 +364,12 @@ function M.live(theme)
 	label.welcome:set_text(label.text.welcome)
 	label.welcome:set_markup(
 		"<span size='"
-			.. font.welcome_size
-			.. "' foreground='"
-			.. theme.label_welcome
-			.. "'>"
-			.. label.welcome.label
-			.. "</span>"
+		.. font.welcome_size
+		.. "' foreground='"
+		.. theme.label_welcome
+		.. "'>"
+		.. label.welcome.label
+		.. "</span>"
 	)
 
 	-- Update other widgets as needed
@@ -262,69 +378,69 @@ function M.live(theme)
 	label.theme:set_text("Settings")
 	label.theme:set_markup(
 		"<span size='"
-			.. font.welcome_size
-			.. "' foreground='"
-			.. theme.label_fg
-			.. "'>"
-			.. label.theme.label
-			.. "</span>"
+		.. font.welcome_size
+		.. "' foreground='"
+		.. theme.label_fg
+		.. "'>"
+		.. label.theme.label
+		.. "</span>"
 	)
 
 	label.theme_apply:set_text("Applied new settings. Please restart the app")
 	label.theme_apply:set_markup(
 		"<span size='"
-			.. font.fg_size
-			.. "' foreground='"
-			.. theme.label_correct
-			.. "'>"
-			.. label.theme_apply.label
-			.. "</span>"
+		.. font.fg_size
+		.. "' foreground='"
+		.. theme.label_correct
+		.. "'>"
+		.. label.theme_apply.label
+		.. "</span>"
 	)
 
 	for key, value in pairs(label.theme_restore) do
 		label.theme_restore[key]:set_text("Restored to default settings")
 		label.theme_restore[key]:set_markup(
 			"<span size='"
-				.. font.fg_size
-				.. "' foreground='"
-				.. theme.label_fg
-				.. "'>"
-				.. label.theme_restore[key].label
-				.. "</span>"
+			.. font.fg_size
+			.. "' foreground='"
+			.. theme.label_fg
+			.. "'>"
+			.. label.theme_restore[key].label
+			.. "</span>"
 		)
 	end
 
 	label.word_list:set_text("Choose your wordlist")
 	label.word_list:set_markup(
 		"<span size='"
-			.. font.word_size
-			.. "' foreground='"
-			.. theme.label_word
-			.. "'>"
-			.. label.word_list.label
-			.. "</span>"
+		.. font.word_size
+		.. "' foreground='"
+		.. theme.label_word
+		.. "'>"
+		.. label.word_list.label
+		.. "</span>"
 	)
 
 	label.language:set_text("Choose Language you want to write answers in:")
 	label.language:set_markup(
 		"<span size='"
-			.. font.lang_size
-			.. "' foreground='"
-			.. theme.label_lang
-			.. "'>"
-			.. label.language.label
-			.. "</span>"
+		.. font.lang_size
+		.. "' foreground='"
+		.. theme.label_lang
+		.. "'>"
+		.. label.language.label
+		.. "</span>"
 	)
 
 	label.word_count:set_text("Choose word amount")
 	label.word_count:set_markup(
 		"<span size='"
-			.. font.word_size
-			.. "' foreground='"
-			.. theme.label_word
-			.. "'>"
-			.. label.word_count.label
-			.. "</span>"
+		.. font.word_size
+		.. "' foreground='"
+		.. theme.label_word
+		.. "'>"
+		.. label.word_count.label
+		.. "</span>"
 	)
 
 	-- Update theme for the settings grid -- {{{ start
@@ -338,12 +454,12 @@ function M.live(theme)
 		array.theme_labels_setting[key]:set_text(labelValue)
 		array.theme_labels_setting[key]:set_markup(
 			"<span foreground='"
-				.. theme.label_fg
-				.. "'size='"
-				.. font.fg_size
-				.. "'>"
-				.. array.theme_labels_setting[key].label
-				.. "</span>"
+			.. theme.label_fg
+			.. "'size='"
+			.. font.fg_size
+			.. "'>"
+			.. array.theme_labels_setting[key].label
+			.. "</span>"
 		)
 	end
 
@@ -358,12 +474,12 @@ function M.live(theme)
 		array.theme_labels_setting[key]:set_text(labelValue)
 		array.theme_labels_setting[key]:set_markup(
 			"<span foreground='"
-				.. theme.label_fg
-				.. "'size='"
-				.. font.fg_size
-				.. "'>"
-				.. array.theme_labels_setting[key].label
-				.. "</span>"
+			.. theme.label_fg
+			.. "'size='"
+			.. font.fg_size
+			.. "'>"
+			.. array.theme_labels_setting[key].label
+			.. "</span>"
 		)
 		array.setting_labels[key]:set_text(value)
 
@@ -381,12 +497,12 @@ function M.live(theme)
 		array.theme_labels_setting[key]:set_text(labelValue)
 		array.theme_labels_setting[key]:set_markup(
 			"<span foreground='"
-				.. theme.label_fg
-				.. "'size='"
-				.. font.fg_size
-				.. "'>"
-				.. array.theme_labels_setting[key].label
-				.. "</span>"
+			.. theme.label_fg
+			.. "'size='"
+			.. font.fg_size
+			.. "'>"
+			.. array.theme_labels_setting[key].label
+			.. "</span>"
 		)
 		local value = value / 1000
 		local value = tostring(value):gsub("%.0+$", "")
@@ -415,12 +531,12 @@ function M.live(theme)
 	label.current_color_scheme:set_text("Current theme is: " .. stringValue)
 	label.current_color_scheme:set_markup(
 		"<span size='"
-			.. font.fg_size
-			.. "' foreground='"
-			.. theme.label_word
-			.. "'>"
-			.. label.current_color_scheme.label
-			.. "</span>"
+		.. font.fg_size
+		.. "' foreground='"
+		.. theme.label_word
+		.. "'>"
+		.. label.current_color_scheme.label
+		.. "</span>"
 	)
 
 	-- Update button properties when updating theme

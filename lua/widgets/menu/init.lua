@@ -1,12 +1,7 @@
 -- Imports libaries we need
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
-local Gdk = require("lgi").Gdk
 local GLib = require("lgi").GLib
-local GObject = lgi.require("GObject", "2.0")
-local GdkPixbuf = lgi.require("GdkPixbuf")
-local lfs = require("lfs")
-local os = require("os")
 
 -- Import widgets
 local widget = require("lua.widgets.box")
@@ -25,7 +20,11 @@ local font = require("lua.theme.default").font.load()
 
 -- Import mkdir function
 local mkdir = require("lua.terminal.mkdir").mkdir
+local rmdir = require("lua.terminal.mkdir").rmdir
 local fileExist = require("lua.fileExist")
+
+-- Import style function for themes
+local style = require("lua.widgets.setting")
 
 -- Function to load config file
 local loadConfig = require("lua.loadConfig").load_config
@@ -36,32 +35,39 @@ local function isEven(number)
 end
 
 -- Function to update the wordlist file with new entries
-local function updateWordlist(wordlist, words, check)
-	-- Checks if custom wordlist exist
-	local wordDir_alt = var.wordDir_alt .. "/" .. wordlist .. ".lua"
-	if fileExists(wordDir_alt) then
-		-- load the wordlist
-		local wordlist = loadConfig(wordDir_alt)
-		formatList = wordlist
-	else 
-		if check then -- Checks if the wordlist has multiple subfiles 
-		-- so it saves them all in one file and combine them in your home dir
-			-- Import the chosen wordlist
-			formatList = require(var.wordMod .. "." .. wordlist).all
+local function updateWordlist(wordlist, words, check, delete)
+	formatList = {}
+	-- Determines to delete word or not
+	local delete = delete or 0
+	if delete == 1 then
+		formatList = words
+	else
+		-- Checks if custom wordlist exist
+		local wordDir_alt = var.wordDir_alt .. "/" .. wordlist .. ".lua"
+		if fileExists(wordDir_alt) then
+			-- load the wordlist
+			local wordlist = loadConfig(wordDir_alt)
+			formatList = wordlist
 		else
-			-- Import the chosen wordlist
-			formatList = require(var.wordMod .. "." .. wordlist)
+			if check then -- Checks if the wordlist has multiple subfiles
+				-- so it saves them all in one file and combine them in your home dir
+				-- Import the chosen wordlist
+				formatList = require(var.wordMod .. "." .. wordlist).all
+			else
+				-- Import the chosen wordlist
+				formatList = require(var.wordMod .. "." .. wordlist)
+			end
 		end
-	end
 
-	-- Loop through the new list to add
-	for i = 1, #words do
-		-- Gets the diffrent words
-		local azerbaijani = words[i][1]
-		local english = words[i][2]
+		-- Loop through the new list to add
+		for i = 1, #words do
+			-- Gets the diffrent words
+			local azerbaijani = words[i][1]
+			local english = words[i][2]
 
-		-- Add the new entry to the wordlist
-		table.insert(formatList, { azerbaijani, english })
+			-- Add the new entry to the wordlist
+			table.insert(formatList, { azerbaijani, english })
+		end
 	end
 
 	-- Create custom word path if it doesn't exist
@@ -69,17 +75,23 @@ local function updateWordlist(wordlist, words, check)
 		mkdir(var.wordDir_alt)
 	end
 
-	-- Serialize the updated wordlist and write it back to the file
-	local file = io.open(var.wordDir_alt .. "/" .. wordlist .. ".lua", "w")
-	file:write("local wordlist = {\n")
-	for _, entry in ipairs(formatList) do
-		file:write(string.format('\t{ "%s", "%s" },\n', entry[1], entry[2]))
-	end
-	file:write("}\n\nreturn wordlist")
-	file:close()
+	if #formatList == 0 then
+		rmdir(var.wordDir_alt .. "/" .. wordlist .. ".lua") -- Remove the file if it gets empty
+	else
+		-- Serialize the updated wordlist and write it back to the file
+		local file = io.open(var.wordDir_alt .. "/" .. wordlist .. ".lua", "w")
+		if file then
+			file:write("local wordlist = {\n")
+			for _, entry in ipairs(formatList) do
+				file:write(string.format('\t{ "%s", "%s" },\n', entry[1], entry[2]))
+			end
+			file:write("}\n\nreturn wordlist")
+			file:close()
 
-	-- Prints to the terminal
-	print("Wordlist updated successfully!")
+			-- Prints to the terminal
+			print("Wordlist updated successfully!")
+		end
+	end
 
 	-- Table to pass to the combo update function
 	local inputCount = {
@@ -93,39 +105,64 @@ local function updateWordlist(wordlist, words, check)
 	-- so it updates whill app is running
 	combo.count = combo:new(inputCount)
 	combo.count:set_count()
+
+	formatList = {}
 end
 
--- Creating empty tables
+-- Creating empty tables -- start {{{
 local M = {}
+
+-- Notebook widget
 M.notebook = {}
+
+-- Main box for the items
 M.box = {}
 M.wordList_items = {}
-M.grid_main = {}
-M.grid_items = {}
-M.grid = {}
-M.entry_items = {}
+
+-- Create some grids used
+M.grid_main = {}   -- Main grid tto attach child grid
+M.grid_items = {}  -- Grid to attach the words
+M.grid = {}        -- Grid to attach add buttons
+M.grid_remove = {} -- Grid to attach remove Button
+
+-- Entry widget
+M.entry_items = {}         -- Entry widget to add word
+M.entry_remove = {}        -- Entry widgets to remove words
+M.entry_items.firstaz = {} -- Azerbajani words
+M.entry_items.firsten = {} -- English words
 M.import_items = {}
 M.new_list = {}
-M.label_list = {}
 
--- Calls the getluafilesdirectory function
+-- Create table for remove button
+M.removeButton = {}
+M.addButton = {}
+M.submitButton = {}
+
+-- Table to create label list
+M.label_list = {}
+M.label_list.remove = {}
+
+-- Table for custom wordlist
+M.custom_wordlist = {}
+--- }}} empty tables end
+
+-- List all available lists
 local directoryPath = var.wordDir
 local luaFiles = list.dir(directoryPath)
 
--- Create popover
-M.popover = Gtk.Popover({
-	relative_to = window,
-})
+---- Table for values not to add to custom list
+local dontAdd = {}
 
--- Create menubar
-M.menuBar = Gtk.MenuButton({ label = "File", popover = M.popover })
+-- Set count values to count the custom wordlist
+local countCustom = 0
+local countCustom_main = 0
 
--- Create a label to display the selected menu item
-M.label = Gtk.Label({ label = "No menu item selected" })
+-- Check for custom wordlist
+update.check_custom_list(countCustom, luaFiles, M, dontAdd)
 
 -- Create a notebook for the wordlist
 M.notebook.word = Gtk.Notebook.new()
-M.notebook.word:set_tab_pos(Gtk.PositionType.LEFT)
+M.notebook.word:set_tab_pos(Gtk.PositionType.LEFT) -- Set position
 
 -- Create a scrolled window
 local scrolledWindow = Gtk.ScrolledWindow({
@@ -137,6 +174,47 @@ local scrolledWindow = Gtk.ScrolledWindow({
 
 -- Create button to add new wordlist
 local addWordListButton = Gtk.Button({ label = "Add New Wordlist", margin_bottom = 5, margin_top = 20 })
+local addWordListEntry = Gtk.Entry({ placeholder_text = "Wordlist Name" })
+
+-- Action to add when you press the button once
+--local function new_wordList_action()
+--	addWordListButton:set_label("Add New Wordlist")
+--	addWordListButton:set_margin_top(0)
+--	widget.box_word_list:remove(addWordListButton)
+--	widget.box_word_list:remove(scrolledWindow)
+--	widget.box_word_list:remove(addWordListEntry)
+--	widget.box_word_list:append(addWordListButton)
+--	widget.box_word_list:append(scrolledWindow)
+--	function addWordListButton:on_clicked()
+--		new_wordList_action_first()
+--	end
+--end
+
+-- Action for new word list button
+local function new_wordList_action_first()
+	if addWordListButton.label == "Submit" then -- If
+		addWordListButton:set_label("Add New Wordlist")
+		addWordListButton:set_margin_top(0)
+		widget.box_word_list:remove(addWordListButton)
+		widget.box_word_list:remove(scrolledWindow)
+		widget.box_word_list:remove(addWordListEntry)
+		widget.box_word_list:append(addWordListButton)
+		widget.box_word_list:append(scrolledWindow)
+	else
+		addWordListButton:set_label("Submit")
+		addWordListButton:set_margin_top(0)
+		widget.box_word_list:remove(addWordListButton)
+		widget.box_word_list:remove(scrolledWindow)
+		widget.box_word_list:append(addWordListEntry)
+		widget.box_word_list:append(addWordListButton)
+		widget.box_word_list:append(scrolledWindow)
+	end
+end
+
+-- Attach the function to the button
+function addWordListButton:on_clicked()
+	new_wordList_action_first()
+end
 
 -- Add notebook widget to the scrolled window
 scrolledWindow:set_child(M.notebook.word)
@@ -145,9 +223,16 @@ scrolledWindow:set_child(M.notebook.word)
 widget.box_word_list:append(addWordListButton)
 widget.box_word_list:append(scrolledWindow)
 
+-- Start for loop to start creating the grids
 for i, item_label in ipairs(luaFiles) do
-	local checkMultiple = false
-	local wordList = list.modify(item_label)
+	local checkMultiple = false            -- Check if the wordlist has multiple subfiles
+	local wordList = list.modify(item_label) -- Modyfies the wordlist name
+	local match = string.match(wordList, "_") -- if the wordlist ends with _ then next if statement will run
+
+	-- If match is not nil
+	if match ~= nil then
+		wordList = item_label
+	end
 
 	-- Create box widget for all items
 	M.box[i] = Gtk.Box({
@@ -159,10 +244,26 @@ for i, item_label in ipairs(luaFiles) do
 		vexpand = false,
 	})
 
+	M.removeButton[i] = Gtk.Button({ label = "Remove Word" })
+	M.label_list.remove[i] = Gtk.Label({ label = "Write index of word\n you want to Delete", margin_top = 50 })
+
+	M.label_list.remove[i]:set_markup(
+		"<span size='"
+		.. font.fg_size
+		.. "' foreground='"
+		.. theme.label_welcome
+		.. "'>"
+		.. M.label_list.remove[i].label
+		.. "</span>"
+	)
+
 	-- creates widgets notebook and grid widgets for all the words
 	M.notebook.word:append_page(M.box[i], Gtk.Label({ label = wordList }))
+
+	-- Create grid widget
 	M.grid_items[i] = widget.grid:main_create()
 	M.grid_main[i] = widget.grid:main_create()
+	M.grid_remove[i] = widget.grid:main_create()
 
 	-- Create label az and append it to the box
 	local label_az = Gtk.Label({ label = "Azerbajani - English" })
@@ -172,12 +273,12 @@ for i, item_label in ipairs(luaFiles) do
 	-- Set theme on title label
 	label_az:set_markup(
 		"<span size='"
-			.. font.welcome_size
-			.. "' foreground='"
-			.. theme.label_welcome
-			.. "'>"
-			.. label_az.label
-			.. "</span>"
+		.. font.welcome_size
+		.. "' foreground='"
+		.. theme.label_welcome
+		.. "'>"
+		.. label_az.label
+		.. "</span>"
 	)
 
 	-- Append to the box widget
@@ -185,71 +286,63 @@ for i, item_label in ipairs(luaFiles) do
 	M.box[i]:append(spacer)
 	M.box[i]:append(M.grid_main[i])
 
-	-- Import the wordlist and custom wordlists if they exist
-	local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
-	if fileExists(wordDir_alt) then
-		local wordlist = loadConfig(wordDir_alt)
-		M.wordList_items[i] = wordlist
-	else
-		M.wordList_items[i] = require(var.wordMod .. "." .. wordList)
-	end
+	-- Function to import the lists thats available
+	update.import_wordlists(dontAdd, M, countCustom_main, wordList, i)
 
 	-- Create grid widget for buttons
 	M.grid[i] = widget.grid:main_create()
 	M.grid[i]:set_hexpand(true)
 
 	-- Create empty table for entry widgets
-	M.entry_items.azerbajaniEntry = {}
-	M.entry_items.englishEntry = {}
+	M.entry_items.azerbajaniEntry = {} -- Azerbajani words
+	M.entry_items.englishEntry = {} -- English words
 
 	-- Sets the first entry boxes to add a new word
 	local entry_az = Gtk.Entry({ margin_top = 50, placeholder_text = "Azerbajani Word" })
 	local entry_eng = Gtk.Entry({ margin_top = 50, placeholder_text = "English Word" })
 
+	M.entry_items.firstaz[i] = entry_az
+	M.entry_items.firsten[i] = entry_eng
+
+	-- Entry box to remove word
+	M.entry_remove[i] = Gtk.Entry({ placeholder_text = "Remove Word: Write Number" })
+
+	-- Set style of entry boxes
+	M.entry_remove[i] = style.set_theme(M.entry_remove[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	M.removeButton[i] = style.set_theme(M.removeButton[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	entry_az = style.set_theme(entry_az, {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	entry_eng = style.set_theme(entry_eng, {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
 	-- Create submit and add button for the grid
 	local submit = Gtk.Button({ label = "Submit" })
 	local addAnother = Gtk.Button({ margin_top = 50, label = "Add" })
+	M.addButton[i] = addAnother
+	M.submitButton[i] = submit
+
+	submit = style.set_theme(submit, {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	addAnother = style.set_theme(addAnother, {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
 
 	-- Make all dirs to lowercase
 	local lower = wordList:lower()
 
-	-- Make sure you dont get errors
-	local success, result = pcall(function()
-		SubDir = list.dir(directoryPath .. "/" .. lower)
-	end)
-
-	-- If pcall succedd this will run
-	if success then
-		checkMultiple = true
-		M.import_items[wordList] = {}
-		M.new_list[wordList] = {}
-		for k = 1, #SubDir do
-			-- Import all words
-			local last = list.modify(SubDir[k])
-			local allWords = lower .. "/" .. last
-			local import = require(var.wordMod .. "." .. allWords)
-			table.insert(M.import_items[wordList], import)
-
-			-- Check if custom file exist and use those words instead
-			-- And breaks out of the loop if it does exist and load the custome words
-			local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
-			if fileExists(wordDir_alt) then
-				local wordlist = loadConfig(wordDir_alt)
-				for key, value in ipairs(wordlist) do
-					for j = 1, #value do
-						table.insert(M.new_list[wordList], value[j])
-					end
-				end
-				break
-			end
-
-			for key, value in ipairs(import) do
-				for j = 1, #value do
-					table.insert(M.new_list[wordList], value[j])
-				end
-			end
-		end
-	end
+	-- Check if there is multiple subdirs
+	update.check_mult_subdir(directoryPath, lower, M, wordList)
 
 	-- Attach widgets to the button grid
 	M.grid[i]:attach(entry_az, 1, 0, 1, 1)
@@ -259,23 +352,23 @@ for i, item_label in ipairs(luaFiles) do
 	submit:set_margin_top(0)
 
 	-- Attach the child grids
-	M.grid_main[i]:attach(M.grid[i], 1, 2, 6, 1) -- attach grid for button
+	M.grid_main[i]:attach(M.grid_remove[i], 1, 3, 20, 1) -- attach grid for button
+	M.grid_main[i]:attach(M.grid[i], 1, 2, 6, 1)      -- attach grid for button
 	M.grid_main[i]:attach(M.grid_items[i], 1, 1, 1, 1) -- attach grid for words
 	--M.box[i]:append(M.grid[i])
 	--M.box[i]:append(submit)
 
 	-- Sets count to 0 at first
 	local entryCount = 0
-	local entryCounter = 0
 	local firstRun = true
 
 	-- Create table to store the buttons
 	local button_table = {}
 	local entry_table = {}
-	local count_table = {}
 
 	-- Function for add button
 	local function add_button_action()
+		local theme = require("lua.theme.default").load()
 		-- Keep track of how many you add
 		entryCount = entryCount + 1
 		-- Will create new button for everytime you add a new word
@@ -287,6 +380,27 @@ for i, item_label in ipairs(luaFiles) do
 
 		M.entry_items.azerbajaniEntry[entryCount] = Gtk.Entry({ placeholder_text = "Azerbajani Word" })
 		M.entry_items.englishEntry[entryCount] = Gtk.Entry({ placeholder_text = "English Word" })
+
+		M.entry_items.englishEntry[entryCount] = style.set_theme(M.entry_items.englishEntry[entryCount], {
+			{
+				size = font.fg_size / 1000,
+				color = theme.label_question,
+				border_color = theme.label_fg,
+			},
+		})
+
+		M.entry_items.azerbajaniEntry[entryCount] = style.set_theme(M.entry_items.azerbajaniEntry[entryCount], {
+			{
+				size = font.fg_size / 1000,
+				color = theme.label_question,
+				border_color = theme.label_fg,
+			},
+		})
+
+		add = style.set_theme(add, {
+			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+		})
+
 		M.grid[i]:attach(M.entry_items.azerbajaniEntry[entryCount], 1, entryCount, 1, 1)
 		M.grid[i]:attach(M.entry_items.englishEntry[entryCount], 2, entryCount, 1, 1)
 		M.grid[i]:remove(submit)
@@ -319,7 +433,7 @@ for i, item_label in ipairs(luaFiles) do
 		end
 
 		function remove:on_clicked()
-			-- Function for temove entry section
+			-- Function for remove entry section
 			local function remove_entry_action()
 				local azEntry = M.grid[i]:get_child_at(1, entryCount)
 				local enEntry = M.grid[i]:get_child_at(2, entryCount)
@@ -401,6 +515,16 @@ for i, item_label in ipairs(luaFiles) do
 		updateWordlist(wordList, combTable, checkMultiple)
 
 		update.update_word_list()
+
+		aze, eng = nil, nil
+
+		for key, value in pairs(M.entry_items.azerbajaniEntry) do
+			M.entry_items.azerbajaniEntry[key].text = ""
+			M.entry_items.englishEntry[key].text = ""
+		end
+
+		entry_az.text = ""
+		entry_eng.text = ""
 	end
 
 	local function isEven(number)
@@ -441,12 +565,12 @@ for i, item_label in ipairs(luaFiles) do
 			-- Set label theme
 			label:set_markup(
 				"<span size='"
-					.. font.word_list_size
-					.. "' foreground='"
-					.. theme.label_fg
-					.. "'>"
-					.. label.label
-					.. "</span>"
+				.. font.word_list_size
+				.. "' foreground='"
+				.. theme.label_fg
+				.. "'>"
+				.. label.label
+				.. "</span>"
 			)
 
 			M.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
@@ -457,12 +581,12 @@ for i, item_label in ipairs(luaFiles) do
 			function M.modify_label()
 				M.label_list[wordList][j]:set_markup(
 					"<span size='"
-						.. font.word_list_size
-						.. "' foreground='"
-						.. theme.label_fg
-						.. "'>"
-						.. M.label_list[wordList][j].label
-						.. "</span>"
+					.. font.word_list_size
+					.. "' foreground='"
+					.. theme.label_fg
+					.. "'>"
+					.. M.label_list[wordList][j].label
+					.. "</span>"
 				)
 			end
 		end
@@ -491,12 +615,12 @@ for i, item_label in ipairs(luaFiles) do
 			-- Set label theme
 			label:set_markup(
 				"<span size='"
-					.. font.word_list_size
-					.. "' foreground='"
-					.. theme.label_fg
-					.. "'>"
-					.. label.label
-					.. "</span>"
+				.. font.word_list_size
+				.. "' foreground='"
+				.. theme.label_fg
+				.. "'>"
+				.. label.label
+				.. "</span>"
 			)
 
 			label:set_size_request(100, -1)
@@ -504,6 +628,74 @@ for i, item_label in ipairs(luaFiles) do
 			M.label_list[wordList][j] = label
 
 			M.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
+		end
+	end
+
+	-- Attach widgets to remove button
+	M.grid_remove[i]:attach(M.label_list.remove[i], 1, 0, 5, 1)
+	M.grid_remove[i]:attach(M.entry_remove[i], 1, 1, 1, 1)
+	M.grid_remove[i]:attach(M.removeButton[i], 2, 1, 1, 1)
+
+	-- Create temp variable for rtemove button
+	local removeButton = M.removeButton[i]
+
+	-- Function to remove words and attach the function to a button
+	function removeButton:on_clicked()
+		-- Count the words
+		local countRem = 0
+		-- Runs if this is a table and not nil
+		if type(M.import_items[wordList]) == "table" then
+			-- Create empty table
+			local WordTable = {}
+
+			for key, value in ipairs(M.new_list[wordList]) do
+				if not isEven(key) then
+					countRem = countRem + 1
+					WordTable[countRem] = { M.new_list[wordList][key], M.new_list[wordList][key + 1] }
+				end
+			end
+
+			local choice = M.entry_remove[i].text
+			if choice ~= "" then
+				local start, finish = string.match(choice, "(%d+)-(%d+)")
+				local start = tonumber(start)
+				local finish = tonumber(finish)
+
+				table.remove(M.wordList_items[i], choice)
+				--	-- Loop over the values in the range
+				--	if start and finish ~= nil then
+				--		for j = start, finish do
+				--			print(j)
+				--			table.remove(M.wordList_items[i], j)
+				--		end
+				--	else
+				--		table.remove(M.wordList_items[i], choice)
+				--	end
+
+				updateWordlist(wordList, M.wordList_items[i], checkMultiple, 1)
+				update.update_word_list()
+			end
+		else -- else will run this
+			local choice = M.entry_remove[i].text
+			if choice ~= "" then
+				local start, finish = string.match(choice, "(%d+)-(%d+)")
+				local start = tonumber(start)
+				local finish = tonumber(finish)
+
+				table.remove(M.wordList_items[i], choice)
+				-- Loop over the values in the range
+				--if start and finish ~= nil then
+				--	for j = start, finish do
+				--		print(j)
+				--		table.remove(M.wordList_items[i], j)
+				--	end
+				--else
+				--	table.remove(M.wordList_items[i], choice)
+				--end
+
+				updateWordlist(wordList, M.wordList_items[i], checkMultiple, 1)
+				update.update_word_list()
+			end
 		end
 	end
 end
@@ -525,5 +717,16 @@ end
 --function M.exitItem:on_activate()
 --      print("exit")
 --end
+
+-- Create popover
+--M.popover = Gtk.Popover({
+--	relative_to = window,
+--})
+--
+---- Create menubar
+--M.menuBar = Gtk.MenuButton({ label = "File", popover = M.popover })
+
+-- Create a label to display the selected menu item
+--M.label = Gtk.Label({ label = "No menu item selected" })
 
 return M

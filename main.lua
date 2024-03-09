@@ -1,4 +1,13 @@
 #!/usr/bin/env lua
+--##____  _                      _
+--#|  _ \| |__   ___   ___ _ __ (_)_  __
+--#| |_) | '_ \ / _ \ / _ \ '_ \| \ \/ /
+--#|  __/| | | | (_) |  __/ | | | |>  <
+--#|_|   |_| |_|\___/ \___|_| |_|_/_/\_\
+--# -*- coding: utf-8 -*-
+--# Azla Language learning program
+--# Made By Phoenix988
+--# Written entirely in Lua scripting language
 
 -- Imports libaries we need
 local lfs = require("lfs")
@@ -43,6 +52,12 @@ local mkdir = require("lua.terminal.mkdir").mkdir
 -- Create the cache file if it doesn't exist
 if not fileExists(cacheDir) then
 	mkdir(cacheDir)
+end
+
+-- Create custom word directory if it doesnt exist
+-- To avoid any errors that relies on this dir
+if not fileExists(var.wordDir_alt) then
+	mkdir(var.wordDir_alt)
 end
 
 if not fileExists(cacheFile) then

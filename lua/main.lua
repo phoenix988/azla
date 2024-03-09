@@ -1,3 +1,16 @@
+-- Made by Phoenix988
+---     .----------------.  .----------------.  .----------------.  .----------------.
+---    | .--------------. || .--------------. || .--------------. || .--------------. |
+---    | |      __      | || |   ________   | || |   _____      | || |      __      | |
+---    | |     /  \     | || |  |  __   _|  | || |  |_   _|     | || |     /  \     | |
+---    | |    / /\ \    | || |  |_/  / /    | || |    | |       | || |    / /\ \    | |
+---    | |   / ____ \   | || |     .'.' _   | || |    | |   _   | || |   / ____ \   | |
+---    | | _/ /    \ \_ | || |   _/ /__/ |  | || |   _| |__/ |  | || | _/ /    \ \_ | |
+---    | ||____|  |____|| || |  |________|  | || |  |________|  | || ||____|  |____|| |
+---    | |              | || |              | || |              | || |              | |
+---    | '--------------' || '--------------' || '--------------' || '--------------' |
+---    '----------------'  '----------------'  '----------------'  '----------------'
+
 -- Imports libaries we need
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
@@ -30,13 +43,16 @@ local import_widgets = require("lua.widgets.init")
 local widget_list = {}
 
 -- Imports Config function that will load config files
+-- Dont really need both functions they do the same thing
+-- Will change it eventually when I try to optimize the app
 local loadConfig = require("lua.loadConfig").load_config
 local loadConfigCustom = require("lua.loadConfig").load_config_custom
 
 -- Imports filexist module
 local fileExist = require("lua.fileExist").fileExists
 
--- Import list function
+-- Import string functions for list.modify list.dir etc
+-- So I can manipulate text and directories
 local list = require("lua.terminal.listFiles")
 
 -- Import keybindings
@@ -55,27 +71,30 @@ local var = require("lua.config.init")
 local currentDir = debug.getinfo(1, "S").source:sub(2)
 local currentDir = currentDir:match("(.*/)") or ""
 
--- Variable to store word arrays
+-- Variable to store word paths and word modules
 local luaWordsPath = var.wordDir
 local luaWordsModule = var.wordMod
 
--- adds some variables to the wordItems table
+-- Adds some variables to the wordItems table
 local wordItems = {
 	list = list,
 	path = luaWordsPath,
 }
 
 -- Sets default variable that will determine language choice
+-- Needed for when you first launch the app
 local exportLanguageChoice = "azerbajani"
 
 -- Gets users home directory
 local home = os.getenv("HOME")
+
+-- Sets path to image
 local imagePath = setting_default.image
 
--- set cachefile config path
+-- Sets cachefile config path
 local cacheFile = var.cacheFile
 
--- Sets path to customConfig
+-- Sets path to customConfig where you can modify the theming of the app
 local customConfig = var.config.custom
 
 -- load cacheFile config
@@ -87,8 +106,7 @@ if config == nil then
 	config = {}
 end
 
--- Sets some empty arrays to be used later
--- Sets window table
+-- Sets empty window table to be used
 local window = {}
 
 -- Variables tthat sets the application values
@@ -108,10 +126,10 @@ end
 
 -- Creates the config array if the custom file exist
 if fileExist(customConfig) then
-	-- load custom config
+	-- Load custom config
 	local customPath = loadConfig(customConfig) -- Custom config exist
 else
-	-- sets empty array if it doesnt exist
+	-- Sets empty array if it doesnt exist
 	local setting = {} --Custom config file doesn't exist
 end
 
@@ -187,7 +205,7 @@ function app1:on_startup()
 		custom = customConfig,
 		fileExist = fileExist,
 	}
-    
+
 	-- Create all the combo words values on launch
 	-- Creates the class instances
 	combo.set = combo:new(input)
@@ -459,6 +477,7 @@ function app1:on_startup()
 
 	-- Create notebook widgets
 	notebook:create()
+	settings.notebook = notebook
 
 	-- Make the notebook scrollable
 	scrolledTheme:set_child(themeGrid)
@@ -492,7 +511,7 @@ function app1:on_startup()
 	themeGrid:attach(button.setting_submit, 1, 5, 1, 1)
 	themeGrid:attach(button.exit_alt, 1, 7, 1, 1)
 	themeGrid:attach(label.theme_apply, 1, 3, 1, 1)
-    
+
 	-- Hide wordlist on startup
 	--notebook.wordlist:set_visible(false)
 

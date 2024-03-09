@@ -162,16 +162,16 @@ end
 -- Main function that runs all config replacements at once
 function write.config_main(cacheFile,combo)
 
-       
+
        -- gets all values we need
        local replace = write.config_settings(replace,combo)
-       
+
        -- makes the settings array
        local configReplace = write.set_config_Replace(replace)
 
        -- Change the name 
        local config = configReplace
-    
+
        -- Replace the cacheFile with the new values
        write.to_config(cacheFile,config)
 
@@ -179,5 +179,11 @@ function write.config_main(cacheFile,combo)
 end
 
 
+
+local mainWindowModule = require("lua.main")
+
+-- Return notebook from main file
+local notebook = mainWindowModule.getSettingList()
+
 -- Returns all variables
-return {write = write}
+return {write = write, notebook = notebook}

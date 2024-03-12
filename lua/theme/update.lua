@@ -23,11 +23,53 @@ local loadConfig = require("lua.loadConfig").load_config
 
 -- Update variables
 local confPath = var.config.custom
-local confDir = var.config.dir
 
 -- Create empty table
 local M = {}
 
+-- Function to update theme for wordlist setting grid
+function M.set_grid_theme(menu, i)
+	local theme = require("lua.theme.default").load()
+	local font = require("lua.theme.default").font.load()
+
+	-- Set label theme
+	menu.label_list.remove[i]:set_markup(
+		"<span size='"
+		.. font.fg_size
+		.. "' foreground='"
+		.. theme.label_welcome
+		.. "'>"
+		.. menu.label_list.remove[i].label
+		.. "</span>"
+	)
+
+	-- Set style of entry boxes
+	menu.entry_remove[i] = style.set_theme(menu.entry_remove[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	menu.entry_items.firstaz[i] = style.set_theme(menu.entry_items.firstaz[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	menu.entry_items.firsten[i] = style.set_theme(menu.entry_items.firsten[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	menu.addButton[i] = style.set_theme(menu.addButton[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	menu.submitButton[i] = style.set_theme(menu.submitButton[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+
+	menu.removeButton[i] = style.set_theme(menu.removeButton[i], {
+		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
+	})
+end
+
+-- Function to import wordlists from the lua modules
 function M.import_wordlists(dont, list, count, wordList, i)
 	-- Import the wordlist items and check if you have custom files
 	local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
@@ -38,9 +80,11 @@ function M.import_wordlists(dont, list, count, wordList, i)
 	elseif fileExists(wordDir_alt) then
 		local wordlist = loadConfig(wordDir_alt)
 		list.wordList_items[i] = wordlist
+		list.check = false
 		return list
 	else
 		list.wordList_items[i] = require(var.wordMod .. "." .. wordList)
+		list.check = true
 		return list
 	end
 end
@@ -116,6 +160,102 @@ function M.check_mult_subdir(directoryPath, lower, newMenu, wordList)
 			end
 		end
 	end
+
+end
+
+-- Create the wordlist grid
+function M.create_wordlist_grid(newMenu, menu, wordList, isEven, i)
+	local theme = require("lua.theme.default").load()
+	local font = require("lua.theme.default").font.load()
+	local count_occurrence = 0
+	if type(newMenu.import_items[wordList]) == "table" then
+		-- Keep track of even and uneven
+		local countTime = 0
+		-- Create final WordTable to add all words from the diffrent lists
+		-- To one single table
+		NewWordTable = {}
+		for key, value in ipairs(newMenu.new_list[wordList]) do
+			if not isEven(key) then
+				countTime = countTime + 1
+				NewWordTable[countTime] = { newMenu.new_list[wordList][key], newMenu.new_list[wordList][key + 1] }
+			end
+		end
+
+		-- Finally we create the diffrent labels for the words in the wordlist
+		last = #NewWordTable
+		for j = 1, #NewWordTable do
+			newMenu.label_list[wordList] = {}
+			local english = list.to_upper(NewWordTable[j][2])
+			local aze = list.to_upper(NewWordTable[j][1])
+
+			-- Make sure special characters also converts to uppercase
+			local checkAz = list.lower_case(aze, 2)
+
+			if checkAz ~= nil then
+				aze = checkAz
+			end
+			local form = aze .. " : " .. english
+			local row = math.floor((j - 1) / 3)
+			local col = (j - 1) % 3
+			local label = Gtk.Label({ label = j .. " " .. form })
+			-- Set label theme
+			label:set_markup(
+				"<span size='"
+				.. font.word_list_size
+				.. "' foreground='"
+				.. theme.label_fg
+				.. "'>"
+				.. label.label
+				.. "</span>"
+			)
+
+			menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
+
+			menu.label_list[wordList][j] = label
+
+		end
+	else
+
+		last = #newMenu.wordList_items[i]
+		for j = 1, #newMenu.wordList_items[i] do
+			newMenu.label_list[wordList] = {}
+			local english = list.to_upper(newMenu.wordList_items[i][j][2])
+			local aze = list.to_upper(newMenu.wordList_items[i][j][1])
+
+			-- Make sure special characters also converts to uppercase
+			local checkAz = list.lower_case(aze, 2)
+
+			if checkAz ~= nil then
+				aze = checkAz
+			end
+			local form = aze .. " : " .. english
+			if wordList == "Phrases" then
+				row = math.floor((j - 1) / 1)
+				col = (j - 1) % 1
+			else
+				row = math.floor((j - 1) / 3)
+				col = (j - 1) % 3
+			end
+			local label = Gtk.Label({ label = j .. " " .. form })
+
+			-- Set label theme
+			label:set_markup(
+				"<span size='"
+				.. font.word_list_size
+				.. "' foreground='"
+				.. theme.label_fg
+				.. "'>"
+				.. label.label
+				.. "</span>"
+			)
+
+			newMenu.label_list[wordList][j] = label
+
+			menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
+
+		end
+	end -- Add words to grid end
+	return { count_occurence = last}
 end
 
 -- function to update word list menu when updating theme
@@ -136,17 +276,18 @@ function M.update_word_list()
 	end
 
 	-- Clear some of the wigets
-	for key, value in pairs(menu.grid_items) do
+	for key, _ in pairs(menu.grid_items) do
 		clear_grid(menu.grid_items[key])
 	end
 
 	-- Create new tables to use for wordlist menu
-	local newMenu = {}
-	newMenu.wordList_items = {} -- for the words in the grid
-	newMenu.import_items = {}
-	newMenu.new_list = {}
-	newMenu.label_list = {}
-	newMenu.custom_wordlist = {} -- for custom wordlists
+	local newMenu = {
+		wordList_items = {}, -- for the words in the grid
+		import_items = {},
+		new_list = {},
+		label_list = {},
+		custom_wordlist = {}, -- for custom wordlists
+	}                   -- end of new menu
 
 	-- List all available lists
 	local directoryPath = var.wordDir
@@ -161,6 +302,7 @@ function M.update_word_list()
 
 	M.check_custom_list(countCustom, luaFiles, newMenu, dontAdd)
 
+	-- Main loop to loop through all the items and update the grid
 	for i, item_label in ipairs(luaFiles) do
 		local wordList = list.modify(item_label)
 		local match = string.match(wordList, "_")
@@ -192,43 +334,7 @@ function M.update_word_list()
 		-- Entry box to remove word
 		menu.entry_remove[i] = Gtk.Entry({ placeholder_text = "Remove Word: Write Number" })
 
-		-- Set label theme
-		menu.label_list.remove[i]:set_markup(
-			"<span size='"
-			.. font.fg_size
-			.. "' foreground='"
-			.. theme.label_welcome
-			.. "'>"
-			.. menu.label_list.remove[i].label
-			.. "</span>"
-		)
-
-		-- Set style of entry boxes
-		menu.entry_remove[i] = style.set_theme(menu.entry_remove[i], {
-			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-		})
-
-		menu.entry_items.firstaz[i] = style.set_theme(menu.entry_items.firstaz[i], {
-			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-		})
-
-		menu.entry_items.firsten[i] = style.set_theme(menu.entry_items.firsten[i], {
-			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-		})
-
-		menu.addButton[i] = style.set_theme(menu.addButton[i], {
-			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-		})
-
-		menu.submitButton[i] = style.set_theme(menu.submitButton[i], {
-			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-		})
-
-		menu.removeButton[i] = style.set_theme(menu.removeButton[i], {
-			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-		})
-
-		-- Readd widgets to the grid
+		-- Read widgets to the grid
 		menu.grid_remove[i]:attach(menu.label_list.remove[i], 1, 0, 5, 1)
 		menu.grid_remove[i]:attach(menu.entry_remove[i], 1, 1, 1, 1)
 		menu.grid_remove[i]:attach(menu.removeButton[i], 2, 1, 1, 1)
@@ -255,8 +361,7 @@ function M.update_word_list()
 		menu.box[i]:append(spacer)
 		menu.box[i]:append(menu.grid_main[i])
 
-
-       M.check_mult_subdir(directoryPath, lower, newMenu, wordList)
+		M.check_mult_subdir(directoryPath, lower, newMenu, wordList)
 
 		-- append the button grid to the box
 		--menu.box[i]:append(menu.grid[i])
@@ -266,89 +371,10 @@ function M.update_word_list()
 			return number % 2 == 0
 		end
 
-		-- Add words to grid start
-		if type(newMenu.import_items[wordList]) == "table" then
-			-- Keep track of even and uneven
-			local countTime = 0
-			-- Create final WordTable to add all words from the diffrent lists
-			-- To one single table
-			NewWordTable = {}
-			for key, value in ipairs(newMenu.new_list[wordList]) do
-				if not isEven(key) then
-					countTime = countTime + 1
-					NewWordTable[countTime] = { newMenu.new_list[wordList][key], newMenu.new_list[wordList][key + 1] }
-				end
-			end
+		M.create_wordlist_grid(newMenu, menu, wordList, isEven, i)
 
-			-- Finally we create the diffrent labels for the words in the wordlist
-			for j = 1, #NewWordTable do
-				newMenu.label_list[wordList] = {}
-				local english = list.to_upper(NewWordTable[j][2])
-				local aze = list.to_upper(NewWordTable[j][1])
 
-				-- Make sure special characters also converts to uppercase
-				local checkAz = list.lower_case(aze, 2)
-
-				if checkAz ~= nil then
-					aze = checkAz
-				end
-				local form = aze .. " : " .. english
-				local row = math.floor((j - 1) / 3)
-				local col = (j - 1) % 3
-				local label = Gtk.Label({ label = j .. " " .. form })
-				-- Set label theme
-				label:set_markup(
-					"<span size='"
-					.. font.word_list_size
-					.. "' foreground='"
-					.. theme.label_fg
-					.. "'>"
-					.. label.label
-					.. "</span>"
-				)
-
-				menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
-
-				menu.label_list[wordList][j] = label
-			end
-		else
-			for j = 1, #newMenu.wordList_items[i] do
-				newMenu.label_list[wordList] = {}
-				local english = list.to_upper(newMenu.wordList_items[i][j][2])
-				local aze = list.to_upper(newMenu.wordList_items[i][j][1])
-
-				-- Make sure special characters also converts to uppercase
-				local checkAz = list.lower_case(aze, 2)
-
-				if checkAz ~= nil then
-					aze = checkAz
-				end
-				local form = aze .. " : " .. english
-				if wordList == "Phrases" then
-					row = math.floor((j - 1) / 1)
-					col = (j - 1) % 1
-				else
-					row = math.floor((j - 1) / 3)
-					col = (j - 1) % 3
-				end
-				local label = Gtk.Label({ label = j .. " " .. form })
-
-				-- Set label theme
-				label:set_markup(
-					"<span size='"
-					.. font.word_list_size
-					.. "' foreground='"
-					.. theme.label_fg
-					.. "'>"
-					.. label.label
-					.. "</span>"
-				)
-
-				newMenu.label_list[wordList][j] = label
-
-				menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
-			end
-		end -- Add words to grid end
+		M.set_grid_theme(menu, i)
 	end
 end
 

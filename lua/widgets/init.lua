@@ -37,6 +37,6 @@ wc.array = wc.setting
 -- Import listBox widget
 wc.listBox = require("lua.widgets.button.treeView")
 wc.menu = require("lua.widgets.menu.init")
-wc.menu_custom = require("lua.widgets.menu.customWords")
+wc.menu_remove = require("lua.widgets.menu.removeList")
 
 return wc

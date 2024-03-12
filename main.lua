@@ -62,12 +62,12 @@ end
 
 if not fileExists(cacheFile) then
 	local file = io.open(cacheFile, "w")
-
-	file:write("config = {\n")
-	file:write("}")
-
-	-- Close the file
-	file:close()
+	if file then
+		file:write("config = {\n")
+		file:write("}")
+		-- Close the file
+		file:close()
+	end
 end
 
 -- set luawords path

@@ -28,7 +28,7 @@ function M.exam(wordlist, widget, last, response, replace, list)
 		local correct = string.lower(wordlist[i][languageNumber_1])
 		local word = wordlist[i][languageNumber_2]
 		local word = list.to_upper(word)
-  
+
 		local choice = widget.entry_fields[i].text:lower()
 
 		-- Make sure special characters also converts so lowercase
@@ -46,6 +46,12 @@ function M.exam(wordlist, widget, last, response, replace, list)
 
 		-- sets dont run variable
 		local dontRun = false
+
+		-- Remove leading spaces
+		local choice = string.gsub(choice, "^%s*", "")
+
+		-- Remove trailing spaces
+		local choice = string.gsub(choice, "%s*$", "")
 
 		-- create all the labels imported from respones.lua in this dir
 		response.labels(correct, choice, word)

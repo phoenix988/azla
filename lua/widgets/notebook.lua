@@ -40,7 +40,7 @@ end
 notebook.wordlist = Gtk.Notebook.new()
 
 notebook.wordlist:append_page(widget.box_word_list, Gtk.Label({ label = "Words" }))
---notebook.wordlist:append_page(widget.box_word_list_2, Gtk.Label({ label = "Custom Wordlists" }))
+notebook.wordlist:append_page(widget.box_word_list_2, Gtk.Label({ label = "Remove Wordlists" }))
 
 -- Simple example of how to add stack widget with a stack switcher
 -- Create a stackswitcher

@@ -2,26 +2,12 @@
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
 local GObject = lgi.require("GObject", "2.0")
-
--- Import labels
 local label = require("lua.widgets.label")
-
--- Import style function to set size and color of widgets
 local style = require("lua.widgets.setting")
-
--- Import theme
-local theme = require("lua.theme.default").load()
-
--- Import fonts
-local font = require("lua.theme.default").font.load()
-
--- Import function to check if a file exist
 local fileExist = require("lua.fileExist")
-
--- Function to load config file
 local loadConfig = require("lua.loadConfig").load_config
-
--- Some variables to use
+local theme = require("lua.theme.default").load()
+local font = require("lua.theme.default").font.load()
 local var = require("lua.config.init")
 
 -- Here we are defining some combo boxes to create
@@ -45,7 +31,6 @@ function combo:create_word_list()
     combo.word_list_model = Gtk.ListStore.new({ GObject.Type.STRING })
 
     -- Calls the getluafilesdirectory function
-
     local directoryPath = self.app.path
     local luaFiles = list.dir(directoryPath)
     local dontAdd = {}
@@ -193,5 +178,75 @@ function combo:create_word_dir()
 
     return combo.word_dir
 end
+
+function combo:create_restore_list()
+    local list = self.app.list
+    -- Model for the second combo box
+    combo.restore_list_model = Gtk.ListStore.new({ GObject.Type.STRING })
+
+    local directoryPath = var.cacheDir
+    local luaFiles = list.dir(directoryPath, "json")
+
+    combo.restore_files = luaFiles
+
+    for _, luafiles in ipairs(combo.restore_files) do
+        local add = list.modify(luafiles)
+        combo.restore_list_model:append({ add })
+    end
+
+    combo.restore_list = Gtk.ComboBox({
+        model = combo.restore_list_model,
+        active = 0,
+        cells = {
+            {
+                Gtk.CellRendererText(),
+                { text = 1 },
+                align = Gtk.Align.START,
+            },
+        },
+    })
+
+    combo.restore_list = style.set_theme(
+        combo.restore_list,
+        { { size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg } }
+    )
+
+
+end
+
+function combo:create_remove_wordlist()
+    local list = self.app.list
+    -- Model for the second combo box
+    combo.remove_wordlist_model = Gtk.ListStore.new({ GObject.Type.STRING })
+
+    local directoryPath = var.wordDir_alt
+    local luaFiles = list.dir(directoryPath)
+
+    combo.remove_wordlist_files = luaFiles
+
+    for _, luafiles in ipairs(combo.remove_wordlist_files) do
+        local add = list.modify(luafiles)
+        combo.remove_wordlist_model:append({ add })
+    end
+
+    combo.remove_wordlist = Gtk.ComboBox({
+        model = combo.remove_wordlist_model,
+        active = 0,
+        cells = {
+            {
+                Gtk.CellRendererText(),
+                { text = 1 },
+                align = Gtk.Align.START,
+            },
+        },
+    })
+
+    combo.remove_wordlist = style.set_theme(
+        combo.remove_wordlist,
+        { { size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg } }
+    )
+
+end
+
 
 return combo

@@ -7,15 +7,22 @@ local list = {}
 -- Modify a string to print the last column in a path
 function list.modify(luaFiles, type)
    local file_type = type or "dir"
-   -- Add items to the wordfile combo box
-   local luafilesFormatFirst = string.gsub(luaFiles, "lua", "")
-   local luafilesFormatSecond = string.gsub(luafilesFormatFirst, ".lua", "")
-   local last = string.match(luafilesFormatSecond, "[^/]+$")
-   local last = string.match(last, "([^.]+).")
 
-   local luaFiles = last
+   local match = string.match(luaFiles, "lua") or string.match(luaFiles, "json")
 
-   return luaFiles
+   if match then
+      -- Add items to the wordfile combo box
+      local luafilesFormatFirst = string.gsub(luaFiles, "lua", "")
+      local luafilesFormatSecond = string.gsub(luafilesFormatFirst, ".lua", "")
+      local last = string.match(luafilesFormatSecond, "[^/]+$")
+      local last = string.match(last, "([^.]+).")
+
+      local luaFiles = last
+      return luaFiles
+   else
+      return luaFiles
+   end
+
 end
 
 -- Modify dir
@@ -46,6 +53,10 @@ function list.dir(directory, type)
          end
       elseif file_type == "dir" then
          if file ~= "." and file ~= ".." and lfs.attributes(filePath, "mode") == "directory" then
+            table.insert(luaFiles, filePath)
+         end
+      elseif file_type == "json" then
+         if lfs.attributes(filePath, "mode") == "file" and file:match("%.json$") then
             table.insert(luaFiles, filePath)
          end
       end
@@ -122,14 +133,14 @@ function list.lower_case(word, ver)
 
    -- replace first letter of the word (SPECIAL LETTERS ONLY)
    local function replace_first(str, replacement)
-    -- Check if the string is not empty
-    if #str > 0 then
-        -- Replace the first character with the replacement character
-        return replacement .. utf8.sub(str, 2)
-    else
-        return str
-    end
-end
+      -- Check if the string is not empty
+      if #str > 0 then
+         -- Replace the first character with the replacement character
+         return replacement .. utf8.sub(str, 2)
+      else
+         return str
+      end
+   end
 
    if ver == 1 then
       -- loops through all the letter tables

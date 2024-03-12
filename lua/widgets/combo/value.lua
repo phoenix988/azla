@@ -4,6 +4,7 @@ local os = require("os")
 local GObject = lgi.require("GObject", "2.0")
 local theme = require("lua.theme.default")
 local label = require("lua.widgets.label")
+local var = require("lua.config.init")
 
 local widget = {}
 
@@ -65,10 +66,10 @@ function widget:set_count()
    -- Gets the length of the wordlist
    self.app.choice = self.app.modelWord[self.app.activeWord][1]
 
-   -- Check if custom path exist 
+   -- Check if custom path exist
    local wordDir_alt = var.wordDir_alt .. "/" .. self.app.choice .. ".lua"
 
-   -- If the custom path exist it will load it instead 
+   -- If the custom path exist it will load it instead
    if fileExists(wordDir_alt) then
       self.app.wordlist = loadConfig(wordDir_alt)
    else
@@ -172,5 +173,6 @@ function widget:set_count_value()
 
    return input
 end
+
 
 return widget

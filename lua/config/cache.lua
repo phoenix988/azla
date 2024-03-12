@@ -9,6 +9,7 @@ function M.set_config_Replace(replace)
       lang_set = replace.lang,
       default_width = replace.width,
       default_height = replace.height,
+      restore_list = replace.restore_list,
    }
 
    return configReplace
@@ -41,9 +42,12 @@ function M.config_settings(replace, combo)
    -- Gets the dimensions of the screen
    replace.width = window.width
    replace.height = window.height
+
+   -- other values
    replace.word = combo.word:get_active()
    replace.lang = combo.lang:get_active()
    replace.word_count = combo.word_count:get_active()
+   replace.restore_list = combo.restore_list:get_active()
 
    return replace
 end
@@ -63,5 +67,5 @@ function M.config_main(cacheFile, combo)
    M.to_config(cacheFile, config)
 end
 
--- Returns the module
+-- Returns the module 
 return { write_cache = M }

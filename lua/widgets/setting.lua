@@ -11,11 +11,11 @@ local setting_default = require("lua.theme.setting").load()
 local M = {}
 
 -- Creates some empty tables for the widgets
-M.theme_labels = {} -- For the theme (Color) setting menu
-M.font_labels = {} -- For the font setting menu
-M.setting_labels = {} -- For the general settings menu
+M.theme_labels = {}         -- For the theme (Color) setting menu
+M.font_labels = {}          -- For the font setting menu
+M.setting_labels = {}       -- For the general settings menu
 M.theme_labels_setting = {} -- For all the labels used in the settings
-M.restore_button = {} -- For all the restore buttons
+M.restore_button = {}       -- For all the restore buttons
 
 -- Function to convert hash to Gdk.RGBA color
 local function hashToRGBA(hash)
@@ -177,7 +177,7 @@ function M.theme_table(theme, font)
 
     -- Add click action too the button to restore the theme to default
     function restoreButton:on_clicked()
-	    --local status = write.write.config.color_scheme('color_scheme = "' .. stringValue .. '"\n', customConfig)
+        --local status = write.write.config.color_scheme('color_scheme = "' .. stringValue .. '"\n', customConfig)
         update.restore("theme") -- function for restoration of theme
     end
 
@@ -225,7 +225,9 @@ function M.setting_table(theme, font)
         M.setting_labels[key]:set_size_request(20, 10) -- Set width = 200, height = 100
 
         -- Sets the theme
-        M.setting_labels[key] = M.set_theme(M.setting_labels[key])
+        M.setting_labels[key] = M.set_theme(M.setting_labels[key], {
+            { color = M.color.label_fg, border_color = M.color.label_fg, size = font.welcome_size / 1000 },
+        })
 
         -- Make label widgets
         M.theme_labels_setting[key] = Gtk.Label({ margin_bottom = 50, label = labelValue })
@@ -309,7 +311,10 @@ function M.font_table(theme, font)
             })
 
             -- Set theme for the font buttons
-            M.font_labels[key] = M.set_theme(M.font_labels[key])
+            M.font_labels[key] = M.set_theme(
+                M.font_labels[key],
+                { { color = M.color.label_fg, border_color = M.color.label_fg, size = font.welcome_size / 1000 } }
+            )
             M.font_labels[key]:set_value(value)
         else
             -- Set theme for the font buttons

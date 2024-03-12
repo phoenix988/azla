@@ -67,12 +67,22 @@ local function updateWordlist(wordlist, words, check, delete)
 
 			-- Add the new entry to the wordlist
 			table.insert(formatList, { azerbaijani, english })
+
+			checkMultiple = false
 		end
 	end
+
+	--for i = 1, #formatList do
+	--	print(i, formatList[i][1])
+	--end
 
 	-- Create custom word path if it doesn't exist
 	if not fileExists(var.wordDir_alt) then
 		mkdir(var.wordDir_alt)
+	end
+
+	if not formatList then
+		formatList = {}
 	end
 
 	if #formatList == 0 then
@@ -104,46 +114,48 @@ local function updateWordlist(wordlist, words, check, delete)
 	-- Sets the wordlist count when adding new words
 	-- so it updates whill app is running
 	combo.count = combo:new(inputCount)
-	combo.count:set_count()
+	combo.count:set_count() -- Update the combo count with the new words
 
-	formatList = {}
+	formatList = {}      -- Resets the list
 end
 
 -- Creating empty tables -- start {{{
-local M = {}
+local M = {
+	-- Notebook widget
+	notebook = {},
 
--- Notebook widget
-M.notebook = {}
+	-- Main box for the items
+	box = {},
+	wordList_items = {},
 
--- Main box for the items
-M.box = {}
-M.wordList_items = {}
+	-- Create some grids used
+	grid_main = {}, -- Main grid tto attach child grid
+	grid_items = {}, -- Grid to attach the words
+	grid = {},     -- Grid to attach add buttons
+	grid_remove = {}, -- Grid to attach remove Button
 
--- Create some grids used
-M.grid_main = {}   -- Main grid tto attach child grid
-M.grid_items = {}  -- Grid to attach the words
-M.grid = {}        -- Grid to attach add buttons
-M.grid_remove = {} -- Grid to attach remove Button
+	-- Entry widget
+	entry_items = {
+		firsten = {}, -- English words
+		firstaz = {}, -- English words
+	},              -- Entry widget to add word
+	entry_remove = {}, -- Entry widgets to remove words
+	import_items = {},
+	new_list = {},
 
--- Entry widget
-M.entry_items = {}         -- Entry widget to add word
-M.entry_remove = {}        -- Entry widgets to remove words
-M.entry_items.firstaz = {} -- Azerbajani words
-M.entry_items.firsten = {} -- English words
-M.import_items = {}
-M.new_list = {}
+	-- Create table for remove button
+	removeButton = {},
+	addButton = {},
+	submitButton = {},
 
--- Create table for remove button
-M.removeButton = {}
-M.addButton = {}
-M.submitButton = {}
+	-- Table to create label list
+	label_list = {
+		remove = {},
+	},
 
--- Table to create label list
-M.label_list = {}
-M.label_list.remove = {}
-
--- Table for custom wordlist
-M.custom_wordlist = {}
+	-- Table for custom wordlist
+	custom_wordlist = {},
+}
 --- }}} empty tables end
 
 -- List all available lists
@@ -176,20 +188,6 @@ local scrolledWindow = Gtk.ScrolledWindow({
 local addWordListButton = Gtk.Button({ label = "Add New Wordlist", margin_bottom = 5, margin_top = 20 })
 local addWordListEntry = Gtk.Entry({ placeholder_text = "Wordlist Name" })
 
--- Action to add when you press the button once
---local function new_wordList_action()
---	addWordListButton:set_label("Add New Wordlist")
---	addWordListButton:set_margin_top(0)
---	widget.box_word_list:remove(addWordListButton)
---	widget.box_word_list:remove(scrolledWindow)
---	widget.box_word_list:remove(addWordListEntry)
---	widget.box_word_list:append(addWordListButton)
---	widget.box_word_list:append(scrolledWindow)
---	function addWordListButton:on_clicked()
---		new_wordList_action_first()
---	end
---end
-
 -- Action for new word list button
 local function new_wordList_action_first()
 	if addWordListButton.label == "Submit" then -- If
@@ -200,6 +198,12 @@ local function new_wordList_action_first()
 		widget.box_word_list:remove(addWordListEntry)
 		widget.box_word_list:append(addWordListButton)
 		widget.box_word_list:append(scrolledWindow)
+		local choice_entry = addWordListEntry.text
+		local add_window = require("lua.widgets.menu.newList")
+
+		if choice_entry ~= "" then
+			add_window.new_word_list(choice_entry)
+		end
 	else
 		addWordListButton:set_label("Submit")
 		addWordListButton:set_margin_top(0)
@@ -260,7 +264,7 @@ for i, item_label in ipairs(luaFiles) do
 	-- creates widgets notebook and grid widgets for all the words
 	M.notebook.word:append_page(M.box[i], Gtk.Label({ label = wordList }))
 
-	-- Create grid widget
+	-- Create grid widgets
 	M.grid_items[i] = widget.grid:main_create()
 	M.grid_main[i] = widget.grid:main_create()
 	M.grid_remove[i] = widget.grid:main_create()
@@ -301,28 +305,12 @@ for i, item_label in ipairs(luaFiles) do
 	local entry_az = Gtk.Entry({ margin_top = 50, placeholder_text = "Azerbajani Word" })
 	local entry_eng = Gtk.Entry({ margin_top = 50, placeholder_text = "English Word" })
 
+	-- Add the entries to the table
 	M.entry_items.firstaz[i] = entry_az
 	M.entry_items.firsten[i] = entry_eng
 
 	-- Entry box to remove word
 	M.entry_remove[i] = Gtk.Entry({ placeholder_text = "Remove Word: Write Number" })
-
-	-- Set style of entry boxes
-	M.entry_remove[i] = style.set_theme(M.entry_remove[i], {
-		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-	})
-
-	M.removeButton[i] = style.set_theme(M.removeButton[i], {
-		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-	})
-
-	entry_az = style.set_theme(entry_az, {
-		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-	})
-
-	entry_eng = style.set_theme(entry_eng, {
-		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-	})
 
 	-- Create submit and add button for the grid
 	local submit = Gtk.Button({ label = "Submit" })
@@ -330,33 +318,37 @@ for i, item_label in ipairs(luaFiles) do
 	M.addButton[i] = addAnother
 	M.submitButton[i] = submit
 
-	submit = style.set_theme(submit, {
-		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-	})
-
-	addAnother = style.set_theme(addAnother, {
-		{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
-	})
-
 	-- Make all dirs to lowercase
 	local lower = wordList:lower()
 
 	-- Check if there is multiple subdirs
 	update.check_mult_subdir(directoryPath, lower, M, wordList)
 
+	local success = pcall(function()
+		NewSubDir = list.dir(directoryPath .. "/" .. lower)
+	end)
+
+	if not M.check then
+		checkMultiple = M.check or false
+	elseif success then
+		checkMultiple = M.check or true
+	else
+		checkMultiple = M.check or false
+	end
+
 	-- Attach widgets to the button grid
 	M.grid[i]:attach(entry_az, 1, 0, 1, 1)
 	M.grid[i]:attach(entry_eng, 2, 0, 1, 1)
 	M.grid[i]:attach(addAnother, 3, 0, 1, 1)
 	M.grid[i]:attach(submit, 0, 1, 4, 1)
+
+	-- Set margin on submit button
 	submit:set_margin_top(0)
 
-	-- Attach the child grids
-	M.grid_main[i]:attach(M.grid_remove[i], 1, 3, 20, 1) -- attach grid for button
-	M.grid_main[i]:attach(M.grid[i], 1, 2, 6, 1)      -- attach grid for button
-	M.grid_main[i]:attach(M.grid_items[i], 1, 1, 1, 1) -- attach grid for words
-	--M.box[i]:append(M.grid[i])
-	--M.box[i]:append(submit)
+	-- Attach the child to the main grid
+	M.grid_main[i]:attach(M.grid_remove[i], 4, 3, 20, 1) -- attach grid for button
+	M.grid_main[i]:attach(M.grid[i], 4, 2, 20, 1)     -- attach grid for button
+	M.grid_main[i]:attach(M.grid_items[i], 1, 1, 20, 1) -- attach grid for words
 
 	-- Sets count to 0 at first
 	local entryCount = 0
@@ -467,6 +459,7 @@ for i, item_label in ipairs(luaFiles) do
 		add_button_action()
 	end
 
+	-- Clear the grid function
 	local function clear_grid(grid)
 		local child = grid:get_last_child()
 		while child do
@@ -486,7 +479,7 @@ for i, item_label in ipairs(luaFiles) do
 		M.grid[i]:attach(entry_eng, 2, 0, 1, 1)
 		M.grid[i]:attach(addAnother, 3, 0, 1, 1)
 		M.grid[i]:attach(submit, 0, 1, 4, 1)
-
+		-- Sets margin
 		addAnother:set_margin_top(50)
 
 		-- Create table to store the added words
@@ -532,111 +525,17 @@ for i, item_label in ipairs(luaFiles) do
 	end
 
 	-- Starts adding the words to the grid
-	if type(M.import_items[wordList]) == "table" then
-		-- Keep track of even and uneven
-		local countTime = 0
-		-- Create final WordTable to add all words from the diffrent lists
-		-- To one single table
-		WordTable = {}
-		for key, value in ipairs(M.new_list[wordList]) do
-			if not isEven(key) then
-				countTime = countTime + 1
-				WordTable[countTime] = { M.new_list[wordList][key], M.new_list[wordList][key + 1] }
-			end
-		end
+	-- Running function from lua.theme.update
+	num = update.create_wordlist_grid(M, M, wordList, isEven, i)
 
-		-- Finally we create the diffrent labels for the words in the wordlist
-		for j = 1, #WordTable do
-			M.label_list[wordList] = {}
-			local english = list.to_upper(WordTable[j][2])
-			local aze = list.to_upper(WordTable[j][1])
-
-			-- Make sure special characters also converts to uppercase
-			local checkAz = list.lower_case(aze, 2)
-
-			if checkAz ~= nil then
-				aze = checkAz
-			end
-
-			local form = aze .. " : " .. english
-			local row = math.floor((j - 1) / 3)
-			local col = (j - 1) % 3
-			local label = Gtk.Label({ label = j .. " " .. form })
-			-- Set label theme
-			label:set_markup(
-				"<span size='"
-				.. font.word_list_size
-				.. "' foreground='"
-				.. theme.label_fg
-				.. "'>"
-				.. label.label
-				.. "</span>"
-			)
-
-			M.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
-
-			label:set_size_request(100, -1)
-			M.label_list[wordList][j] = label
-
-			function M.modify_label()
-				M.label_list[wordList][j]:set_markup(
-					"<span size='"
-					.. font.word_list_size
-					.. "' foreground='"
-					.. theme.label_fg
-					.. "'>"
-					.. M.label_list[wordList][j].label
-					.. "</span>"
-				)
-			end
-		end
-	else
-		for j = 1, #M.wordList_items[i] do
-			M.label_list[wordList] = {}
-			local english = list.to_upper(M.wordList_items[i][j][2])
-			local aze = list.to_upper(M.wordList_items[i][j][1])
-			-- Make sure special characters also converts to uppercase
-			local checkAz = list.lower_case(aze, 2)
-
-			if checkAz ~= nil then
-				aze = checkAz
-			end
-
-			local form = aze .. " : " .. english
-			if wordList == "Phrases" then
-				row = math.floor((j - 1) / 1)
-				col = (j - 1) % 1
-			else
-				row = math.floor((j - 1) / 3)
-				col = (j - 1) % 3
-			end
-			local label = Gtk.Label({ label = j .. " " .. form })
-
-			-- Set label theme
-			label:set_markup(
-				"<span size='"
-				.. font.word_list_size
-				.. "' foreground='"
-				.. theme.label_fg
-				.. "'>"
-				.. label.label
-				.. "</span>"
-			)
-
-			label:set_size_request(100, -1)
-
-			M.label_list[wordList][j] = label
-
-			M.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
-		end
-	end
+	update.set_grid_theme(M, i)
 
 	-- Attach widgets to remove button
-	M.grid_remove[i]:attach(M.label_list.remove[i], 1, 0, 5, 1)
+	M.grid_remove[i]:attach(M.label_list.remove[i], 1, 0, 10, 1)
 	M.grid_remove[i]:attach(M.entry_remove[i], 1, 1, 1, 1)
-	M.grid_remove[i]:attach(M.removeButton[i], 2, 1, 1, 1)
+	M.grid_remove[i]:attach(M.removeButton[i], 3, 1, 4, 1)
 
-	-- Create temp variable for rtemove button
+	-- Create temp variable for remove button
 	local removeButton = M.removeButton[i]
 
 	-- Function to remove words and attach the function to a button
@@ -645,56 +544,65 @@ for i, item_label in ipairs(luaFiles) do
 		local countRem = 0
 		-- Runs if this is a table and not nil
 		if type(M.import_items[wordList]) == "table" then
-			-- Create empty table
-			local WordTable = {}
-
-			for key, value in ipairs(M.new_list[wordList]) do
-				if not isEven(key) then
-					countRem = countRem + 1
-					WordTable[countRem] = { M.new_list[wordList][key], M.new_list[wordList][key + 1] }
-				end
-			end
-
 			local choice = M.entry_remove[i].text
 			if choice ~= "" then
-				local start, finish = string.match(choice, "(%d+)-(%d+)")
-				local start = tonumber(start)
-				local finish = tonumber(finish)
-
-				table.remove(M.wordList_items[i], choice)
-				--	-- Loop over the values in the range
-				--	if start and finish ~= nil then
-				--		for j = start, finish do
-				--			print(j)
-				--			table.remove(M.wordList_items[i], j)
-				--		end
-				--	else
-				--		table.remove(M.wordList_items[i], choice)
-				--	end
+				local indices = {}
+				local firstRun = true
+				for index in string.gmatch(choice, "%d+") do
+					if firstRun then
+						First = tonumber(index)
+						firstRun = false
+					end
+					table.insert(indices, tonumber(index))
+					Last = tonumber(index)
+				end
+				local suc, res = pcall(function()
+					for j = 1, Last do
+						if j >= First then
+							print(j)
+							table.remove(M.wordList_items[i], j)
+						end
+						if j == Last then
+							print(j)
+							table.remove(M.wordList_items[i], j)
+						end
+					end
+				end)
 
 				updateWordlist(wordList, M.wordList_items[i], checkMultiple, 1)
 				update.update_word_list()
+
+				Last, First, firstRun = 0, 0, true
 			end
 		else -- else will run this
 			local choice = M.entry_remove[i].text
 			if choice ~= "" then
-				local start, finish = string.match(choice, "(%d+)-(%d+)")
-				local start = tonumber(start)
-				local finish = tonumber(finish)
-
-				table.remove(M.wordList_items[i], choice)
-				-- Loop over the values in the range
-				--if start and finish ~= nil then
-				--	for j = start, finish do
-				--		print(j)
-				--		table.remove(M.wordList_items[i], j)
-				--	end
-				--else
-				--	table.remove(M.wordList_items[i], choice)
-				--end
+				local indices = {}
+				local firstRun = true
+				for index in string.gmatch(choice, "%d+") do
+					if firstRun then
+						First = tonumber(index)
+						firstRun = false
+					end
+					table.insert(indices, tonumber(index))
+					Last = tonumber(index)
+				end
+				local suc, res = pcall(function()
+					for j = 1, Last do
+						if j >= First then
+							print(j)
+							table.remove(M.wordList_items[i], j)
+						end
+						if j == Last then
+							print(j)
+							table.remove(M.wordList_items[i], j)
+						end
+					end
+				end)
 
 				updateWordlist(wordList, M.wordList_items[i], checkMultiple, 1)
 				update.update_word_list()
+				Last, First, firstRun = 0, 0, true
 			end
 		end
 	end
@@ -729,4 +637,4 @@ end
 -- Create a label to display the selected menu item
 --M.label = Gtk.Label({ label = "No menu item selected" })
 
-return M
+return M -- Return the table

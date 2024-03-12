@@ -167,7 +167,6 @@ function app1:on_startup()
 	-- Combo box --START
 	-- Here I am configuiring the combo box widgets for Azla
 	-- Where you make some choices in the app like choosing wordlist and language
-
 	-- Model for the combo box
 	combo:create_lang()
 
@@ -176,6 +175,9 @@ function app1:on_startup()
 
 	-- Creates the wordlist box
 	combo.set:create_word_list()
+
+	-- create the restore list box
+	combo.set:create_restore_list()
 
 	-- Creates combo word count box
 	combo:create_word_count()
@@ -187,12 +189,12 @@ function app1:on_startup()
 	label.word_list.label = "WordList " .. set.wordActive .. " selected (" .. set.last_word_label .. ")"
 	label.word_list:set_markup(
 		"<span size='"
-			.. font.word_size
-			.. "' foreground='"
-			.. theme.label_word
-			.. "'>"
-			.. label.word_list.label
-			.. "</span>"
+		.. font.word_size
+		.. "' foreground='"
+		.. theme.label_word
+		.. "'>"
+		.. label.word_list.label
+		.. "</span>"
 	)
 
 	-- Creates a table to pass through the combo class
@@ -236,12 +238,12 @@ function app1:on_startup()
 		label.language.label = "Option " .. n .. " selected (" .. combo.lang_items[n + 1] .. ")"
 		label.language:set_markup(
 			"<span size='"
-				.. font.lang_size
-				.. "' foreground='"
-				.. theme.label_lang
-				.. "'>"
-				.. label.language.label
-				.. "</span>"
+			.. font.lang_size
+			.. "' foreground='"
+			.. theme.label_lang
+			.. "'>"
+			.. label.language.label
+			.. "</span>"
 		)
 
 		if n == 0 then
@@ -286,12 +288,12 @@ function app1:on_startup()
 			label.word_list.label = "WordList " .. n .. " selected (" .. last .. ")"
 			label.word_list:set_markup(
 				"<span size='"
-					.. font.word_size
-					.. "' foreground='"
-					.. theme.label_word
-					.. "'>"
-					.. label.word_list.label
-					.. "</span>"
+				.. font.word_size
+				.. "' foreground='"
+				.. theme.label_word
+				.. "'>"
+				.. label.word_list.label
+				.. "</span>"
 			)
 		end
 
@@ -314,6 +316,8 @@ function app1:on_startup()
 	-- set value of word combo box
 	combo.set:set_value(combo.word, config.word_set)
 
+	combo.set:set_value(combo.restore_list, config.restore_list)
+
 	-- Function that runs when combo word count changes
 	function combo.word_count:on_changed()
 		-- Reload theme
@@ -331,17 +335,105 @@ function app1:on_startup()
 			label.word_count.label = "Selected " .. combo.word_count_items[n + 1] .. " Words"
 			label.word_count:set_markup(
 				"<span size='"
-					.. font.word_size
-					.. "' foreground='"
-					.. theme.label_word
-					.. "'>"
-					.. label.word_count.label
-					.. "</span>"
+				.. font.word_size
+				.. "' foreground='"
+				.. theme.label_word
+				.. "'>"
+				.. label.word_count.label
+				.. "</span>"
 			)
 		end)
 
 		write.write.cache.config_main(cacheFile, combo)
 	end
+
+	local set_word_count_text = combo.word_count:get_active()
+	local _, _ = pcall(function()
+		-- Code that uses the variable
+		label.word_count.label = "Selected " .. combo.word_count_items[set_word_count_text + 1] .. " Words"
+		label.word_count:set_markup(
+			"<span size='"
+			.. font.word_size
+			.. "' foreground='"
+			.. theme.label_word
+			.. "'>"
+			.. label.word_count.label
+			.. "</span>"
+		)
+	end)
+
+	function combo.restore_list:on_changed()
+		local theme = require("lua.theme.default")
+		local theme = theme.load()
+
+		window.width = win:get_allocated_width()
+		window.height = win:get_allocated_height()
+
+		loadConfig(cacheFile)
+
+		local n = self:get_active()
+
+		-- Only get the list name
+		newStr = combo.restore_files[n + 1]
+
+		if newStr then
+			last = list.modify(newStr)
+		end
+
+		-- Updates label when you change option
+		if last then
+			label.restore_list.label = "Session " .. n + 1 .. " selected (" .. last .. ")"
+			label.restore_list:set_markup(
+				"<span size='"
+				.. font.word_size
+				.. "' foreground='"
+				.. theme.label_word
+				.. "'>"
+				.. label.restore_list.label
+				.. "</span>"
+			)
+		end
+
+		write.write.cache.config_main(cacheFile, combo)
+
+		settings.restore_list = last
+	end
+
+	function combo.remove_wordlist:on_changed()
+		local theme = require("lua.theme.default")
+		local theme = theme.load()
+
+		window.width = win:get_allocated_width()
+		window.height = win:get_allocated_height()
+
+		loadConfig(cacheFile)
+
+		local n = self:get_active()
+
+		-- Only get the list name
+		newStr = combo.remove_wordlist_files[n + 1]
+
+		if newStr then
+			last = list.modify(newStr)
+		end
+
+		-- Updates label when you change option
+		if last then
+			label.remove_wordlist.label = "Remove " .. n + 1 .. " wordlist (" .. last .. ")"
+			label.remove_wordlist:set_markup(
+				"<span size='"
+				.. font.welcome_size
+				.. "' foreground='"
+				.. theme.label_word
+				.. "'>"
+				.. label.remove_wordlist.label
+				.. "</span>"
+			)
+		end
+
+		write.write.cache.config_main(cacheFile, combo)
+	end
+
 
 	-- Exports the default language option on startup
 	local lang_value = combo.lang:get_active()
@@ -354,6 +446,13 @@ function app1:on_startup()
 	end
 
 	--Combo --END
+	-- Only get the list name
+	local restore_n = combo.restore_list:get_active()
+	combo_restore_str = combo.restore_files[restore_n + 1]
+
+	if combo_restore_str then
+		combo_restore_list_choosen = list.modify(combo_restore_str)
+	end
 
 	-- Returns some settings start
 	-- Gets the active items in the combo boxes
@@ -362,10 +461,12 @@ function app1:on_startup()
 	-- If I didn't set these
 	-- settings start
 	settings = {}
-	
+
 	-- adds the active wordlist and stores it in settings table
 	settings.word = combo.word:get_active()
-    
+
+	settings.restore_list = combo_restore_list_choosen
+
 	-- adds the active lang and stores it in settings table
 	settings.lang = combo.lang:get_active()
 	settings.comboWord = comboWord
@@ -439,12 +540,12 @@ function app1:on_startup()
 	label.current_color_scheme:set_text("Current theme is: " .. stringValue)
 	label.current_color_scheme:set_markup(
 		"<span size='"
-			.. font.fg_size
-			.. "' foreground='"
-			.. theme.label_word
-			.. "'>"
-			.. label.current_color_scheme.label
-			.. "</span>"
+		.. font.fg_size
+		.. "' foreground='"
+		.. theme.label_word
+		.. "'>"
+		.. label.current_color_scheme.label
+		.. "</span>"
 	)
 
 	widget.box_theme:append(schemeGrid)
@@ -487,18 +588,20 @@ function app1:on_startup()
 	local themeGrid = grid.main_create()
 
 	-- Attach all the widgets to the mainGrid
-	mainGrid:attach(label.welcome, 0, 2, 1, 1)
-	mainGrid:attach(label.language, 0, 3, 1, 1)
-	mainGrid:attach(combo.lang, 0, 4, 1, 1)
-	mainGrid:attach(label.word_list, 0, 5, 1, 1)
-	mainGrid:attach(combo.word, 0, 6, 1, 1)
-	mainGrid:attach(label.word_count, 0, 7, 1, 1)
-	mainGrid:attach(combo.word_count, 0, 8, 1, 1)
-	mainGrid:attach(button.start, 0, 11, 1, 1)
-	mainGrid:attach(button.exam_mode, 0, 12, 1, 1)
-	mainGrid:attach(button.restore_mode, 0, 13, 1, 1)
-	mainGrid:attach(button.setting, 0, 14, 1, 1)
-	mainGrid:attach(button.exit, 0, 15, 1, 1)
+	mainGrid:attach(label.welcome, 0, 2, 10, 1)
+	mainGrid:attach(label.language, 0, 3, 10, 1)
+	mainGrid:attach(combo.lang, 0, 4, 10, 1)
+	mainGrid:attach(label.word_list, 0, 7, 1, 1)
+	mainGrid:attach(combo.word, 0, 8, 1, 1)
+	mainGrid:attach(label.word_count, 1, 7, 10, 1)
+	mainGrid:attach(combo.word_count, 1, 8, 10, 1)
+	mainGrid:attach(button.start, 0, 11, 10, 1)
+	mainGrid:attach(button.exam_mode, 0, 12, 10, 1)
+	mainGrid:attach(label.restore_list, 0, 13, 10, 1)
+	mainGrid:attach(combo.restore_list, 0, 14, 10, 1)
+	mainGrid:attach(button.restore_mode, 0, 15, 10, 1)
+	mainGrid:attach(button.setting, 0, 16, 10, 1)
+	mainGrid:attach(button.exit, 0, 17, 10, 1)
 
 	--themeGrid:attach(button.setting_submit,0,0,1,1)
 	themeGrid:attach(image2, 1, -2, 1, 1)
@@ -535,7 +638,7 @@ function app1:on_startup()
 	-- is which  box to append it to
 
 	widget.append = {
-		{ image, "main" },
+		{ image,    "main" },
 		{ mainGrid, "main" },
 	}
 

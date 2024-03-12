@@ -54,6 +54,12 @@ button.setting_wordlist = style.set_theme(
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
 )
 
+button.remove_wordlist = Gtk.Button({ label = "Remove", margin_top = 8, width_request = 200 })
+button.remove_wordlist = style.set_theme(
+	button.remove_wordlist,
+	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
+)
+
 button.exit_alt = style.set_theme(
 	button.exit_alt,
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
@@ -78,6 +84,7 @@ button.restore_mode = style.set_theme(
 	button.restore_mode,
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
 )
+
 
 -- Create color scheme button
 button.color_scheme = Gtk.Button({

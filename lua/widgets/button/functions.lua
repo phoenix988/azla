@@ -2,6 +2,7 @@
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
 local GLib = require("lgi").GLib
+local GObject = lgi.require("GObject", "2.0")
 local theme = require("lua.theme.default")
 local update = require("lua.theme.update")
 local array = require("lua.widgets.setting")
@@ -74,7 +75,7 @@ local function backAction(currentQuestion, question, window_alt, win, import, ma
 		question.jsonSettings.treeViewCheck[i] = question.checkForMultiple[i]
 	end
 
-	json.saveSession(question.jsonSettings)
+	json.saveSession(question.jsonSettings, question.jsonSettings.check)
 
 	question.jsonSettings = {}
 
@@ -141,9 +142,7 @@ function M.back_exit_create(currentQuestion, question, import, win, mainWin, rep
 			question.jsonSettings.treeViewCheck[word] = question.checkForMultiple[word]
 		end
 
-		json.saveSession(question.jsonSettings)
-
-		question.jsonSettings = {}
+		json.saveSession(question.jsonSettings, question.jsonSettings.check, 1)
 
 		write.write.cache.config_main(cacheFile, combo)
 
@@ -289,24 +288,24 @@ function M.click_action(widget, image, label, theme, setting, write)
 		local theme = require("lua.theme.default")
 		local theme = theme.load()
 
-                -- Import functions we need
+		-- Import functions we need
 		local update = require("lua.theme.update")
 		local write = require("lua.config.init")
 		local theme = require("lua.theme.default")
 		local mkdir = require("lua.terminal.mkdir").mkdir
-		
+
 		-- Create config if it doesn't exist
 		if not fileExists(var.config.dir) then
 			mkdir(var.config.dir)
 		end
 		-- Write the color scheme to file etc so it updates
 		theme.color_scheme(treeView, write, update)
-		
+
 		-- Live update the app while its running
 		--update.live(theme)
 		update.live(apply)
 	end
-        
+
 	-- Function for button color -- NOTE: this button is not used
 	function button.color_scheme:on_clicked()
 		local theme = require("lua.theme.default")
@@ -318,9 +317,9 @@ end
 function M.exit_click(window, write, win, cacheFile, combo)
 	window.width = win:get_allocated_width()
 	window.height = win:get_allocated_height()
-        -- Write to the cache file 
+	-- Write to the cache file
 	write.write.cache.config_main(cacheFile, combo)
-        -- Destroy the window
+	-- Destroy the window
 	win:destroy()
 end
 

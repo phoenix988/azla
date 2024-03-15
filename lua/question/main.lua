@@ -127,6 +127,11 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	local getLanguageChoice = mainWindowModule.getLanguageChoice
 	local languageChoice = getLanguageChoice()
 
+	question.jsonSettings.check = {
+		dontSave = wordlist.check.dontSave or false,
+		file = wordlist.check.file,
+	}
+
 	-- Relaunches the wordlist language if you restore session
 	if wordlist.lang then
 		if wordlist.lang == "azerbajani" then
@@ -154,7 +159,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		question.jsonSettings.lang = "english"
 	end
 
-	-- Gets the wordlist count value of the combo count box
+	-- Gets the wordlist count value of the combo.count_new_new box
 	local count = tonumber(wordlist.count)
 
 	local wordTable = {}
@@ -219,6 +224,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	-- create treeView widget
 	local treeView = wordview:create_tree(wordTable)
 	wg.treeWidget = treeView
+	question.treeWidget = treeView
 
 	-- Adss the questionGrid to the wg table
 	wg.tree = questionGrid
@@ -346,7 +352,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 				currentQuestion = currentQuestion
 				if tonumber(currentQuestion) > tonumber(wordlist.count) then
 					question.jsonSettings = {}
-					json.saveSession(question.jsonSettings)
+					local delete = 1
+					json.saveSession(question.jsonSettings, wordlist.check, delete)
 				end
 			end
 
@@ -514,7 +521,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 			question.jsonSettings.count_start = question.count_start
 
 			-- save to json file
-			json.saveSession(question.jsonSettings)
+			json.saveSession(question.jsonSettings, wordlist.check)
 		end
 
 		-- Sets default visibility of all widgets
@@ -580,8 +587,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 	-- Add checkmark if the question is answered from previous session
 	question.update_tree(treeTable, w)
 	if wordlist.checkForMultiple ~= nil then
-	    -- If you restore session then it will mark the
-		-- word with checkmarks already and avoid stacking of 
+		-- If you restore session then it will mark the
+		-- word with checkmarks already and avoid stacking of
 		-- checkmarks
 		checkForMultiple = wordlist.checkForMultiple
 		-- Reset variables (Probably dont need them)
@@ -658,7 +665,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		question.jsonSettings.count_start = question.count_start
 
 		-- Save to json file
-		json.saveSession(question.jsonSettings)
+		json.saveSession(question.jsonSettings, wordlist.check)
 	end)
 
 	-- save checkForMultiple to json file so you can restore
@@ -705,7 +712,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		-- Will run if you didn't complete all questions
 		if question.complete == false then
 			-- Prompt you to be sure you want to continue
-			-- you didnt answer all questions 
+			-- you didnt answer all questions
 			pop.are_you_sure(
 				currentQuestion,
 				switchQuestion,
@@ -740,7 +747,8 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 
 		-- Resets the json file
 		question.jsonSettings = {}
-		json.saveSession(question.jsonSettings)
+		local delete = 1
+		json.saveSession(question.jsonSettings, wordlist.check, delete)
 	end
 
 	-- Single next button made for exam mode
@@ -754,7 +762,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		currentQuestion = switchQuestion(true, question, w, wg, bt)
 
 		-- Current question
-	 	current = currentQuestion
+		current = currentQuestion
 
 		-- current question
 		question.count_start = current
@@ -783,7 +791,7 @@ function question.main(wordlist, w, mainGrid, questionGrid, currentQuestion, bt)
 		question.jsonSettings.count_start = question.count_start
 
 		-- save to json file
-		json.saveSession(question.jsonSettings)
+		json.saveSession(question.jsonSettings, wordlist.check)
 	end
 
 	-- Get the tree selection and set the default selection

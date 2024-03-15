@@ -1,6 +1,5 @@
 local M = {}
 
-
 -- Functions that are used to write to the cache file
 function M.set_config_Replace(replace)
    local configReplace = {
@@ -47,7 +46,9 @@ function M.config_settings(replace, combo)
    replace.word = combo.word:get_active()
    replace.lang = combo.lang:get_active()
    replace.word_count = combo.word_count:get_active()
-   replace.restore_list = combo.restore_list:get_active()
+   if combo.restore_list then
+      replace.restore_list = combo.restore_list:get_active()
+   end
 
    return replace
 end
@@ -67,5 +68,5 @@ function M.config_main(cacheFile, combo)
    M.to_config(cacheFile, config)
 end
 
--- Returns the module 
+-- Returns the module
 return { write_cache = M }

@@ -18,6 +18,7 @@ label.text = {
 	wordlist_count = "Choose word amount",
 	restore_list = "Choose session to restore",
 	remove_wordlist = "Choose wordlist to remove",
+	remove_restore_list = "Choose session to remove",
 }
 
 function label.text.create_response(opt)
@@ -92,13 +93,13 @@ for key, _ in pairs(restoreList) do
 	label.theme_restore[key]:set_margin_top(20)
 end
 
-
 label.language = Gtk.Label({ label = label.text.lang })
 
 label.word_list = Gtk.Label({ label = label.text.wordlist, height_request = 50 })
 label.word_count = Gtk.Label({ label = label.text.wordlist_count, height_request = 50 })
 label.restore_list = Gtk.Label({ label = label.text.restore_list, height_request = 50, margin_top = 40 })
 label.remove_wordlist = Gtk.Label({ label = label.text.remove_wordlist, height_request = 50, margin_top = 40 })
+label.remove_restore_list = Gtk.Label({ label = label.text.remove_restore_list, height_request = 50, margin_top = 40 })
 
 label.welcome = Gtk.Label({
 	label = label.text.welcome,
@@ -167,6 +168,15 @@ label.remove_wordlist:set_markup(
 	.. label.remove_wordlist.label
 	.. "</span>"
 )
+label.remove_restore_list:set_markup(
+	"<span size='"
+	.. font.welcome_size
+	.. "' foreground='"
+	.. theme.label_word
+	.. "'>"
+	.. label.remove_restore_list.label
+	.. "</span>"
+)
 label.language:set_markup(
 	"<span size='"
 	.. font.lang_size
@@ -207,6 +217,5 @@ label.theme_apply:set_markup(
 	.. label.theme_apply.label
 	.. "</span>"
 )
-
 
 return label

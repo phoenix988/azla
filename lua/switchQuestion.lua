@@ -93,7 +93,6 @@ function import.switchQuestion(next, question, w, wg, bt)
       if question.label_incorrect ~= nil then
          bt.notebook:append_page(bt.resultWindow2, Gtk.Label({ label = "Incorrect" }))
       end
-
    end
 
    -- Hide all question elements

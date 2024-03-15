@@ -35,8 +35,7 @@ local function isEven(number)
 end
 
 -- Function to update the wordlist file with new entries
-local function updateWordlist(wordlist, words, check, delete)
-	formatList = {}
+local function write_update_wordlist(wordlist, words, check, delete)
 	-- Determines to delete word or not
 	local delete = delete or 0
 	if delete == 1 then
@@ -114,12 +113,14 @@ local function updateWordlist(wordlist, words, check, delete)
 	-- Sets the wordlist count when adding new words
 	-- so it updates whill app is running
 	combo.count = combo:new(inputCount)
-	combo.count:set_count() -- Update the combo count with the new words
-
-	formatList = {}      -- Resets the list
+	combo.count:set_count() -- Update the combo.count with the new words
 end
 
 -- Creating empty tables -- start {{{
+-- Import table to store wordlist variables
+local import_wordlist = {}
+import_wordlist.count = 0
+
 local M = {
 	-- Notebook widget
 	notebook = {},
@@ -131,7 +132,7 @@ local M = {
 	-- Create some grids used
 	grid_main = {}, -- Main grid tto attach child grid
 	grid_items = {}, -- Grid to attach the words
-	grid = {},     -- Grid to attach add buttons
+	grid_buttons = {}, -- Grid to attach add buttons
 	grid_remove = {}, -- Grid to attach remove Button
 
 	-- Entry widget
@@ -167,7 +168,6 @@ local dontAdd = {}
 
 -- Set count values to count the custom wordlist
 local countCustom = 0
-local countCustom_main = 0
 
 -- Check for custom wordlist
 update.check_custom_list(countCustom, luaFiles, M, dontAdd)
@@ -290,12 +290,18 @@ for i, item_label in ipairs(luaFiles) do
 	M.box[i]:append(spacer)
 	M.box[i]:append(M.grid_main[i])
 
+	if import_wordlist.count == 0 then
+		import_wordlist.count = 1
+	elseif import_wordlist.count == nil then
+		import_wordlist.count = 1
+	end
+
 	-- Function to import the lists thats available
-	update.import_wordlists(dontAdd, M, countCustom_main, wordList, i)
+	import_wordlist = update.import_wordlists(dontAdd, M, import_wordlist.count, wordList, i)
 
 	-- Create grid widget for buttons
-	M.grid[i] = widget.grid:main_create()
-	M.grid[i]:set_hexpand(true)
+	M.grid_buttons[i] = widget.grid:main_create()
+	M.grid_buttons[i]:set_hexpand(true)
 
 	-- Create empty table for entry widgets
 	M.entry_items.azerbajaniEntry = {} -- Azerbajani words
@@ -314,8 +320,8 @@ for i, item_label in ipairs(luaFiles) do
 
 	-- Create submit and add button for the grid
 	local submit = Gtk.Button({ label = "Submit" })
-	local addAnother = Gtk.Button({ margin_top = 50, label = "Add" })
-	M.addButton[i] = addAnother
+	local addButton = Gtk.Button({ margin_top = 50, label = "Add" })
+	M.addButton[i] = addButton
 	M.submitButton[i] = submit
 
 	-- Make all dirs to lowercase
@@ -337,17 +343,17 @@ for i, item_label in ipairs(luaFiles) do
 	end
 
 	-- Attach widgets to the button grid
-	M.grid[i]:attach(entry_az, 1, 0, 1, 1)
-	M.grid[i]:attach(entry_eng, 2, 0, 1, 1)
-	M.grid[i]:attach(addAnother, 3, 0, 1, 1)
-	M.grid[i]:attach(submit, 0, 1, 4, 1)
+	M.grid_buttons[i]:attach(entry_az, 1, 0, 1, 1)
+	M.grid_buttons[i]:attach(entry_eng, 2, 0, 1, 1)
+	M.grid_buttons[i]:attach(addButton, 3, 0, 1, 1)
+	M.grid_buttons[i]:attach(submit, 0, 1, 4, 1)
 
 	-- Set margin on submit button
 	submit:set_margin_top(0)
 
 	-- Attach the child to the main grid
 	M.grid_main[i]:attach(M.grid_remove[i], 4, 3, 20, 1) -- attach grid for button
-	M.grid_main[i]:attach(M.grid[i], 4, 2, 20, 1)     -- attach grid for button
+	M.grid_main[i]:attach(M.grid_buttons[i], 4, 2, 20, 1) -- attach grid for button
 	M.grid_main[i]:attach(M.grid_items[i], 1, 1, 20, 1) -- attach grid for words
 
 	-- Sets count to 0 at first
@@ -393,31 +399,31 @@ for i, item_label in ipairs(luaFiles) do
 			{ size = font.fg_size / 1000, color = theme.label_question, border_color = theme.label_fg },
 		})
 
-		M.grid[i]:attach(M.entry_items.azerbajaniEntry[entryCount], 1, entryCount, 1, 1)
-		M.grid[i]:attach(M.entry_items.englishEntry[entryCount], 2, entryCount, 1, 1)
-		M.grid[i]:remove(submit)
-		M.grid[i]:attach(submit, 0, entryCount + 1, 4, 1)
+		M.grid_buttons[i]:attach(M.entry_items.azerbajaniEntry[entryCount], 1, entryCount, 1, 1)
+		M.grid_buttons[i]:attach(M.entry_items.englishEntry[entryCount], 2, entryCount, 1, 1)
+		M.grid_buttons[i]:remove(submit)
+		M.grid_buttons[i]:attach(submit, 0, entryCount + 1, 4, 1)
 
 		-- Schedule removal and reattachment of the "Add" button
 		GLib.idle_add(GLib.PRIORITY_DEFAULT, function()
 			-- Remove and reattach the "Add" button
 			-- If first time then it will remove the first button created
 			if firstRun then
-				M.grid[i]:remove(addAnother)
+				M.grid_buttons[i]:remove(addButton)
 				firstRun = false
 			else
 				-- else it will remove the other buttons
-				M.grid[i]:remove(button_table[entryCount - 1])
+				M.grid_buttons[i]:remove(button_table[entryCount - 1])
 			end
-			M.grid[i]:attach(button_table[entryCount], 3, entryCount, 1, 1)
-			M.grid[i]:attach(entry_table[entryCount], 3, entryCount - 1, 1, 1)
+			M.grid_buttons[i]:attach(button_table[entryCount], 3, entryCount, 1, 1)
+			M.grid_buttons[i]:attach(entry_table[entryCount], 3, entryCount - 1, 1, 1)
 			entry_table[entryCount]:set_margin_top(0)
 			entry_table[1]:set_margin_top(50)
 			-- Restore scroll position
 			return false -- Stop the idle handler
 		end)
 
-		addAnother:set_margin_top(0)
+		addButton:set_margin_top(0)
 
 		-- Attach the function
 		function add:on_clicked()
@@ -427,25 +433,25 @@ for i, item_label in ipairs(luaFiles) do
 		function remove:on_clicked()
 			-- Function for remove entry section
 			local function remove_entry_action()
-				local azEntry = M.grid[i]:get_child_at(1, entryCount)
-				local enEntry = M.grid[i]:get_child_at(2, entryCount)
-				local entry = M.grid[i]:get_child_at(3, entryCount - 1)
-				local button = M.grid[i]:get_child_at(3, entryCount)
+				local azEntry = M.grid_buttons[i]:get_child_at(1, entryCount)
+				local enEntry = M.grid_buttons[i]:get_child_at(2, entryCount)
+				local entry = M.grid_buttons[i]:get_child_at(3, entryCount - 1)
+				local button = M.grid_buttons[i]:get_child_at(3, entryCount)
 				entryCount = entryCount - 1
 				if entryCount == 0 then
-					M.grid[i]:remove(azEntry)
-					M.grid[i]:remove(enEntry)
-					M.grid[i]:remove(entry)
-					M.grid[i]:remove(button)
-					M.grid[i]:attach(addAnother, 3, entryCount, 1, 1)
-					addAnother:set_margin_top(50)
+					M.grid_buttons[i]:remove(azEntry)
+					M.grid_buttons[i]:remove(enEntry)
+					M.grid_buttons[i]:remove(entry)
+					M.grid_buttons[i]:remove(button)
+					M.grid_buttons[i]:attach(addButton, 3, entryCount, 1, 1)
+					addButton:set_margin_top(50)
 					firstRun = true
 				else
-					M.grid[i]:remove(entry)
-					M.grid[i]:remove(azEntry)
-					M.grid[i]:remove(enEntry)
-					M.grid[i]:remove(button)
-					M.grid[i]:attach(button_table[entryCount], 3, entryCount, 1, 1)
+					M.grid_buttons[i]:remove(entry)
+					M.grid_buttons[i]:remove(azEntry)
+					M.grid_buttons[i]:remove(enEntry)
+					M.grid_buttons[i]:remove(button)
+					M.grid_buttons[i]:attach(button_table[entryCount], 3, entryCount, 1, 1)
 				end
 			end
 
@@ -454,7 +460,7 @@ for i, item_label in ipairs(luaFiles) do
 	end
 
 	-- Attach the function to the add button
-	function addAnother:on_clicked()
+	function addButton:on_clicked()
 		-- Calls the function
 		add_button_action()
 	end
@@ -472,15 +478,15 @@ for i, item_label in ipairs(luaFiles) do
 		-- Reset the counters
 		firstRun = true
 		entryCount = 0
-		clear_grid(M.grid[i])
+		clear_grid(M.grid_buttons[i])
 
 		-- Reattach the default buttons
-		M.grid[i]:attach(entry_az, 1, 0, 1, 1)
-		M.grid[i]:attach(entry_eng, 2, 0, 1, 1)
-		M.grid[i]:attach(addAnother, 3, 0, 1, 1)
-		M.grid[i]:attach(submit, 0, 1, 4, 1)
+		M.grid_buttons[i]:attach(entry_az, 1, 0, 1, 1)
+		M.grid_buttons[i]:attach(entry_eng, 2, 0, 1, 1)
+		M.grid_buttons[i]:attach(addButton, 3, 0, 1, 1)
+		M.grid_buttons[i]:attach(submit, 0, 1, 4, 1)
 		-- Sets margin
-		addAnother:set_margin_top(50)
+		addButton:set_margin_top(50)
 
 		-- Create table to store the added words
 		local combTable = {}
@@ -505,7 +511,7 @@ for i, item_label in ipairs(luaFiles) do
 		end
 
 		-- update the wordlist
-		updateWordlist(wordList, combTable, checkMultiple)
+		write_update_wordlist(wordList, combTable, checkMultiple)
 
 		update.update_word_list()
 
@@ -569,7 +575,7 @@ for i, item_label in ipairs(luaFiles) do
 					end
 				end)
 
-				updateWordlist(wordList, M.wordList_items[i], checkMultiple, 1)
+				write_update_wordlist(wordList, M.wordList_items[i], checkMultiple, 1)
 				update.update_word_list()
 
 				Last, First, firstRun = 0, 0, true
@@ -600,7 +606,7 @@ for i, item_label in ipairs(luaFiles) do
 					end
 				end)
 
-				updateWordlist(wordList, M.wordList_items[i], checkMultiple, 1)
+				write_update_wordlist(wordList, M.wordList_items[i], checkMultiple, 1)
 				update.update_word_list()
 				Last, First, firstRun = 0, 0, true
 			end

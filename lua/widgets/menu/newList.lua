@@ -2,6 +2,7 @@ local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
 local style = require("lua.widgets.setting")
 local var = require("lua.config.init")
+local update = require("lua.theme.update")
 
 local M = {}
 
@@ -81,13 +82,14 @@ function M.new_word_list(name_wordlist)
 					file:write("local wordlist = {\n")
 					for _, entry in ipairs(wordlist_table) do
 						if entry[1] ~= nil or entry[2] ~= nil then
-							file:write(string.format('\t{ "%s", "%s" },\n', entry[1],
-								entry[2]))
+							file:write(string.format('\t{ "%s", "%s" },\n', entry[1], entry[2]))
 						end
 					end
 					file:write("}\n\nreturn wordlist")
 					file:close()
 				end
+
+				update.update_word_list()
 
 				window:destroy()
 			end,

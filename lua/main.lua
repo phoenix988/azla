@@ -14,10 +14,6 @@
 -- Imports libaries we need
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "4.0")
-local Gdk = require("lgi").Gdk
-local GObject = lgi.require("GObject", "2.0")
-local GdkPixbuf = lgi.require("GdkPixbuf")
-local lfs = require("lfs")
 local os = require("os")
 
 -- Import theme
@@ -85,9 +81,6 @@ local wordItems = {
 -- Needed for when you first launch the app
 local exportLanguageChoice = "azerbajani"
 
--- Gets users home directory
-local home = os.getenv("HOME")
-
 -- Sets path to image
 local imagePath = setting_default.image
 
@@ -98,7 +91,7 @@ local cacheFile = var.cacheFile
 local customConfig = var.config.custom
 
 -- load cacheFile config
-local configPath = loadConfig(cacheFile)
+loadConfig(cacheFile)
 
 -- Creates empty array of config so we dont get errors
 -- If the cache file doesn't exist
@@ -316,7 +309,11 @@ function app1:on_startup()
 	-- set value of word combo box
 	combo.set:set_value(combo.word, config.word_set)
 
-	combo.set:set_value(combo.restore_list, config.restore_list)
+	if combo.restore_list then
+		combo.set:set_value(combo.restore_list, config.restore_list)
+	end
+
+	combo.set:set_value(combo.remove_restore_list, config.restore_list)
 
 	-- Function that runs when combo word count changes
 	function combo.word_count:on_changed()
@@ -362,7 +359,46 @@ function app1:on_startup()
 		)
 	end)
 
-	function combo.restore_list:on_changed()
+	if combo.restore_list then
+		function combo.restore_list:on_changed()
+			local theme = require("lua.theme.default")
+			local theme = theme.load()
+
+			window.width = win:get_allocated_width()
+			window.height = win:get_allocated_height()
+
+			loadConfig(cacheFile)
+
+			local n = self:get_active()
+
+			-- Only get the list name
+			newStr = combo.restore_files[n + 1]
+
+			if newStr then
+				last = list.modify(newStr)
+			end
+
+			-- Updates label when you change option
+			if last then
+				label.restore_list.label = "Session " .. n + 1 .. " selected (" .. last .. ")"
+				label.restore_list:set_markup(
+					"<span size='"
+					.. font.word_size
+					.. "' foreground='"
+					.. theme.label_word
+					.. "'>"
+					.. label.restore_list.label
+					.. "</span>"
+				)
+			end
+
+			write.write.cache.config_main(cacheFile, combo)
+
+			settings.restore_list = last
+		end
+	end
+
+	function combo.remove_restore_list:on_changed()
 		local theme = require("lua.theme.default")
 		local theme = theme.load()
 
@@ -382,14 +418,14 @@ function app1:on_startup()
 
 		-- Updates label when you change option
 		if last then
-			label.restore_list.label = "Session " .. n + 1 .. " selected (" .. last .. ")"
-			label.restore_list:set_markup(
+			label.remove_restore_list.label = "Remove " .. "(" .. last .. ")"
+			label.remove_restore_list:set_markup(
 				"<span size='"
-				.. font.word_size
+				.. font.welcome_size
 				.. "' foreground='"
 				.. theme.label_word
 				.. "'>"
-				.. label.restore_list.label
+				.. label.remove_restore_list.label
 				.. "</span>"
 			)
 		end
@@ -434,7 +470,6 @@ function app1:on_startup()
 		write.write.cache.config_main(cacheFile, combo)
 	end
 
-
 	-- Exports the default language option on startup
 	local lang_value = combo.lang:get_active()
 
@@ -447,11 +482,13 @@ function app1:on_startup()
 
 	--Combo --END
 	-- Only get the list name
-	local restore_n = combo.restore_list:get_active()
-	combo_restore_str = combo.restore_files[restore_n + 1]
+	if combo.restore_list then
+		local restore_n = combo.restore_list:get_active()
+		combo_restore_str = combo.restore_files[restore_n + 1]
 
-	if combo_restore_str then
-		combo_restore_list_choosen = list.modify(combo_restore_str)
+		if combo_restore_str then
+			combo_restore_list_choosen = list.modify(combo_restore_str)
+		end
 	end
 
 	-- Returns some settings start
@@ -597,11 +634,15 @@ function app1:on_startup()
 	mainGrid:attach(combo.word_count, 1, 8, 10, 1)
 	mainGrid:attach(button.start, 0, 11, 10, 1)
 	mainGrid:attach(button.exam_mode, 0, 12, 10, 1)
-	mainGrid:attach(label.restore_list, 0, 13, 10, 1)
-	mainGrid:attach(combo.restore_list, 0, 14, 10, 1)
-	mainGrid:attach(button.restore_mode, 0, 15, 10, 1)
+	if combo.restore_list then
+		mainGrid:attach(label.restore_list, 0, 13, 10, 1)
+		mainGrid:attach(combo.restore_list, 0, 14, 10, 1)
+		mainGrid:attach(button.restore_mode, 0, 15, 10, 1)
+	end
 	mainGrid:attach(button.setting, 0, 16, 10, 1)
 	mainGrid:attach(button.exit, 0, 17, 10, 1)
+
+	settings.mainGrid = mainGrid
 
 	--themeGrid:attach(button.setting_submit,0,0,1,1)
 	themeGrid:attach(image2, 1, -2, 1, 1)

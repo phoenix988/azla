@@ -23,6 +23,24 @@ function combo:new(inp)
     return obj           -- Return the instance
 end
 
+-- Create function to add files
+function combo.add_files(model, path, fileType)
+    local list = require("lua.terminal.listFiles")
+    local path = path or var.wordDir_alt
+    local fileType = fileType or "lua"
+    local directoryPath = path
+    local luaFiles = list.dir(directoryPath, fileType)
+
+    local files = luaFiles
+
+    for _, luafiles in ipairs(files) do
+        local add = list.modify(luafiles)
+        model:append({ add })
+    end
+
+    return files
+end
+
 -- Create wordlist box
 function combo:create_word_list()
     local list = self.app.list
@@ -86,7 +104,6 @@ function combo:create_word_list()
         combo.word,
         { { size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg } }
     )
-
 end
 
 -- Create word count box
@@ -181,21 +198,49 @@ end
 
 function combo:create_restore_list()
     local list = self.app.list
-    -- Model for the second combo box
     combo.restore_list_model = Gtk.ListStore.new({ GObject.Type.STRING })
 
     local directoryPath = var.cacheDir
     local luaFiles = list.dir(directoryPath, "json")
 
     combo.restore_files = luaFiles
+    local didnotRun = true
 
-    for _, luafiles in ipairs(combo.restore_files) do
-        local add = list.modify(luafiles)
-        combo.restore_list_model:append({ add })
-    end
+    pcall(function()
+        for _, luafiles in ipairs(combo.restore_files) do
+            local add = list.modify(luafiles)
+            combo.restore_list_model:append({ add })
+            didnotRun = false
+        end
 
-    combo.restore_list = Gtk.ComboBox({
-        model = combo.restore_list_model,
+        if not didnotRun then
+            combo.restore_list = Gtk.ComboBox({
+                model = combo.restore_list_model,
+                active = 0,
+                cells = {
+                    {
+                        Gtk.CellRendererText(),
+                        { text = 1 },
+                        align = Gtk.Align.START,
+                    },
+                },
+            })
+
+            combo.restore_list = style.set_theme(
+                combo.restore_list,
+                { { size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg } }
+            )
+        end
+    end)
+end
+
+function combo:create_remove_restore_list()
+    combo.remove_restore_list_model = Gtk.ListStore.new({ GObject.Type.STRING })
+
+    combo.restore_remove_files = combo.add_files(combo.remove_restore_list_model, var.cacheDir, "json")
+
+    combo.remove_restore_list = Gtk.ComboBox({
+        model = combo.remove_restore_list_model,
         active = 0,
         cells = {
             {
@@ -206,12 +251,10 @@ function combo:create_restore_list()
         },
     })
 
-    combo.restore_list = style.set_theme(
-        combo.restore_list,
+    combo.remove_restore_list = style.set_theme(
+        combo.remove_restore_list,
         { { size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg } }
     )
-
-
 end
 
 function combo:create_remove_wordlist()
@@ -245,8 +288,18 @@ function combo:create_remove_wordlist()
         combo.remove_wordlist,
         { { size = font.fg_size / 1000, color = theme.label_fg, border_color = theme.label_fg } }
     )
-
 end
 
+function combo.clear_model(combo)
+    if combo then
+        local model = combo:get_model()
+        local iter = model:get_iter_first()
+
+        while iter do
+            model:remove(iter)
+            iter = model:get_iter_first()
+        end
+    end
+end
 
 return combo

@@ -27,7 +27,7 @@ button.exit_alt = Gtk.Button({ label = "Exit", margin_top = 8 })
 button.exit_alt = style.set_theme(button.exit_alt)
 
 -- Create some setting buttons
-button.setting = Gtk.Button({ label = "Settings"})
+button.setting = Gtk.Button({ label = "Settings" })
 
 button.setting = style.set_theme(
 	button.setting,
@@ -60,6 +60,12 @@ button.remove_wordlist = style.set_theme(
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
 )
 
+button.remove_restore_list = Gtk.Button({ label = "Remove", margin_top = 8, width_request = 200 })
+button.remove_restore_list = style.set_theme(
+	button.remove_restore_list,
+	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
+)
+
 button.exit_alt = style.set_theme(
 	button.exit_alt,
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
@@ -84,7 +90,6 @@ button.restore_mode = style.set_theme(
 	button.restore_mode,
 	{ { color = style.color.label_welcome, border_color = style.color.label_welcome, size = font.fg_size / 1000 } }
 )
-
 
 -- Create color scheme button
 button.color_scheme = Gtk.Button({

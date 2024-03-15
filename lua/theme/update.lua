@@ -74,9 +74,9 @@ function M.import_wordlists(dont, list, count, wordList, i)
 	-- Import the wordlist items and check if you have custom files
 	local wordDir_alt = var.wordDir_alt .. "/" .. wordList .. ".lua"
 	if not dont[wordList] then
-		count = count + 1
 		list.wordList_items[i] = list.custom_wordlist[count]
-		return list
+		count = count + 1
+		return { list = list, count = count }
 	elseif fileExists(wordDir_alt) then
 		local wordlist = loadConfig(wordDir_alt)
 		list.wordList_items[i] = wordlist
@@ -160,7 +160,6 @@ function M.check_mult_subdir(directoryPath, lower, newMenu, wordList)
 			end
 		end
 	end
-
 end
 
 -- Create the wordlist grid
@@ -212,10 +211,8 @@ function M.create_wordlist_grid(newMenu, menu, wordList, isEven, i)
 			menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
 
 			menu.label_list[wordList][j] = label
-
 		end
 	else
-
 		last = #newMenu.wordList_items[i]
 		for j = 1, #newMenu.wordList_items[i] do
 			newMenu.label_list[wordList] = {}
@@ -252,10 +249,9 @@ function M.create_wordlist_grid(newMenu, menu, wordList, isEven, i)
 			newMenu.label_list[wordList][j] = label
 
 			menu.grid_items[i]:attach(label, col, row * 2 + 1, 1, 1)
-
 		end
 	end -- Add words to grid end
-	return { count_occurence = last}
+	return { count_occurence = last }
 end
 
 -- function to update word list menu when updating theme
@@ -302,6 +298,9 @@ function M.update_word_list()
 
 	M.check_custom_list(countCustom, luaFiles, newMenu, dontAdd)
 
+	local import_wordlist = {}
+	import_wordlist.count = 0
+
 	-- Main loop to loop through all the items and update the grid
 	for i, item_label in ipairs(luaFiles) do
 		local wordList = list.modify(item_label)
@@ -311,7 +310,13 @@ function M.update_word_list()
 			wordList = item_label
 		end
 
-		M.import_wordlists(dontAdd, newMenu, countCustom_main, wordList, i)
+		if import_wordlist.count == 0 then
+			import_wordlist.count = 1
+		elseif import_wordlist.count == nil then
+			import_wordlist.count = 1
+		end
+
+		import_wordlist = M.import_wordlists(dontAdd, newMenu, import_wordlist.count, wordList, i)
 
 		-- Clear box
 		clear_grid(menu.box[i])
@@ -327,7 +332,7 @@ function M.update_word_list()
 
 		-- Clears some grids to update colors
 		clear_grid(menu.grid_remove[i])
-		clear_grid(menu.grid[i])
+		clear_grid(menu.grid_buttons[i])
 
 		menu.label_list.remove[i] = Gtk.Label({ label = "Write index of word\n you want to Delete", margin_top = 50 })
 
@@ -340,10 +345,10 @@ function M.update_word_list()
 		menu.grid_remove[i]:attach(menu.removeButton[i], 2, 1, 1, 1)
 
 		-- Readd widgets to the grid
-		menu.grid[i]:attach(menu.entry_items.firstaz[i], 1, 0, 1, 1)
-		menu.grid[i]:attach(menu.entry_items.firsten[i], 2, 0, 1, 1)
-		menu.grid[i]:attach(menu.addButton[i], 3, 0, 1, 1)
-		menu.grid[i]:attach(menu.submitButton[i], 0, 1, 4, 1)
+		menu.grid_buttons[i]:attach(menu.entry_items.firstaz[i], 1, 0, 1, 1)
+		menu.grid_buttons[i]:attach(menu.entry_items.firsten[i], 2, 0, 1, 1)
+		menu.grid_buttons[i]:attach(menu.addButton[i], 3, 0, 1, 1)
+		menu.grid_buttons[i]:attach(menu.submitButton[i], 0, 1, 4, 1)
 
 		-- Set theme on title label
 		label_az:set_markup(
@@ -364,7 +369,7 @@ function M.update_word_list()
 		M.check_mult_subdir(directoryPath, lower, newMenu, wordList)
 
 		-- append the button grid to the box
-		--menu.box[i]:append(menu.grid[i])
+		--menu.box[i]:append(menu.grid_buttons[i])
 
 		-- Function to check for even numbers
 		local function isEven(number)
@@ -372,7 +377,6 @@ function M.update_word_list()
 		end
 
 		M.create_wordlist_grid(newMenu, menu, wordList, isEven, i)
-
 
 		M.set_grid_theme(menu, i)
 	end

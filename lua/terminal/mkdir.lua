@@ -10,5 +10,4 @@ function M.rmdir(file)
    os.execute("rm -rf " .. file)
 end
 
-
 return M

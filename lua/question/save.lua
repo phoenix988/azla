@@ -65,8 +65,10 @@ function M.saveSession(settings, check, delete)
 		end
 	else
 		jsonStr = json.encode(settings)
-		jsonPath = jsonPath .. "/" .. check.file .. ".json"
-		LastPath = jsonPath
+		pcall(function()
+			jsonPath = jsonPath .. "/" .. check.file .. ".json"
+			LastPath = jsonPath
+		end)
 
 		if delete == 1 then
 			os.remove(LastPath)

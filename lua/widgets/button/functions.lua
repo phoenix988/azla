@@ -142,7 +142,24 @@ function M.back_exit_create(currentQuestion, question, import, win, mainWin, rep
 			question.jsonSettings.treeViewCheck[word] = question.checkForMultiple[word]
 		end
 
-		json.saveSession(question.jsonSettings, question.jsonSettings.check, 1)
+		local theme = require("lua.theme.default").load()
+		local font = require("lua.theme.default").font.load()
+
+		local endLabel_current = "<span foreground="
+			.. "'"
+			.. theme.label_fg
+			.. "'"
+			.. "size="
+			.. "'"
+			.. font.fg_size
+			.. "'"
+			.. "></span>"
+
+		if wg.labelEnd.label == endLabel_current then
+			json.saveSession(question.jsonSettings, question.jsonSettings.check)
+		else
+			json.saveSession(question.jsonSettings, question.jsonSettings.check, 1)
+		end
 
 		write.write.cache.config_main(cacheFile, combo)
 

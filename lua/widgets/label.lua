@@ -10,7 +10,7 @@ label.theme_restore = {}
 
 label.text = {
 	welcome = "Welcome to AZLA",
-	last_text = "You reached the last question",
+	last_text = "",
 	aze = "in Azerbajani ?",
 	eng = "in English ?",
 	lang = "Choose Language you want to write answers in:",
